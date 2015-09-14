@@ -1,0 +1,9 @@
+[Unit]
+Description=epg2xml timer
+
+[Timer]
+OnCalendar=*-*-* 00,12:00:00
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target

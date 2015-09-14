@@ -437,6 +437,7 @@ fn_generate_xml() {
 
 fn_cleanup() {
 	mv -f output.xml xmltv.xml
+	rm -rf xmltv.xml.gz
 	gzip -9 xmltv.xml
 	rm -rf working_naver
 	rm -rf working_epg
