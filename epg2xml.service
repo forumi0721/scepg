@@ -3,4 +3,5 @@ Description=epg2xml
 
 [Service]
 Type=oneshot
+WorkingDirectory=/var/lib/epg2xml
 ExecStart=/var/lib/epg2xml/epg2xml
