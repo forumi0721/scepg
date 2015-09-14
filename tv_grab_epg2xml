@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+	zcat /var/lib/epg2xml/xmltv.xml.gz
+	exit $?
+fi
+
+case "$1" in
+	--description)
+	echo "EPG grabber(epg2xml)"
+	;;
+
+	--version)
+	echo "1.0"
+	;;
+
+	--capabilities)
+	echo "baseline"
+	;;
+esac
