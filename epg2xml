@@ -211,6 +211,7 @@ fn_generate_xml_channel() {
 	echo_blue " -> " "Generate Channel"
 	local channels="$(grep -v "^$" "${TV_CHANNEL_CONF}" | grep -v "^#")"
 	local channels_count="$(echo "${channels}" | wc -l)"
+	local count=1
 	local line=
 	while read -r line
 	do
