@@ -374,7 +374,7 @@ fn_generate_xml_programme_naver_thread() {
 EOF
 }
 
-fn_generate_xml_programme_eqp() {
+fn_generate_xml_programme_epg() {
 	local working_file="${WORKING_FILE}_epg"
 	echo_blue " -> " "Generate Programme(epg)"
 
@@ -388,7 +388,7 @@ fn_generate_xml_programme_eqp() {
 			sleep 0.1
 		done
 
-		fn_generate_xml_programme_eqp_thread "${line}" &
+		fn_generate_xml_programme_epg_thread "${line}" &
 
 		count=$((count + 1))
 	done < "${working_file}"
@@ -399,7 +399,7 @@ fn_generate_xml_programme_eqp() {
 	echo_blue " -> " "Done."
 }
 
-fn_generate_xml_programme_eqp_thread() {
+fn_generate_xml_programme_epg_thread() {
 	local line="${1}"
 
 	local date_time="$(echo "${line}" | sed "s/^'.*','.*','.*','\(.*\)','.*','.*','.*'/\1/g")"
@@ -429,7 +429,6 @@ fn_generate_xml_programme_eqp_thread() {
 
 	local channel_no="$(echo "${line}" | sed "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g")"
 	local title="$(echo "${line}" | sed "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g")"
-	title="${title}"
 	local category="$(echo "${line}" | sed "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g")"
 	category="${category//-*/}"
 	cat << EOF >> "${OUTPUT_FILE}"
@@ -449,7 +448,7 @@ EOF
 fn_generate_xml_programme() {
 	fn_generate_xml_programme_naver
 
-	fn_generate_xml_programme_eqp
+	fn_generate_xml_programme_epg
 }
 
 fn_generate_footer() {
@@ -487,7 +486,8 @@ fn_cleanup() {
 	echo_green "==> " "Done."
 	echo
 }
-
+fn_generate_xml_programme_epg
+exit
 fn_download
 
 fn_generate_xml
