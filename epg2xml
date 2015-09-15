@@ -145,8 +145,14 @@ fn_download_naver() {
 		filter+="$(echo "${line}" | sed "s/^.*:N,\(.*\),.*,\(.*\),\(.*\)$/\"broadcastType\":\1,\"channelId\":\2,\\\|/g")"
 	done <<< "$(grep ":N," "${TV_CHANNEL_CONF}")"
 
-	sed -i -e 's/"scheduleId":"[[:alnum:] ]*","programMasterId":"[[:alnum:] ]*",//g' -e 's/"live":[[:alnum:] ]*,"rebroadcast":[[:alnum:] ]*,"hd":[[:alnum:] ]*,"audio":"[[:alnum:] ]*","screenExplain":[[:alnum:] ]*,"caption":[[:alnum:] ]*,//g' -e 's/,"signLanguage":[[:alnum:] ]*//g' -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' -e 's/&amp;amp;/\&amp;/g' -e 's/&amp;gt;/\&gt;/g' -e 's/&amp;lt;/\&lt;/g' -e 's/&amp;#37;/\&#37;/g' -e '/[[:space:]]*\"broadcastType\".*/ {N;N;N;N;N;N; s/[[:space:]]*\(\"broadcastType\"\) : \([[:digit:]]*,\).*\(\"channelId\"\) : \([[:digit:]]*,\).*.*\(\"programList\"\) : \(.*$\)/\1:\2\3:\4\5:\6/g}' -e '/\"broadcastType\"/!d' -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
-	#sed -i -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
+	#Remove unused elements
+	sed -i -e 's/"scheduleId":"[[:alnum:] ]*","programMasterId":"[[:alnum:] ]*",//g' -e 's/"live":[[:alnum:] ]*,"rebroadcast":[[:alnum:] ]*,"hd":[[:alnum:] ]*,"audio":"[[:alnum:] ]*","screenExplain":[[:alnum:] ]*,"caption":[[:alnum:] ]*,//g' -e 's/,"signLanguage":[[:alnum:] ]*//g' "${WORKING_NAVER}"
+	#Merge Line
+	sed -i -e '/[[:space:]]*\"broadcastType\".*/ {N;N;N;N;N;N; s/[[:space:]]*\(\"broadcastType\"\) : \([[:digit:]]*,\).*\(\"channelId\"\) : \([[:digit:]]*,\).*\(\"programList\"\) : \(.*$\)/\1:\2\3:\4\5:\6/g}' "${WORKING_NAVER}"
+	#Remove unused channel
+	sed -i -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
+	#XML Char
+	sed -i -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' "${WORKING_NAVER}"
 
 	echo_blue " -> " "Done."
 }
