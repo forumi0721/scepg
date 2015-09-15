@@ -432,8 +432,8 @@ fn_generate_xml_programme_epg_thread() {
 	local category="$(echo "${line}" | sed "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g")"
 	category="${category//-*/}"
 	cat << EOF >> "${OUTPUT_FILE}"
-	<programme start="${start_date_time} +0900" stop="${end_date_time} +0900" channel="I${channel_no}.schedule.epg.co.kr">
-		<title lang="kr">${title}</title>
+	<programme start="${start_date_time} +0900" stop="${end_date_time} +0900" channel="I${channel_no:0:-1}.schedule.epg.co.kr">
+		<title lang="kr">${title:0:-1}</title>
 		<sub-title lang="kr"></sub-title>
 		<episode-num system="onscreen"></episode-num>
 		<category lang="ko">${category}</category>
