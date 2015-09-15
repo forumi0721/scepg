@@ -306,9 +306,9 @@ fn_generate_xml_programme_naver_thread() {
 	local programme_stop="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}+${runtime} minutes")"
 
 	local title="$(echo "${pgm}" | sed 's/^.*"scheduleName":"\(.*\)","beginDate":.*$/\1/g')"
-	title="${title//","*/}"
+	title="${title//\",\"*/}"
 	local subtitle="$(echo "${pgm}" | sed 's/^.*"subtitle":"\(.*\)".*$/\1/g')"
-	subtitle="${subtitle//","*/}"
+	subtitle="${subtitle//\",\"*/}"
 	local episode="$(echo "${pgm}" | sed 's/^.*"episodeNo":"\([[:alnum:]]*\)",.*/\1/g')"
 	local category="$(echo "${pgm}" | sed 's/^.*"largeGenreId":"\([[:alnum:]]*\)",.*/\1/g')"
 	local rating="$(echo "${pgm}" | sed 's/^.*"ageRating":\([[:alnum:]]*\),.*/\1/g')"
