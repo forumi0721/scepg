@@ -29,24 +29,67 @@ echo_violet() {
 }
 
 #Variables
+DEBUG=0
 TV_CHANNEL_CONF="tvchannel.conf"
-if [ ! -e "${TV_CHANNEL_CONF}" ]; then
-	echo "Cannot find ${TV_CHANNEL_CONF}"
-	exit 1
-fi
-WORKING_FILE="working"
-TMP_FILE="download.html"
-OUTPUT_FILE="output.xml"
+SHM="/dev/shm/epg2xml"
+BASE_URL_NAVER='http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={var1}&channelGroup={var2}&date={date}'
+BASE_URL_EPG='http://schedule.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={var1}&old_top_channel_group={var1}&search_sub_channel_group={var2}&old_sub_channel_group={var2}&ymd={date}&{channel}'
+BASE_URL_EPG_CHECKCHANNEL='checkchannel%5B{var1}%5D={var2}'
+WORKING_NAVER="working_naver"
+WORKING_EPG="working_epg"
+DOWNLOAD_NAVER="download_naver"
+DOWNLOAD_EPG="download_naver"
+LOCK_SHM=".lock_shm"
+LOCK_XML=".lock_xml"
+OUTPUT_FILE="xmltv.xml"
+
+fn_validation() {
+	if [ ! -e "${TV_CHANNEL_CONF}" ]; then
+		echo "Cannot find ${TV_CHANNEL_CONF}"
+		exit 1
+	fi
+	if [ -e "${SHM}" ]; then
+		rm -rf "${SHM}" &> /dev/null
+		if [ "${?}" != "0" ]; then
+			echo "Cannot remove ${SHM}"
+			exit 1
+		fi
+	fi
+}
+
+fn_prepare() {
+	fn_count_reset
+	touch "${OUTPUT_FILE}"
+	if [ "${DEBUG}" = "0" ]; then
+		rm -rf "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${LOCK_SHM}" "${LOCK_XML}"
+	fi
+}
+
+fn_count_reset() {
+	(
+		flock -x -w 10 200 || exit 1
+		echo 1 > "${SHM}"
+	) 200>"${LOCK_SHM}"
+}
+
+fn_count_get() {
+	(
+		flock -x -w 10 200 || exit 1
+		local count=$(cat "${SHM}")
+		echo $((count + 1)) > "${SHM}"
+		echo ${count}
+	) 200>"${LOCK_SHM}"
+}
+
+fn_xml_add() {
+	(
+		flock -x -w 10 200 || exit 1
+		echo "${1}" >> "${OUTPUT_FILE}"
+	) 200>"${LOCK_XML}"
+}
 
 fn_download_naver() {
-	local working_file="${WORKING_FILE}_naver"
-	local download_file="${TMP_FILE}_naver"
-	local base_url='http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={var1}&channelGroup={var2}&date={date}'
-
-	local download_array=()
-
-	rm -rf "${working_file}"
-	rm -rf "${download_file}"
+	local download_list=()
 
 	echo_blue " -> " "Generate Download URL(naver)"
 	for conf in $(cat tvchannel.conf | grep -v "^#" | cut -d ':' -f 2 | cut -d ',' -f 1,2,3 | grep -v '^$' | sort -u)
@@ -59,10 +102,10 @@ fn_download_naver() {
 		local var1="$(echo "${conf}" | cut -f 2 -d ',')"
 		local var2="$(echo "${conf}" | cut -f 3 -d ',')"
 
-		local url="${base_url}"
+		local url="${BASE_URL_NAVER}"
 		url="${url//\{var1\}/${var1}}"
 		url="${url//\{var2\}/${var2}}"
-		download_array+=("${url}")
+		download_list+=("${url}")
 	done
 
 	echo_blue " -> " "Done."
@@ -70,44 +113,47 @@ fn_download_naver() {
 	echo_blue " -> " "Start Download(naver)"
 	for day in 0 1 2
 	do
-		local count=1
+		fn_count_reset
 		local date="$(date +%Y%m%d -d "${day} days")"
 		local date_display="$(date +%Y-%m-%d -d "${day} days")"
 
-		for url in ${download_array[@]}
+		for url in ${download_list[@]}
 		do
-			rm -rf "${download_file}"
-			echo -ne " -> ${date_display} ${count}/${#download_array[@]}\033[0K\r"
-			wget "${url/\{date\}/${date}}" -O "${download_file}" &>/dev/null
-			if [ "${?}" != "0" -o ! -e "${download_file}" ]; then
+			rm -rf "${DOWNLOAD_NAVER}"
+			echo -ne " -> ${date_display} $(fn_count_get)/${#download_list[@]}\033[0K\r"
+			wget "${url/\{date\}/${date}}" -O "${DOWNLOAD_EPG}" &>/dev/null
+			if [ "${?}" != "0" -o ! -e "${DOWNLOAD_NAVER}" ]; then
+				echo
 				echo "Error"
-				return
+				continue
 			fi
-			local data="$(LC_ALL=C sed -n '/^var PROGRAM_SCHEDULES=/,/^var pageInitialize =/p' "${download_file}" | sed 's/var PROGRAM_SCHEDULES=//g' | sed '/var pageInitialize =/d' | sed 's/^};/}/g')"
+			local data="$(LC_ALL=C sed -n '/^var PROGRAM_SCHEDULES=/,/^var pageInitialize =/p' "${DOWNLOAD_EPG}" | sed 's/var PROGRAM_SCHEDULES=//g' | sed '/var pageInitialize =/d' | sed 's/^};/}/g')"
 		   
 			if [ ! -z "${data}" ]; then
-				echo "${data}" >> "${working_file}"
-				echo "," >> "${working_file}"
+				echo "${data}" >> "${WORKING_NAVER}"
+				echo "," >> "${WORKING_NAVER}"
 			fi
-			rm -rf "${download_file}"
-
-			count=$((count + 1))
+			rm -rf "${DOWNLOAD_NAVER}"
 		done
 		echo
 	done
-	echo_blue " -> " "Done."
 
-	sed -i -e 's/"scheduleId":"[[:alnum:] ]*","programMasterId":"[[:alnum:] ]*",//g' -e 's/"live":[[:alnum:] ]*,"rebroadcast":[[:alnum:] ]*,"hd":[[:alnum:] ]*,"audio":"[[:alnum:] ]*","screenExplain":[[:alnum:] ]*,"caption":[[:alnum:] ]*,//g' -e 's/,"signLanguage":[[:alnum:] ]*//g' "${working_file}"
-	sed -i  -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' -e 's/&amp;amp;/\&amp;/g' -e 's/&amp;gt;/\&gt;/g' -e 's/&amp;lt;/\&lt;/g' -e 's/&amp;#37;/\&#37;/g' "${working_file}"
+	local filter=
+	while read -r line
+	do
+		channel="$(echo "${line}" | cut -d ',' -f 1)"
+		filter+="$(echo "${line}" | sed "s/^.*:N,\(.*\),.*,\(.*\),\(.*\)$/\"broadcastType\":\1,\"channelId\":\2,\\\|/g")"
+	done <<< "$(grep ":N," "${TV_CHANNEL_CONF}")"
+
+	sed -i -e 's/"scheduleId":"[[:alnum:] ]*","programMasterId":"[[:alnum:] ]*",//g' -e 's/"live":[[:alnum:] ]*,"rebroadcast":[[:alnum:] ]*,"hd":[[:alnum:] ]*,"audio":"[[:alnum:] ]*","screenExplain":[[:alnum:] ]*,"caption":[[:alnum:] ]*,//g' -e 's/,"signLanguage":[[:alnum:] ]*//g' -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' -e 's/&amp;amp;/\&amp;/g' -e 's/&amp;gt;/\&gt;/g' -e 's/&amp;lt;/\&lt;/g' -e 's/&amp;#37;/\&#37;/g' -e '/[[:space:]]*\"broadcastType\".*/ {N;N;N;N;N;N; s/[[:space:]]*\(\"broadcastType\"\) : \([[:digit:]]*,\).*\(\"channelId\"\) : \([[:digit:]]*,\).*.*\(\"programList\"\) : \(.*$\)/\1:\2\3:\4\5:\6/g}' -e '/\"broadcastType\"/!d' -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
+	#sed -i -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
+
+	echo_blue " -> " "Done."
 }
 
 fn_download_epg() {
-	local working_file="${WORKING_FILE}_epg"
-	local download_file="${TMP_FILE}_epg"
-	local base_url='http://schedule.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={var1}&old_top_channel_group={var1}&search_sub_channel_group={var2}&old_sub_channel_group={var2}&ymd={date}&{channel}'
-	local base_url_checkchannel='checkchannel%5B{var1}%5D={var2}'
 
-	local download_array=()
+	local download_list=()
 
 	echo_blue " -> " "Generate Download URL(epg)"
 	for conf in $(cat tvchannel.conf | grep -v "^#" | cut -d ':' -f 2 | cut -d ',' -f 1,2,3 | grep -v '^$' | sort -u)
@@ -127,17 +173,17 @@ fn_download_epg() {
 			fi
 			local check="$(echo ${line} | cut -d ',' -f 5)"
 			local channelno="$(echo ${line} | cut -d ',' -f 1)"
-			local checkchannel_curr="${base_url_checkchannel}"
+			local checkchannel_curr="${BASE_URL_EPG_CHECKCHANNEL}"
 			checkchannel_curr="${checkchannel_curr//\{var1\}/${check}}"
 			checkchannel_curr="${checkchannel_curr//\{var2\}/${channelno}}"
 			checkchannel+="${checkchannel_curr}&"
 
 			if [ "$((loop_seq % 5))" = "0" ]; then
-				local url="${base_url}"
+				local url="${BASE_URL_EPG}"
 				url="${url//\{var1\}/${var1}}"
 				url="${url//\{var2\}/${var2}}"
 				url="${url//\{channel\}/${checkchannel}}"
-				download_array+=("${url}")
+				download_list+=("${url}")
 				checkchannel=""
 			fi
 
@@ -145,36 +191,35 @@ fn_download_epg() {
 		done <<< "$(grep ":${conf}," "${TV_CHANNEL_CONF}" | grep -v '^#')"
 
 		if [ ! -z "${checkchannel}" ]; then
-			local url="${base_url}"
+			local url="${BASE_URL_EPG}"
 			url="${url//\{var1\}/${var1}}"
 			url="${url//\{var2\}/${var2}}"
 			url="${url//\{channel\}/${checkchannel}}"
-			download_array+=("${url}")
+			download_list+=("${url}")
 			checkchannel=""
 		fi
 	done
 	echo_blue " -> " "Done."
 
 	echo_blue " -> " "Start Download(epg)"
-	rm -rf "${working_file}"
+	rm -rf "${WORKING_EPG}"
 	for day in 0 1 2
 	do
-		local count=1
+		fn_count_reset
+
 		local date="$(date +%Y-%m-%d -d "${day} days")"
 
-		for url in ${download_array[@]}
+		for url in ${download_list[@]}
 		do
-			echo -ne " -> ${date} ${count}/${#download_array[@]}\033[0K\r"
-			rm -rf "${download_file}"
-			wget "${url/\{date\}/${date}}" -O "${download_file}" &>/dev/null
-			if [ "${?}" != "0" -o ! -e "${download_file}" ]; then
+			echo -ne " -> ${date} $(fn_count_get)/${#download_list[@]}\033[0K\r"
+			rm -rf "${DOWNLOAD_EPG}"
+			wget "${url/\{date\}/${date}}" -O "${DOWNLOAD_EPG}" &>/dev/null
+			if [ "${?}" != "0" -o ! -e "${DOWNLOAD_EPG}" ]; then
 				echo "Error"
 				return
 			fi
-			grep --text 'onMouseOver="Preview(' "${download_file}" | sed -e 's/onMouseOver=/\n/g' -e 's/onMouseOut=/\n/g' | grep --text '"Preview(' | sed -e 's/"Preview(\(.*\)/\1/g' -e 's/)"//g' | sed -e 's/<br>//g' -e "s/\\\'/\'/g" | iconv -f cp949 -t utf-8 >> "${working_file}"
-			rm -rf "${download_file}"
-
-			count=$((count + 1))
+			grep --text 'onMouseOver="Preview(' "${DOWNLOAD_EPG}" | sed -e 's/onMouseOver=/\n/g' -e 's/onMouseOut=/\n/g' | grep --text '"Preview(' | sed -e 's/"Preview(\(.*\)/\1/g' -e 's/)"//g' | sed -e 's/<br>//g' -e "s/\\\'/\'/g" | iconv -f cp949 -t utf-8 >> "${WORKING_EPG}"
+			rm -rf "${DOWNLOAD_EPG}"
 		done
 		echo
 	done
@@ -198,12 +243,14 @@ fn_generate_xml_string() {
 
 fn_generate_xml_header() {
 	echo_blue " -> " "Generate Header"
-	cat << EOF > "${OUTPUT_FILE}"
+	local result=
+	read -r -d '' result << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE tv SYSTEM "xmltv.dtd">
 
 <tv source-info-name="epg.co.kr" generator-info-name="forumi0721" generator-info-url="mailto:forumi0721@gmail.com">
 EOF
+	fn_xml_add "${result}"
 	echo_blue " -> " "Done."
 }
 
@@ -211,11 +258,11 @@ fn_generate_xml_channel() {
 	echo_blue " -> " "Generate Channel"
 	local channels="$(grep -v "^$" "${TV_CHANNEL_CONF}" | grep -v "^#")"
 	local channels_count="$(echo "${channels}" | wc -l)"
-	local count=1
+	fn_count_reset
 	local line=
 	while read -r line
 	do
-		echo -ne " -> ${count}/${channels_count}\033[0K\r"
+		echo -ne " -> $(fn_count_get)/${channels_count}\033[0K\r"
 		local channel_no="$(echo "${line}" | cut -d ',' -f 1)"
 		local channel_name="$(fn_generate_xml_string "$(echo "${line}" | cut -d ':' -f 1 | cut -d ',' -f 2)")"
 
@@ -223,69 +270,41 @@ fn_generate_xml_channel() {
 			continue
 		fi
 
-		cat << EOF >> "${OUTPUT_FILE}"
-	<channel id="I${channel_no}.schedule.epg.co.kr">
-		<display-name>${channel_no} ${channel_name}</display-name>
-		<display-name>${channel_no}</display-name>
-		<display-name>${channel_name}</display-name>
-	</channel>
+		local result=
+		read -r -d '' result << EOF
+<channel id="I${channel_no}.schedule.epg.co.kr">
+	<display-name>${channel_no} ${channel_name}</display-name>
+	<display-name>${channel_no}</display-name>
+	<display-name>${channel_name}</display-name>
+</channel>
 EOF
-		count=$((count + 1))
+		fn_xml_add "${result}"
 	done <<< "${channels}"
 	echo
 	echo_blue " -> " "Done."
 }
 
 fn_generate_xml_programme_naver() {
-	local working_file="${WORKING_FILE}_naver"
 	echo_blue " -> " "Generate Programme(naver)"
 
-	local count=1
-	local broadcastType=
-	local channel=
-	local line=
+	fn_count_reset
 	
+	local line=
 	while read -r line
 	do
-		if [ ! -z "$(echo "${line}" | grep "\"broadcastType\" : ")" ]; then
-			broadcastType="$(($(echo "${line}" | cut -d ':' -f 2) + 0))"
-			continue
-		fi
-		if [ -z "${broadcastType}" ]; then
-			continue
-		fi
-		if [ ! -z "$(echo "${line}" | grep "\"channelId\" : ")" ]; then
-			channel="$(($(echo "${line}" | cut -d ':' -f 2) + 0))"
-			continue
-		fi
-	
-		if [ -z "${channel}" ]; then
-			continue
-		fi
-
-		local conf="$(grep ":N,${broadcastType},.*,${channel},.*" tvchannel.conf | grep -v '^#')"
-		if [ -z "${broadcastType}" -o -z "${channel}" -o -z "${conf}" ]; then
-			continue
-		fi
-
-		local channelNo="$(echo "${conf}" | cut -d ',' -f 1)"
-
-		while [ $(jobs | wc -l) -ge 10 ]
+		local channel="$(echo "${line}" | cut -d ',' -f 1)"
+		local channel_filter="$(echo "${line}" | sed "s/^.*:N,\(.*\),.*,\(.*\),\(.*\)$/\"broadcastType\":\1,\"channelId\":\2,/g")"
+		local pgm_list=
+		while read -r pgm_list
 		do
-			sleep 0.1
-		done
+			while [ $(jobs | wc -l) -ge 16 ]
+			do
+				sleep 0.1
+			done
 
-		IFS=$'\n'
-		local pgm=
-		for pgm in ${line//\},\{/$'\n'}
-		do
-			echo -ne " -> ${count}\033[0K\r"
-			fn_generate_xml_programme_naver_thread "${channelNo}" "${pgm}" &
-			count=$((count + 1))
-		done
-
-		channel=
-	done <<< "$(grep -o "\"broadcastType\" : [[:digit:]]\+\|\"channelId\" : [[:digit:]]\+\|\"programList\" : \[.*\]" "${working_file}" | sed -e "s/\"programList\" : \[\(.*\)\]$/\1/g")"
+			fn_generate_xml_programme_naver_thread "${channel}" "${pgm_list}" &
+		done <<< "$(grep "${channel_filter}" "${WORKING_NAVER}")"
+	done <<< "$(grep ":N," "${TV_CHANNEL_CONF}")"
 
 	wait
 
@@ -295,104 +314,108 @@ fn_generate_xml_programme_naver() {
 
 fn_generate_xml_programme_naver_thread() {
 	local channel="${1}"
-	local pgm="${2}"
+	local programList="${2}"
 
-	local begin_date="$(echo "${pgm}" | sed 's/^.*"beginDate":"\([[:alnum:]-]\+\)",.*/\1/g')"
-	local begin_time="$(echo "${pgm}" | sed 's/^.*"beginTime":"\([[:alnum:]:]\+\)",.*/\1/g')"
+	while read -r pgm
+	do
+		echo -ne " -> $(fn_count_get)\033[0K\r"
 
-	local runtime="$(echo "${pgm}" | sed 's/^.*"runtime":\([[:alnum:]]\+\),.*/\1/g')"
-	local begin_date_time_base="$(LANG=C date -d "${begin_date} ${begin_time}:00")"
-
-	local programme_start="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}")"
-	local programme_stop="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}+${runtime} minutes")"
-
-	local title="$(echo "${pgm}" | sed 's/^.*"scheduleName":"\(.*\)","beginDate":.*$/\1/g')"
-	title="${title//\",\"*/}"
-	local subtitle="$(echo "${pgm}" | sed 's/^.*"subtitle":"\(.*\)".*$/\1/g')"
-	subtitle="${subtitle//\",\"*/}"
-	local episode="$(echo "${pgm}" | sed 's/^.*"episodeNo":"\([[:alnum:]]*\)",.*/\1/g')"
-	local category="$(echo "${pgm}" | sed 's/^.*"largeGenreId":"\([[:alnum:]]*\)",.*/\1/g')"
-	local rating="$(echo "${pgm}" | sed 's/^.*"ageRating":\([[:alnum:]]*\),.*/\1/g')"
-	if [ "${rating}" = "0" ]; then
-		rating=""
-	fi
-	case ${category//\"/} in
-		A)
-			category="드라마"
-			;;
-		B)
-			category="영화"
-			;;
-		C)
-			category="만화"
-			;;
-		D)
-			category="연예/오락"
-			;;
-		E)
-			category="스포츠"
-			;;
-		F)
-			category="취미/레저"
-			;;
-		G)
-			category="음악"
-			;;
-		H)
-			category="교육"
-			;;
-		I)
-			category="뉴스"
-			;;
-		J)
-			category="취미/레저"
-			;;
-		K)
-			category="교양/정보"
-			;;
-		K)
-			category="교양/정보"
-			;;
-		L)
-			category="홈쇼핑"
-			;;
-		*)
-			category=""
-			;;
-	esac
-
-	cat << EOF >> "${OUTPUT_FILE}"
-	<programme start="${programme_start} +0900" stop="${programme_stop} +0900" channel="I${channel}.schedule.epg.co.kr">
-		<title lang="kr">${title}</title>
-		<sub-title lang="kr">${subtitle}</sub-title>
-		<episode-num system="onscreen">${episode}</episode-num>
-		<category lang="ko">${category}</category>
-		<language>kr</language>
-		<rating system="VCHIP">
-			<value>${rating}</value>
-		</rating>
-	</programme>
+		local begin_date="$(echo "${pgm}" | sed 's/^.*"beginDate":"\([[:alnum:]-]\+\)",.*/\1/g')"
+		local begin_time="$(echo "${pgm}" | sed 's/^.*"beginTime":"\([[:alnum:]:]\+\)",.*/\1/g')"
+	
+		local runtime="$(echo "${pgm}" | sed 's/^.*"runtime":\([[:alnum:]]\+\),.*/\1/g')"
+		local begin_date_time_base="$(LANG=C date -d "${begin_date} ${begin_time}:00")"
+	
+		local programme_start="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}")"
+		local programme_stop="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}+${runtime} minutes")"
+	
+		local title="$(echo "${pgm}" | sed 's/^.*"scheduleName":"\(.*\)","beginDate":.*$/\1/g')"
+		title="${title//\",\"*/}"
+		local subtitle="$(echo "${pgm}" | sed 's/^.*"subtitle":"\(.*\)".*$/\1/g')"
+		subtitle="${subtitle//\",\"*/}"
+		local episode="$(echo "${pgm}" | sed 's/^.*"episodeNo":"\([[:alnum:]]*\)",.*/\1/g')"
+		local category="$(echo "${pgm}" | sed 's/^.*"largeGenreId":"\([[:alnum:]]*\)",.*/\1/g')"
+		local rating="$(echo "${pgm}" | sed 's/^.*"ageRating":\([[:alnum:]]*\),.*/\1/g')"
+		if [ "${rating}" = "0" ]; then
+			rating=""
+		fi
+		case ${category//\"/} in
+			A)
+				category="드라마"
+				;;
+			B)
+				category="영화"
+				;;
+			C)
+				category="만화"
+				;;
+			D)
+				category="연예/오락"
+				;;
+			E)
+				category="스포츠"
+				;;
+			F)
+				category="취미/레저"
+				;;
+			G)
+				category="음악"
+				;;
+			H)
+				category="교육"
+				;;
+			I)
+				category="뉴스"
+				;;
+			J)
+				category="취미/레저"
+				;;
+			K)
+				category="교양/정보"
+				;;
+			K)
+				category="교양/정보"
+				;;
+			L)
+				category="홈쇼핑"
+				;;
+			*)
+				category=""
+				;;
+		esac
+	
+		local result=
+		read -r -d '' result << EOF
+<programme start="${programme_start} +0900" stop="${programme_stop} +0900" channel="I${channel}.schedule.epg.co.kr">
+	<title lang="kr">${title}</title>
+	<sub-title lang="kr">${subtitle}</sub-title>
+	<episode-num system="onscreen">${episode}</episode-num>
+	<category lang="ko">${category}</category>
+	<language>kr</language>
+	<rating system="VCHIP">
+		<value>${rating}</value>
+	</rating>
+</programme>
 EOF
+		fn_xml_add "${result}"
+	done <<< "$(echo "${programList}" | sed -e "s/^.*\"programList\":\[\(.*\)\]/\1/g" -e "s/},{/\n/g")"
 }
 
 fn_generate_xml_programme_epg() {
-	local working_file="${WORKING_FILE}_epg"
 	echo_blue " -> " "Generate Programme(epg)"
 
-	local count=1
+	fn_count_reset
 
 	while read -r line
 	do
-		echo -ne " -> ${count}\033[0K\r"
-		while [ $(jobs | wc -l) -ge 10 ]
+		while [ $(jobs | wc -l) -ge 16 ]
 		do
 			sleep 0.1
 		done
 
+		echo -ne " -> $(fn_count_get)\033[0K\r"
 		fn_generate_xml_programme_epg_thread "${line}" &
-
-		count=$((count + 1))
-	done < "${working_file}"
+	done < "${WORKING_EPG}"
 
 	wait
 
@@ -428,35 +451,45 @@ fn_generate_xml_programme_epg_thread() {
 	local end_date_time_mm=$(($(echo "${date_time_2}" | cut -d ':' -f 2) + 0))
 	local end_date_time="$(printf '2015%02d%02d%02d%02d00' ${end_date_time_m} ${end_date_time_d} ${end_date_time_hh} ${end_date_time_mm})"
 
-	local channel_no="$(echo "${line}" | sed "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g")"
-	local title="$(echo "${line}" | sed "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g")"
+	local channel_no="$(echo "${line}" | sed "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g" | sed "s/[[:space:]]*$//g")"
+	local title="$(echo "${line}" | sed "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g" | sed "s/[[:space:]]*$//g")"
 	local category="$(echo "${line}" | sed "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g")"
 	category="${category//-*/}"
-	cat << EOF >> "${OUTPUT_FILE}"
-	<programme start="${start_date_time} +0900" stop="${end_date_time} +0900" channel="I${channel_no:0:-1}.schedule.epg.co.kr">
-		<title lang="kr">${title:0:-1}</title>
-		<sub-title lang="kr"></sub-title>
-		<episode-num system="onscreen"></episode-num>
-		<category lang="ko">${category}</category>
-		<language>kr</language>
-		<rating system="VCHIP">
-			<value></value>
-		</rating>
-	</programme>
+	local result=
+	read -r -d '' result << EOF
+<programme start="${start_date_time} +0900" stop="${end_date_time} +0900" channel="I${channel_no}.schedule.epg.co.kr">
+	<title lang="kr">${title}</title>
+	<sub-title lang="kr"></sub-title>
+	<episode-num system="onscreen"></episode-num>
+	<category lang="ko">${category}</category>
+	<language>kr</language>
+	<rating system="VCHIP">
+		<value></value>
+	</rating>
+</programme>
 EOF
+	fn_xml_add "${result}"
 }
 
 fn_generate_xml_programme() {
-	fn_generate_xml_programme_naver
+	if [ -e "${WORKING_NAVER}" ]; then
+		fn_generate_xml_programme_naver
+	fi
 
-	fn_generate_xml_programme_epg
+	if [ -e "${WORKING_EPG}" ]; then
+		fn_generate_xml_programme_epg
+	fi
 }
 
 fn_generate_footer() {
 	echo_blue " -> " "Generate Footer"
-	cat << EOF >> "${OUTPUT_FILE}"
+
+	local result=
+	read -r -d '' result << EOF
 </tv>
 EOF
+	fn_xml_add "${result}"
+
 	echo_blue " -> " "Done."
 }
 
@@ -478,20 +511,29 @@ fn_generate_xml() {
 fn_cleanup() {
 	echo_green "==> " "Cleanup"
 
-	rm -rf xmltv.xml xmltv.xml.gz
-	mv -f "${OUTPUT_FILE}" xmltv.xml
-	gzip -9 xmltv.xml
-	rm -rf working_naver
-	rm -rf working_epg
+	if [ "${DEBUG}" = "0" ]; then
+		rm -rf "${OUTPUT_FILE}.gz" "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${SHM}" 
+	fi
+	rm -rf "${LOCK_SHM}" "${LOCK_XML}"
+	gzip -9 "${OUTPUT_FILE}"
 
 	echo_green "==> " "Done."
 	echo
 }
 
+#Validation
+fn_validation
+
+#Prepare
+fn_prepare
+
+#Download
 fn_download
 
+#Generate XML
 fn_generate_xml
 
+#Cleanup
 fn_cleanup
 
 exit
