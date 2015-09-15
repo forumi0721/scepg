@@ -486,8 +486,7 @@ fn_cleanup() {
 	echo_green "==> " "Done."
 	echo
 }
-fn_generate_xml_programme_epg
-exit
+
 fn_download
 
 fn_generate_xml
