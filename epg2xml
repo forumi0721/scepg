@@ -132,7 +132,7 @@ fn_download_naver() {
 	echo_blue " -> " "Done."
 
 	echo_blue " -> " "Start Download(naver)"
-	for day in 0 1 2
+	for day in -1 0 1 2 3 4 5 6
 	do
 		fn_count_reset
 		local date="$(date +%Y%m%d -d "${day} days")"
@@ -172,6 +172,7 @@ fn_download_naver() {
 	sed -i -e '/[[:space:]]*\"broadcastType\".*/ {N;N;N;N;N;N; s/[[:space:]]*\(\"broadcastType\"\) : \([[:digit:]]*,\).*\(\"channelId\"\) : \([[:digit:]]*,\).*\(\"programList\"\) : \(.*$\)/\1:\2\3:\4\5:\6/g}' "${WORKING_NAVER}"
 	#Remove unused channel
 	sed -i -e "/${filter:0:-2}/!d" "${WORKING_NAVER}"
+	sed -i -e '/,"programList":\[\]/d' "${WORKING_NAVER}"
 	#XML Char
 	sed -i -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' "${WORKING_NAVER}"
 
@@ -230,7 +231,7 @@ fn_download_epg() {
 
 	echo_blue " -> " "Start Download(epg)"
 	rm -rf "${WORKING_EPG}"
-	for day in 0 1 2
+	for day in -1 0 1 2 3 4 5 6
 	do
 		fn_count_reset
 
@@ -315,6 +316,8 @@ fn_generate_xml_programme_naver() {
 	echo_blue " -> " "Generate Programme(naver)"
 
 	fn_count_reset
+
+	local total_count="$(grep -oi "\"scheduleName\"" "${WORKING_NAVER}" | wc -l)"
 	
 	local line=
 	while read -r line
@@ -324,12 +327,17 @@ fn_generate_xml_programme_naver() {
 		local pgm_list=
 		while read -r pgm_list
 		do
-			while [ $(jobs | wc -l) -ge 16 ]
+			if [ -z "${pgm_list}" ]; then
+				echo_red " -> " "${channel} Not found"
+				continue
+			fi
+
+			while [ $(jobs -rp | wc -l) -ge 8 ]
 			do
-				sleep 0.1
+				sleep 1
 			done
 
-			fn_generate_xml_programme_naver_thread "${channel}" "${pgm_list}" &
+			fn_generate_xml_programme_naver_thread "${channel}" "${pgm_list}" "${total_count}" &
 		done <<< "$(grep "${channel_filter}" "${WORKING_NAVER}")"
 	done <<< "$(grep ":N," "${TV_CHANNEL_CONF}")"
 
@@ -342,15 +350,16 @@ fn_generate_xml_programme_naver() {
 fn_generate_xml_programme_naver_thread() {
 	local channel="${1}"
 	local programList="${2}"
+	local total_count="${3}"
 
 	while read -r pgm
 	do
-		echo -ne " -> $(fn_count_get)\033[0K\r"
+		echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
 
 		local begin_date="$(echo "${pgm}" | sed 's/^.*"beginDate":"\([[:alnum:]-]\+\)",.*/\1/g')"
 		local begin_time="$(echo "${pgm}" | sed 's/^.*"beginTime":"\([[:alnum:]:]\+\)",.*/\1/g')"
-	
 		local runtime="$(echo "${pgm}" | sed 's/^.*"runtime":\([[:alnum:]]\+\),.*/\1/g')"
+
 		local begin_date_time_base="$(LANG=C date -d "${begin_date} ${begin_time}:00")"
 	
 		local programme_start="$(LANG=C date '+%Y%m%d%H%M%S' -d "${begin_date_time_base}")"
@@ -433,14 +442,17 @@ fn_generate_xml_programme_epg() {
 
 	fn_count_reset
 
+	local total_count="$(cat "${WORKING_EPG}" | wc -l)"
+
+	local line=
 	while read -r line
 	do
-		while [ $(jobs | wc -l) -ge 16 ]
+		while [ $(jobs -rp | wc -l) -ge 8 ]
 		do
-			sleep 0.1
+			sleep 1
 		done
 
-		echo -ne " -> $(fn_count_get)\033[0K\r"
+		echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
 		fn_generate_xml_programme_epg_thread "${line}" &
 	done < "${WORKING_EPG}"
 
