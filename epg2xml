@@ -41,6 +41,7 @@ DOWNLOAD_NAVER="download_naver"
 DOWNLOAD_EPG="download_naver"
 LOCK_SHM=".lock_shm"
 LOCK_XML=".lock_xml"
+TIMESTAMP=".timestamp"
 OUTPUT_FILE="xmltv.xml"
 
 fn_validation() {
@@ -55,9 +56,29 @@ fn_validation() {
 			exit 1
 		fi
 	fi
+	if [ "${DEBUG}" = "0" -a -e "${TIMESTAMP}" -a "${OUTPUT_FILE}.gz" ]; then
+		if [ "$(cat "${TIMESTAMP}" | wc -l)" = "3" ]; then
+			local md5sum_prev="$(head -n 1 "${TIMESTAMP}")"
+			local datetime_prev="$(sed -n "2,1p" "${TIMESTAMP}")"
+
+			if [ ! -z "${md5sum_prev}" -a ! -z "${datetime_prev}" ]; then
+				local md5sum="$(md5sum "${TV_CHANNEL_CONF}" | cut -d ' ' -f 1)"
+				local datetime_prev_s="$(date -d "${datetime_prev}" +%s)"
+				local datetime_s="$(date +%s)"
+
+				if [ "${md5sum}" = "${md5sum_prev}" -a $((datetime_s - $datetime_prev_s)) -lt 3600 ]; then
+					echo_yellow "Alread up-to date ($(date -d "${datetime_prev}" "+%F %T"))"
+					exit 1
+				fi
+			fi
+		fi
+	fi
 }
 
 fn_prepare() {
+	md5sum "${TV_CHANNEL_CONF}" | cut -d ' ' -f 1 > "${TIMESTAMP}"
+	LANG=C date >> "${TIMESTAMP}"
+
 	fn_count_reset
 	touch "${OUTPUT_FILE}"
 	if [ "${DEBUG}" = "0" ]; then
@@ -522,6 +543,8 @@ fn_cleanup() {
 	fi
 	rm -rf "${LOCK_SHM}" "${LOCK_XML}"
 	gzip -9 "${OUTPUT_FILE}"
+
+	LANG=C date >> "${TIMESTAMP}"
 
 	echo_green "==> " "Done."
 	echo
