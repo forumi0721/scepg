@@ -31,30 +31,42 @@ echo_violet() {
 #Variables
 DEBUG=0
 TV_CHANNEL_CONF="tvchannel.conf"
-SHM="/dev/shm/epg2xml"
+WORKING_DIR=
+if [ -d "/dev/shm" -a -w "/dev/shm" ]; then
+	WORKING_DIR="/dev/shm/epg2xml_${USER}"
+else
+	WORKING_DIR=./working
+fi
+COUNT="${WORKING_DIR}/count"
 BASE_URL_NAVER='http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={var1}&channelGroup={var2}&date={date}'
 BASE_URL_EPG='http://schedule.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={var1}&old_top_channel_group={var1}&search_sub_channel_group={var2}&old_sub_channel_group={var2}&ymd={date}&{channel}'
 BASE_URL_EPG_CHECKCHANNEL='checkchannel%5B{var1}%5D={var2}'
-WORKING_NAVER="working_naver"
-WORKING_EPG="working_epg"
-DOWNLOAD_NAVER="download_naver"
-DOWNLOAD_EPG="download_naver"
-LOCK_SHM=".lock_shm"
-LOCK_XML=".lock_xml"
+WORKING_NAVER="${WORKING_DIR}/working_naver"
+WORKING_EPG="${WORKING_DIR}/working_epg"
+DOWNLOAD_NAVER="${WORKING_DIR}/download_naver"
+DOWNLOAD_EPG="${WORKING_DIR}/download_naver"
+LOCK_COUNT="${WORKING_DIR}/.lock_count"
+LOCK_XML="${WORKING_DIR}/.lock_xml"
+OUTPUT_FILE="${WORKING_DIR}/xmltv.xml"
+XMLTV_FILE="./xmltv.xml.gz"
 TIMESTAMP=".timestamp"
-OUTPUT_FILE="xmltv.xml"
 
 fn_validation() {
 	if [ ! -e "${TV_CHANNEL_CONF}" ]; then
 		echo "Cannot find ${TV_CHANNEL_CONF}"
 		exit 1
 	fi
-	if [ -e "${SHM}" ]; then
-		rm -rf "${SHM}" &> /dev/null
+	if [ -e "${COUNT}" ]; then
+		rm -rf "${COUNT}" &> /dev/null
 		if [ "${?}" != "0" ]; then
-			echo "Cannot remove ${SHM}"
+			echo "Cannot remove ${COUNT}"
 			exit 1
 		fi
+	fi
+	mkdir -p "${WORKING_DIR}" &> /dev/null
+	if [ "${?}" != "0" ]; then
+		echo "Cannot make working directory(${WORKING_DIR})"
+		exit 1
 	fi
 	if [ "${DEBUG}" = "0" -a -e "${TIMESTAMP}" -a "${OUTPUT_FILE}.gz" ]; then
 		if [ "$(cat "${TIMESTAMP}" | wc -l)" = "3" ]; then
@@ -82,24 +94,25 @@ fn_prepare() {
 	fn_count_reset
 	touch "${OUTPUT_FILE}"
 	if [ "${DEBUG}" = "0" ]; then
-		rm -rf "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${LOCK_SHM}" "${LOCK_XML}"
+		rm -rf "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${LOCK_COUNT}" "${LOCK_XML}" "${WORKING_DIR}"
 	fi
+	mkdir -p "${WORKING_DIR}" &> /dev/null
 }
 
 fn_count_reset() {
 	(
 		flock -x -w 10 200 || exit 1
-		echo 1 > "${SHM}"
-	) 200>"${LOCK_SHM}"
+		echo 1 > "${COUNT}"
+	) 200>"${LOCK_COUNT}"
 }
 
 fn_count_get() {
 	(
 		flock -x -w 10 200 || exit 1
-		local count=$(cat "${SHM}")
-		echo $((count + 1)) > "${SHM}"
+		local count=$(cat "${COUNT}")
+		echo $((count + 1)) > "${COUNT}"
 		echo ${count}
-	) 200>"${LOCK_SHM}"
+	) 200>"${LOCK_COUNT}"
 }
 
 fn_xml_add() {
@@ -423,11 +436,11 @@ fn_generate_xml_programme_naver_thread() {
 		local result=
 		read -r -d '' result << EOF
 <programme start="${programme_start} +0900" stop="${programme_stop} +0900" channel="I${channel}.schedule.epg.co.kr">
-	<title lang="kr">${title}</title>
-	<sub-title lang="kr">${subtitle}</sub-title>
+	<title lang="ko">${title}</title>
+	<sub-title lang="ko">${subtitle}</sub-title>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="ko">${category}</category>
-	<language>kr</language>
+	<language>ko</language>
 	<rating system="VCHIP">
 		<value>${rating}</value>
 	</rating>
@@ -491,17 +504,35 @@ fn_generate_xml_programme_epg_thread() {
 	local end_date_time="$(printf '2015%02d%02d%02d%02d00' ${end_date_time_m} ${end_date_time_d} ${end_date_time_hh} ${end_date_time_mm})"
 
 	local channel_no="$(echo "${line}" | sed "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g" | sed "s/[[:space:]]*$//g")"
-	local title="$(echo "${line}" | sed "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g" | sed "s/[[:space:]]*$//g")"
+	local title="$(echo "${line}" | sed "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g")"
+	title="$(echo "${title}" | sed "s/[[:space:]]*$//g")"
+	local episode="$(echo "${title}" | sed 's/^.*(\([[:digit:]]*회\))$/\1/g')"
+	if [ "${title}" = "${episode}" ]; then
+		episode=
+	else
+		title="$(echo "${title}" | sed 's/^\(.*\)[[:space:]]*([[:digit:]]*회)$/\1/g')"
+		title="$(echo "${title}" | sed "s/[[:space:]]*$//g")"
+	fi
+	local subtitle="$(echo "${title}" | sed 's/^.*&lt;\(.*\)&gt;$/\1/g')"
+	if [ "${title}" = "${subtitle}" ]; then
+		subtitle=
+	else
+		title="$(echo "${title}" | sed 's/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g')"
+		title="$(echo "${title}" | sed "s/[[:space:]]*$//g")"
+	fi
 	local category="$(echo "${line}" | sed "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g")"
 	category="${category//-*/}"
+	title="$(echo "${title}" | sed "s/[[:space:]]*$//g")"
+	subtitle="$(echo "${subtitle}" | sed "s/[[:space:]]*$//g")"
+	episode="$(echo "${episode}" | sed "s/[[:space:]]*$//g")"
 	local result=
 	read -r -d '' result << EOF
 <programme start="${start_date_time} +0900" stop="${end_date_time} +0900" channel="I${channel_no}.schedule.epg.co.kr">
-	<title lang="kr">${title}</title>
-	<sub-title lang="kr"></sub-title>
-	<episode-num system="onscreen"></episode-num>
+	<title lang="ko">${title}</title>
+	<sub-title lang="ko">${subtitle}</sub-title>
+	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="ko">${category}</category>
-	<language>kr</language>
+	<language>ko</language>
 	<rating system="VCHIP">
 		<value></value>
 	</rating>
@@ -550,17 +581,27 @@ fn_generate_xml() {
 fn_cleanup() {
 	echo_green "==> " "Cleanup"
 
-	if [ "${DEBUG}" = "0" ]; then
-		rm -rf "${OUTPUT_FILE}.gz" "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${SHM}" 
+	sed -i -e '/<sub-title lang="ko"><\/sub-title>/d' -e '/<episode-num system="onscreen"><\/episode-num>/d' -e '/<category lang="ko"><\/category>/d' "${OUTPUT_FILE}"
+	sed -i -e '/[[:space:]]*<rating system="VCHIP">.*/ {N;N; /[[:space:]]*<rating system="VCHIP">.*<value><\/value>.*<\/rating>/d}' "${OUTPUT_FILE}"
+
+	if [ "${XMLTV_FILE//\.gz/}" != "${XMLTV_FILE}" ]; then
+		gzip -9 "${OUTPUT_FILE}"
+		mv "${OUTPUT_FILE}.gz" "${XMLTV_FILE}"
+	else
+		mv "${OUTPUT_FILE}" "${XMLTV_FILE}"
 	fi
-	rm -rf "${LOCK_SHM}" "${LOCK_XML}"
-	gzip -9 "${OUTPUT_FILE}"
+	rm -rf "${LOCK_COUNT}" "${LOCK_XML}"
+	if [ "${DEBUG}" = "0" ]; then
+		rm -rf "${WORKING_DIR}" "${OUTPUT_FILE}" "${WORKING_NAVER}" "${WORKING_EPG}" "${DOWNLOAD_NAVER}" "${DOWNLOAD_EPG}" "${COUNT}" 
+	fi
 
 	LANG=C date >> "${TIMESTAMP}"
 
 	echo_green "==> " "Done."
 	echo
 }
+
+LANG=C
 
 #Validation
 fn_validation
