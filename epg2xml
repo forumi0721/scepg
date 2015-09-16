@@ -470,7 +470,7 @@ fn_generate_xml_programme_epg_thread() {
 	local start_date_time_m=$(($(echo "${date_time_1}" | cut -d '/' -f 1) + 0))
 	local start_date_time_d=$(($(echo "${date_time_1}" | cut -d '/' -f 2 | cut -d ' ' -f 1) + 0))
 	local start_date_time_hh=
-	if [ "$(echo "${date_time_1}" | cut -d ' ' -f 2)" = "pm" ]; then
+	if [ "$(echo "${date_time_1}" | cut -d ' ' -f 2)" = "PM" ]; then
 		start_date_time_hh=$(($(echo "${date_time_1}" | cut -d ' ' -f 3 | cut -d ':' -f 1) + 12))
 	else
 		start_date_time_hh=$(($(echo "${date_time_1}" | cut -d ' ' -f 3 | cut -d ':' -f 1) + 0))
@@ -482,7 +482,7 @@ fn_generate_xml_programme_epg_thread() {
 	local end_date_time_m=$(($(echo "${date_time_2}" | cut -d '/' -f 1) + 0))
 	local end_date_time_d=$(($(echo "${date_time_2}" | cut -d '/' -f 2 | cut -d ' ' -f 1) + 0))
 	local end_date_time_hh=
-	if [ "$(echo "${date_time_2}" | cut -d ' ' -f 2)" = "pm" ]; then
+	if [ "$(echo "${date_time_2}" | cut -d ' ' -f 2)" = "PM" ]; then
 		end_date_time_hh=$(($(echo "${date_time_2}" | cut -d ' ' -f 3 | cut -d ':' -f 1) + 12))
 	else
 		end_date_time_hh=$(($(echo "${date_time_2}" | cut -d ' ' -f 3 | cut -d ':' -f 1) + 0))
