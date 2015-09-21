@@ -29,6 +29,13 @@ echo_violet() {
 }
 
 #Variables
+IS_MAC=N
+if [ "$(uname -s)" = "Darwin" ]; then
+	IS_MAC=Y
+	SED="gsed"
+else
+	SED="sed"
+fi
 DEBUG=0
 TV_CHANNEL_CONF="tvchannel.conf"
 WORKING_DIR=
@@ -56,6 +63,20 @@ fn_validation() {
 		echo "Cannot find ${TV_CHANNEL_CONF}"
 		exit 1
 	fi
+	if [ -z "$(which "${SED}")" ]; then
+		echo_red " -> " "Cannot found ${SED}"
+		if [ "${IS_MAC}" = "Y" ]; then
+			echo_red "    " "Pleas install brew gnu-sed package"
+		fi
+		exit 1
+	fi
+	if [ -z "$(which flock)" ]; then
+		echo_red " -> " "Cannot found flock"
+		if [ "${IS_MAC}" = "Y" ]; then
+			echo_red "    " "Pleas install brew scoteq/discoteq/flock package"
+		fi
+		exit 1
+	fi
 	mkdir -p "${WORKING_DIR}" &> /dev/null
 	if [ "${?}" != "0" ]; then
 		echo_red " -> " "Cannot make working directory(${WORKING_DIR})"
@@ -68,10 +89,10 @@ fn_validation() {
 	if [ "${DEBUG}" = "0" -a -e "${TIMESTAMP}" -a "${OUTPUT_FILE}" ]; then
 		if [ "$(wc -l < "${TIMESTAMP}")" = "3" ]; then
 			local md5sum_prev="$(head -n 1 "${TIMESTAMP}")"
-			local datetime_prev="$(sed -n "2,1p" "${TIMESTAMP}")"
+			local datetime_prev="$("${SED}" -n "2,1p" "${TIMESTAMP}")"
 
 			if [ ! -z "${md5sum_prev}" -a ! -z "${datetime_prev}" ]; then
-				local md5sum="$(md5sum "${TV_CHANNEL_CONF}" | sed -e 's/^\(.*\)[[:space:]]\+.*/\1/g')"
+				local md5sum="$(fn_md5 "${TV_CHANNEL_CONF}")"
 				local datetime_prev_s="$(date -d "${datetime_prev}" +%s)"
 				local datetime_s="$(date +%s)"
 
@@ -85,8 +106,8 @@ fn_validation() {
 }
 
 fn_prepare() {
-	md5sum "${TV_CHANNEL_CONF}" | sed -e 's/^\(.*\)[[:space:]]\+.*/\1/g' > "${TIMESTAMP}"
-	date >> "${TIMESTAMP}"
+	fn_md5 "${TV_CHANNEL_CONF}" > "${TIMESTAMP}"
+	date +"%F %T" >> "${TIMESTAMP}"
 
 	if [ "${DEBUG}" = "0" ]; then
 		rm -rf "${WORKING_DIR}"
@@ -101,9 +122,39 @@ fn_prepare() {
 	fn_count_reset
 }
 
+fn_md5() {
+	if [ "${IS_MAC}" = "Y" ]; then
+		md5 "${1}" | "${SED}" -e 's/^.*= \(.*\)$/\1/g'
+	else
+		md5sum "${1}" | "${SED}" -e 's/^\(.*\)[[:space:]]\+.*/\1/g'
+	fi
+}
+
+fn_count_reset() {
+	(
+		while ! flock -w 10 100
+		do
+			sleep 0.1
+		done
+		echo 1 > "${COUNT}"
+	) 100>"${COUNT}.lock"
+}
+
+fn_count_get() {
+	(
+		while ! flock -w 10 200
+		do
+			sleep 0.1
+		done
+		local count=$(cat "${COUNT}")
+		echo $((count + 1)) > "${COUNT}"
+		echo ${count}
+	) 200>"${COUNT}.lock"
+}
+
 fn_file_write() {
 	(
-		while ! flock -x -w 10 200
+		while ! flock -w 10 300
 		do
 			sleep 0.1
 		done
@@ -115,29 +166,7 @@ fn_file_write() {
 		else
 			echo "${2}" >> "${1}"
 		fi
-	) 200>"${1}.lock"
-}
-
-fn_count_reset() {
-	(
-		while ! flock -x -w 10 200
-		do
-			sleep 0.1
-		done
-		echo 1 > "${COUNT}"
-	) 200>"${COUNT}.lock"
-}
-
-fn_count_get() {
-	(
-		while ! flock -x -w 10 200
-		do
-			sleep 0.1
-		done
-		local count=$(cat "${COUNT}")
-		echo $((count + 1)) > "${COUNT}"
-		echo ${count}
-	) 200>"${COUNT}.lock"
+	) 300>"${1}.lock"
 }
 
 fn_download_naver() {
@@ -145,20 +174,20 @@ fn_download_naver() {
 
 	echo_blue " -> " "Generate Download URL(naver)"
 
-	local channels="$(sed -e '/^[^#].*,.*:N,.*,.*,.*,.*$/!d' "${TV_CHANNEL_CONF}")"
-	local channel_filter="$(sed -e 's/^.*,.*:N,\(.*\),.*,\(.*\),.*$/\1,\2,/g' <<< "${channels}" | sed -e ':a;N;$!ba;s/\n/\\|/g')"
+	local channels="$("${SED}" -e '/^[^#].*,.*:N,.*,.*,.*,.*$/!d' "${TV_CHANNEL_CONF}")"
+	local channel_filter="$("${SED}" -e 's/^.*,.*:N,\(.*\),.*,\(.*\),.*$/\1,\2,/g' <<< "${channels}" | "${SED}" -e ':a;N;$!ba;s/\n/\\|/g')"
 
 	local line=
 	while read -r line
    	do
-		local var1="$(sed -e 's/^\(.*\),.*/\1/g' <<< "${line}")"
-		local var2="$(sed -e 's/^.*,\(.*\)/\1/g' <<< "${line}")"
+		local var1="$("${SED}" -e 's/^\(.*\),.*/\1/g' <<< "${line}")"
+		local var2="$("${SED}" -e 's/^.*,\(.*\)/\1/g' <<< "${line}")"
 
 		local url="${BASE_URL_NAVER}"
 		url="${url//\{var1\}/${var1}}"
 		url="${url//\{var2\}/${var2}}"
 		download_list+=("${url}")
-	done <<< "$(sed -e 's/^.*,.*:N,\(.*,.*\),.*,.*$/\1/g' <<< "${channels}" | sort -u)"
+	done <<< "$("${SED}" -e 's/^.*,.*:N,\(.*,.*\),.*,.*$/\1/g' <<< "${channels}" | sort -u)"
 
 	echo_blue " -> " "Done."
 
@@ -182,7 +211,7 @@ fn_download_naver() {
 			done
 
 			echo -ne " -> ${date_display} $(fn_count_get)/${#download_list[@]}\033[0K\r"
-			curl -s "${url/\{date\}/${date}}" | sed -e '/[[:space:]]*"broadcastType" :\|[[:space:]]*"channelId" :\|[[:space:]]*"programList" :/!d' -e 's/^[[:space:]]\+//' | sed -e '/^"broadcastType\".*/ {N;N; s/\"broadcastType\" : \([[:digit:]]*\),.*\"channelId\" : \([[:digit:]]*\),.*\(\"programList\" :.*\)$/\1,\2,\3/g}' | sed -e "/${channel_filter}/!d" | sed -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' | fn_file_write "${WORKING_NAVER}" &
+			curl -s "${url/\{date\}/${date}}" | "${SED}" -e '/[[:space:]]*"broadcastType" :\|[[:space:]]*"channelId" :\|[[:space:]]*"programList" :/!d' -e 's/^[[:space:]]\+//' | "${SED}" -e '/^"broadcastType\".*/ {N;N; s/\"broadcastType\" : \([[:digit:]]*\),.*\"channelId\" : \([[:digit:]]*\),.*\(\"programList\" :.*\)$/\1,\2,\3/g}' | "${SED}" -e "/${channel_filter}/!d" | "${SED}" -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' | fn_file_write "${WORKING_NAVER}" &
 		done
 
 		wait
@@ -200,20 +229,20 @@ fn_download_epg() {
 
 	echo_blue " -> " "Generate Download URL(epg)"
 
-	local channels="$(sed -e '/^[^#].*,.*:E,.*,.*,.*,.*$/!d' "${TV_CHANNEL_CONF}")"
+	local channels="$("${SED}" -e '/^[^#].*,.*:E,.*,.*,.*,.*$/!d' "${TV_CHANNEL_CONF}")"
 
 	local line=
 	while read -r line
 	do
-		local var1="$(sed -e 's/^\(.*\),.*$/\1/g' <<< "${line}")"
-		local var2="$(sed -e 's/^.*,\(.*\)$/\1/g' <<< "${line}")"
+		local var1="$("${SED}" -e 's/^\(.*\),.*$/\1/g' <<< "${line}")"
+		local var2="$("${SED}" -e 's/^.*,\(.*\)$/\1/g' <<< "${line}")"
 		local checkchannel=
 		local loop_seq=1
 		local line=
 		while read -r channel
 	   	do
-			local check="$(sed -e 's/^.*:E,.*,.*,\(.*\),.*$/\1/g' <<< "${channel}")"
-			local channelno="$(sed -e 's/^\(.*\),.*:E,.*,.*,.*,.*$/\1/g' <<< "${channel}")"
+			local check="$("${SED}" -e 's/^.*:E,.*,.*,\(.*\),.*$/\1/g' <<< "${channel}")"
+			local channelno="$("${SED}" -e 's/^\(.*\),.*:E,.*,.*,.*,.*$/\1/g' <<< "${channel}")"
 			local checkchannel_curr="${BASE_URL_EPG_CHECKCHANNEL}"
 			checkchannel_curr="${checkchannel_curr//\{var1\}/${check}}"
 			checkchannel_curr="${checkchannel_curr//\{var2\}/${channelno}}"
@@ -229,7 +258,7 @@ fn_download_epg() {
 			fi
 
 			loop_seq=$((loop_seq + 1))
-		done <<< "$(sed -e "/^.*,.*:E,${var1},${var2},.*,.*/!d" <<< "${channels}")"
+		done <<< "$("${SED}" -e "/^.*,.*:E,${var1},${var2},.*,.*/!d" <<< "${channels}")"
 
 		if [ ! -z "${checkchannel}" ]; then
 			local url="${BASE_URL_EPG}"
@@ -239,7 +268,7 @@ fn_download_epg() {
 			download_list+=("${url}")
 			checkchannel=""
 		fi
-	done <<< "$(sed -e 's/^.*,.*:E,\(.*,.*\),.*,.*$/\1/g' <<< "${channels}" | sort -u)"
+	done <<< "$("${SED}" -e 's/^.*,.*:E,\(.*,.*\),.*,.*$/\1/g' <<< "${channels}" | sort -u)"
 
 	echo_blue " -> " "Done."
 
@@ -263,7 +292,7 @@ fn_download_epg() {
 			done
 
 			echo -ne " -> ${date} $(fn_count_get)/${#download_list[@]}\033[0K\r"
-			curl -s "${url/\{date\}/${date}}" | iconv -f cp949 -t utf-8 | sed -e '/onMouseOver=\"Preview(/!d' -e 's/.*onMouseOver=\"Preview(\(.*\))\" onMouseOut=.*$/\1/g' -e 's/<br>//g' -e "s/\\\'/'/g" | sed -e "s/^'.*',\('.*','.*'\),'\(.*\) \(.*\) \(.*\)~\(.*\) \(.*\) \(.*\)',\('.*','.*','.*'\)/\1,'${year}\/\2 \4 \3','${year}\/\5 \7 \6',\8/g" | fn_file_write "${WORKING_EPG}" &
+			curl -s "${url/\{date\}/${date}}" | iconv -f cp949 -t utf-8 | "${SED}" -e '/onMouseOver=\"Preview(/!d' -e 's/.*onMouseOver=\"Preview(\(.*\))\" onMouseOut=.*$/\1/g' -e 's/<br>//g' -e "s/\\\'/'/g" | "${SED}" -e "s/^'.*',\('.*','.*'\),'\(.*\) \(.*\) \(.*\)~\(.*\) \(.*\) \(.*\)',\('.*','.*','.*'\)/\1,'${year}\/\2 \4 \3','${year}\/\5 \7 \6',\8/g" | fn_file_write "${WORKING_EPG}" &
 		done
 
 		wait
@@ -308,15 +337,15 @@ fn_generate_xml_channel() {
 
 	fn_count_reset
 
-	local channels="$(sed -e '/^#/d' -e 's/^\(.*\):\+.*$/\1/g' "${TV_CHANNEL_CONF}")"
+	local channels="$("${SED}" -e '/^#/d' -e 's/^\(.*\):\+.*$/\1/g' "${TV_CHANNEL_CONF}")"
 	local channels_count="$(wc -l <<< "${channels}")"
 
 	local line=
 	while read -r line
 	do
 		echo -ne " -> $(fn_count_get)/${channels_count}\033[0K\r"
-		local channel_no="$(sed -e 's/^\(.*\),.*/\1/g' <<< "${line}")"
-		local channel_name="$(sed -e 's/^.*,\(.*\)/\1/g' -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' -e 's/&amp;amp;/\&amp;/g' -e 's/&amp;gt;/\&gt;/g' -e 's/&amp;lt;/\&lt;/g' -e 's/&amp;#37;/\&#37;/g' <<< "${line}")"
+		local channel_no="$("${SED}" -e 's/^\(.*\),.*/\1/g' <<< "${line}")"
+		local channel_name="$("${SED}" -e 's/^.*,\(.*\)/\1/g' -e 's/&/&amp;/g' -e 's/>/\&gt;/g' -e 's/</\&lt;/g' -e 's/%/\&#37;/g' -e 's/&amp;amp;/\&amp;/g' -e 's/&amp;gt;/\&gt;/g' -e 's/&amp;lt;/\&lt;/g' -e 's/&amp;#37;/\&#37;/g' <<< "${line}")"
 
 		if [ -z "${channel_no}" -o -z "${channel_name}" ]; then
 			continue
@@ -342,17 +371,17 @@ fn_generate_xml_programme_naver() {
 
 	fn_count_reset
 
-	local total_count="$(sed -e 's/scheduleName/scheduleName\n/g' "${WORKING_NAVER}" | sed -e '/scheduleName/!d' | wc -l)"
+	local total_count="$("${SED}" -e 's/scheduleName/scheduleName\n/g' "${WORKING_NAVER}" | "${SED}" -e '/scheduleName/!d' | wc -l)"
 	
 	local line=
 	while read -r line
 	do
-		local channel="$(sed -e 's/^\(.*\),.*:N,.*,.*,.*,.*$/\1/g' <<< "${line}")"
+		local channel="$("${SED}" -e 's/^\(.*\),.*:N,.*,.*,.*,.*$/\1/g' <<< "${line}")"
 		if [ -z "${channel}" -o "${channel}" = "${line}" ]; then
 			echo_red " -> " "${channel} Not found"
 			continue
 		fi
-		local channel_filter="$(sed -e 's/^.*,.*:N,\(.*\),.*,\(.*\),.*$/\^\1,\2,/g' <<< "${line}")"
+		local channel_filter="$("${SED}" -e 's/^.*,.*:N,\(.*\),.*,\(.*\),.*$/\^\1,\2,/g' <<< "${line}")"
 		local pgm_list=
 		while read -r pgm_list
 		do
@@ -367,8 +396,8 @@ fn_generate_xml_programme_naver() {
 			done
 
 			fn_generate_xml_programme_naver_thread "${channel}" "${pgm_list}" "${total_count}" &
-		done <<< "$(sed -e "/${channel_filter}/!d" "${WORKING_NAVER}")"
-	done <<< "$(sed -e '/:N,/!d' "${TV_CHANNEL_CONF}")"
+		done <<< "$("${SED}" -e "/${channel_filter}/!d" "${WORKING_NAVER}")"
+	done <<< "$("${SED}" -e '/:N,/!d' "${TV_CHANNEL_CONF}")"
 
 	wait
 
@@ -386,16 +415,16 @@ fn_generate_xml_programme_naver_thread() {
 	do
 		echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
 
-		local begin_time="$(sed 's/^.*"beginDate":"\([^\"]*\)",.*"beginTime":"\([^\"]*\)",.*/\1 \2/g' <<< "${pgm}")"
-		local runtime="$(sed 's/^.*"runtime":\([^,]*\),.*/\1/g' <<< "${pgm}")"
+		local begin_time="$("${SED}" 's/^.*"beginDate":"\([^\"]*\)",.*"beginTime":"\([^\"]*\)",.*/\1 \2/g' <<< "${pgm}")"
+		local runtime="$("${SED}" 's/^.*"runtime":\([^,]*\),.*/\1/g' <<< "${pgm}")"
 
 		local start="$(date -d "${begin_time}" '+%Y%m%d%H%M%S %z')"
 		local end="$(date -d "${begin_time} ${runtime} minutes" '+%Y%m%d%H%M%S %z')"
 	
-		local title="$(sed 's/^.*"scheduleName":"\(.*\)","beginDate":.*$/\1/g' <<< "${pgm}")"
-		local subtitle="$(sed 's/^.*"subtitle":"\(.*\)","signLanguage":.*$/\1/g' <<< "${pgm}")"
-		local episode="$(sed 's/^.*"episodeNo":"\(.*\)","live":.*$/\1/g' <<< "${pgm}")"
-		local category="$(sed 's/^.*"largeGenreId":"\([[:alnum:]]*\)","episodeNo":.*$/\1/g' <<< "${pgm}")"
+		local title="$("${SED}" 's/^.*"scheduleName":"\(.*\)","beginDate":.*$/\1/g' <<< "${pgm}")"
+		local subtitle="$("${SED}" 's/^.*"subtitle":"\(.*\)","signLanguage":.*$/\1/g' <<< "${pgm}")"
+		local episode="$("${SED}" 's/^.*"episodeNo":"\(.*\)","live":.*$/\1/g' <<< "${pgm}")"
+		local category="$("${SED}" 's/^.*"largeGenreId":"\([[:alnum:]]*\)","episodeNo":.*$/\1/g' <<< "${pgm}")"
 		local category_en=
 		case ${category} in
 			A) #드라마
@@ -452,7 +481,7 @@ fn_generate_xml_programme_naver_thread() {
 				;;
 		esac
 
-		local rating="$(sed 's/^.*"ageRating":\(.*\),"subtitle":.*$/\1/g' <<< "${pgm}")"
+		local rating="$("${SED}" 's/^.*"ageRating":\(.*\),"subtitle":.*$/\1/g' <<< "${pgm}")"
 
 		local desc="${title}"
 		if [ ! -z "${subtitle}" ]; then
@@ -478,7 +507,7 @@ fn_generate_xml_programme_naver_thread() {
 </programme>
 EOF
 		fn_file_write "${OUTPUT_FILE}" "${result}"
-	done <<< "$(sed -e "s/^.*\"programList\":\[\(.*\)\]/\1/g" -e "s/},{/\n/g" <<< "${pgm_list}")"
+	done <<< "$("${SED}" -e "s/^.*\"programList\":\[\(.*\)\]/\1/g" -e "s/},{/\n/g" <<< "${pgm_list}")"
 }
 
 fn_generate_xml_programme_epg() {
@@ -510,20 +539,20 @@ fn_generate_xml_programme_epg() {
 fn_generate_xml_programme_epg_thread() {
 	local line="${1}"
 
-	local title="$(sed -e "s/^'\(.*\)','.*','.*','.*','.*','.*','.*'/\1/g" <<< "${line}")"
+	local title="$("${SED}" -e "s/^'\(.*\)','.*','.*','.*','.*','.*','.*'/\1/g" <<< "${line}")"
 
-	local episode="$(sed -e "s/^.*(\([[:digit:]]\+회\))/\1/g" <<< "${title}")"
+	local episode="$("${SED}" -e "s/^.*(\([[:digit:]]\+회\))/\1/g" <<< "${title}")"
 	if [ "${episode}" = "${title}" ]; then
 		episode=""
 	else
-		title="$(sed -e "s/^\(.*\)[[:space:]]*([[:digit:]]\+회)/\1/g" <<< "${title}" | sed -e 's/[[:space:]]\+$//g')"
+		title="$("${SED}" -e "s/^\(.*\)[[:space:]]*([[:digit:]]\+회)/\1/g" <<< "${title}" | "${SED}" -e 's/[[:space:]]\+$//g')"
 	fi
 
-	local subtitle="$(sed -e "s/^.*&lt;\(.*\)&gt;$/\1/g" <<< "${title}")"
+	local subtitle="$("${SED}" -e "s/^.*&lt;\(.*\)&gt;$/\1/g" <<< "${title}")"
 	if [ "${subtitle}" = "${title}" ]; then
 		subtitle=""
 	else
-		title="$(sed -e "s/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g" <<< "${title}" | sed -e 's/[[:space:]]\+$//g')"
+		title="$("${SED}" -e "s/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g" <<< "${title}" | "${SED}" -e 's/[[:space:]]\+$//g')"
 	fi
 
 	local desc="${title}"
@@ -534,14 +563,14 @@ fn_generate_xml_programme_epg_thread() {
 		desc+=" (${episode})"
 	fi
 
-	local start="$(sed -e "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g" <<< "${line}")"
+	local start="$("${SED}" -e "s/^'.*','.*','\(.*\)','.*','.*','.*','.*'/\1/g" <<< "${line}")"
 	start="$(date -d "${start}" '+%Y%m%d%H%M%S %z')"
 
-	local end="$(sed -e "s/^'.*','.*','.*','\(.*\)','.*','.*','.*'/\1/g" <<< "${line}")"
+	local end="$("${SED}" -e "s/^'.*','.*','.*','\(.*\)','.*','.*','.*'/\1/g" <<< "${line}")"
 	end="$(date -d "${end}" '+%Y%m%d%H%M%S %z')"
 
-	local channel_no="$(sed -e "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g" <<< "${line}")"
-	local category="$(sed -e "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g" <<< "${line}")"
+	local channel_no="$("${SED}" -e "s/^'.*','\(.*\)','.*','.*','.*','.*','.*'/\1/g" <<< "${line}")"
+	local category="$("${SED}" -e "s/^'.*','.*','.*','.*','\(.*\)','.*','.*'/\1/g" <<< "${line}")"
 	local category_en=
 	case ${category//-*/} in
 		드라마) #드라마
@@ -597,7 +626,7 @@ fn_generate_xml_programme_epg_thread() {
 			category_en=""
 			;;
 	esac
-	local actor="$(sed -e "s/^'.*','.*','.*','.*','.*','\(.*\)','.*'/\1/g" <<< "${line}")"
+	local actor="$("${SED}" -e "s/^'.*','.*','.*','.*','.*','\(.*\)','.*'/\1/g" <<< "${line}")"
 
 	local result=
 	read -r -d '' result << EOF
@@ -657,8 +686,7 @@ fn_cleanup() {
 
 	wait
 
-	#sed -i -e '/<sub-title lang="ko"><\/sub-title>/d' -e '/<episode-num system="onscreen"><\/episode-num>/d' -e '/<category lang="ko"><\/category>/d' -e '/[[:space:]]*<rating system="VCHIP">.*/ {N;N; /[[:space:]]*<rating system="VCHIP">.*<value><\/value>.*<\/rating>/d}' -e '/[[:space:]]*<credits>.*/ {N;N; /[[:space:]]*<credits>.*<actor><\/actor>.*<\/credits>/d}' "${OUTPUT_FILE}"
-	sed -i -e '/<sub-title lang="ko"><\/sub-title>/d' -e '/<episode-num system="onscreen"><\/episode-num>/d' -e '/[[:space:]]*<rating system="VCHIP">.*/ {N;N; /[[:space:]]*<rating system="VCHIP">.*<value><\/value>.*<\/rating>/d}' -e '/[[:space:]]*<credits>.*/ {N;N; /[[:space:]]*<credits>.*<actor><\/actor>.*<\/credits>/d}' "${OUTPUT_FILE}"
+	"${SED}" -i -e '/<sub-title lang="ko"><\/sub-title>/d' -e '/<episode-num system="onscreen"><\/episode-num>/d' -e '/[[:space:]]*<rating system="VCHIP">.*/ {N;N; /[[:space:]]*<rating system="VCHIP">.*<value>0\?<\/value>.*<\/rating>/d}' -e '/[[:space:]]*<credits>.*/ {N;N; /[[:space:]]*<credits>.*<actor><\/actor>.*<\/credits>/d}' "${OUTPUT_FILE}"
 
 	if [ "${XMLTV_FILE//\.gz/}" != "${XMLTV_FILE}" ]; then
 		gzip -9 "${OUTPUT_FILE}"
@@ -670,13 +698,11 @@ fn_cleanup() {
 		rm -rf "${WORKING_DIR}"
 	fi
 
-	date >> "${TIMESTAMP}"
+	date +"%F %T" >> "${TIMESTAMP}"
 
 	echo_green "==> " "Done."
 	echo
 }
-
-LANG=C
 
 #Validation
 fn_validation
