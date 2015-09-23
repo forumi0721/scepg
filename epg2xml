@@ -66,7 +66,7 @@ fn_validation() {
 		exit 1
 	fi
 	if [ -z "$(which "${SED}")" ]; then
-		echo_red " -> " "Cannot found ${SED}"
+		echo_red " -> " "Cannot found "${SED}""
 		if [ "${IS_MAC}" = "Y" ]; then
 			echo_red "    " "Pleas install brew gnu-sed package"
 		fi
@@ -267,9 +267,9 @@ fn_parser_cnm() {
 					channel_seq=$((channel_seq + 1))
 				else
 					seq=$((channel_seq - 1))
-					min="$(sed -e "s/\([[:digit:]]\+\) [[:alnum:]]\+ .*/\1/g" <<< "${data}")"
-					pid="$(sed -e "s/[[:digit:]]\+ \([[:alnum:]]\+\) .*/\1/g" <<< "${data}")"
-					title="$(sed -e "s/[[:digit:]]\+ [[:alnum:]]\+ \(.*\)/\1/g" <<< "${data}")"
+					min="$("${SED}" -e "s/\([[:digit:]]\+\) [[:alnum:]]\+ .*/\1/g" <<< "${data}")"
+					pid="$("${SED}" -e "s/[[:digit:]]\+ \([[:alnum:]]\+\) .*/\1/g" <<< "${data}")"
+					title="$("${SED}" -e "s/[[:digit:]]\+ [[:alnum:]]\+ \(.*\)/\1/g" <<< "${data}")"
 					if [ "${ampm}" = "PM" -a "${time}" = "12" -a $((${step} / ${#channel_list[@]})) -eq 3 ]; then
 						ampm="AM"
 						working_date="$(date -d "${working_date} 1 days" +%F)"
@@ -277,9 +277,9 @@ fn_parser_cnm() {
 					date_time="$(date -d "${working_date} ${time}:${min} ${ampm}" +"%F %T")"
 					while read -r ch
 					do
-						local channel_no="$(sed -e "s/^\(.*\),.*:C,.*,.*,.*,.*/\1/g" <<< "${ch}")"
+						local channel_no="$("${SED}" -e "s/^\(.*\),.*:C,.*,.*,.*,.*/\1/g" <<< "${ch}")"
 						echo "'${channel_no}','${title}','${date_time}'"
-					done <<< $(sed -e "/.*,.*:C,.*,.*,.*,${channel_list[${seq}]}/!d" <<< "${channels}" | sort -u)
+					done <<< $("${SED}" -e "/.*,.*:C,.*,.*,.*,${channel_list[${seq}]}/!d" <<< "${channels}" | sort -u)
 				fi
 			fi
 		fi
@@ -354,7 +354,7 @@ fn_download_cnm() {
 			done
 
 			echo -ne " -> ${date_display} $(fn_count_get)/${#download_list[@]}\033[0K\r"
-			curl -s "${url/\{date\}/${date}}" | iconv -f cp949 -t utf-8 | sed -e "/<td align=\"center\" width=\"[[:digit:]]\+%\" >.*<\/td>\|[[:digit:]]\+시\s\+<\/td>\|<td valign=top height=\"25\">\[.*\]<\/td>\|<td height=\"25\" valign=top >\|<table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">\|<\/html>/!d" | sed -e "s/\s\+<td><table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">/-----/g" -e "s/<\/html>/=====/g" | sed -e 's/\s\+<td align=\"center\" width=\"[[:digit:]]\+%\" >\(.*\)<\/td>/Channel : \1/g' | sed -e "s/^\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" -e "s/^\s\+<td colspan=\"2\">\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" | sed -e "/<tr><td valign=top height=\"25\">\[.*\]<\/td>/ {N; s/<tr><td valign=top height=\"25\">\[\(.*\)\]<\/td>.*<td height=\"25\" valign=top > <a href=\"JavaScript:ViewContent('\(.*\)')\">\(.*\)<\/b>.*<\/td><\/tr>/\1 \2 \3/g}" | sed -e "/^$/d" | fn_parser_cnm "${channels}" | fn_file_write "${WORKING_CNM}" &
+			curl -s "${url/\{date\}/${date}}" | iconv -f cp949 -t utf-8 | "${SED}" -e "/<td align=\"center\" width=\"[[:digit:]]\+%\" >.*<\/td>\|[[:digit:]]\+시\s\+<\/td>\|<td valign=top height=\"25\">\[.*\]<\/td>\|<td height=\"25\" valign=top >\|<table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">\|<\/html>/!d" | "${SED}" -e "s/\s\+<td><table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">/-----/g" -e "s/<\/html>/=====/g" | "${SED}" -e 's/\s\+<td align=\"center\" width=\"[[:digit:]]\+%\" >\(.*\)<\/td>/Channel : \1/g' | "${SED}" -e "s/^\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" -e "s/^\s\+<td colspan=\"2\">\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" | "${SED}" -e "/<tr><td valign=top height=\"25\">\[.*\]<\/td>/ {N; s/<tr><td valign=top height=\"25\">\[\(.*\)\]<\/td>.*<td height=\"25\" valign=top > <a href=\"JavaScript:ViewContent('\(.*\)')\">\(.*\)<\/b>.*<\/td><\/tr>/\1 \2 \3/g}" | "${SED}" -e "/^$/d" | fn_parser_cnm "${channels}" | fn_file_write "${WORKING_CNM}" &
 		done
 
 		wait
@@ -663,7 +663,7 @@ EOF
 }
 
 fn_generate_xml_programme_cnm() {
-	local channels=($(sed -e "s/^'\(.*\)','.*','.*'$/\1/g" "${WORKING_CNM}" | sort -u))
+	local channels=($("${SED}" -e "s/^'\(.*\)','.*','.*'$/\1/g" "${WORKING_CNM}" | sort -u))
 	local total_count="$(($(wc -l < "${WORKING_CNM}") - ${#channels[@]}))"
 	if [ "${total_count}" -le 0 ]; then
 		return
@@ -681,7 +681,7 @@ fn_generate_xml_programme_cnm() {
 			sleep 0.1
 		done
 
-		fn_generate_xml_programme_cnm_thread "${ch}" "$(sed -e "/^'${ch}',/!d" "${WORKING_CNM}")" "${total_count}" &
+		fn_generate_xml_programme_cnm_thread "${ch}" "$("${SED}" -e "/^'${ch}',/!d" "${WORKING_CNM}")" "${total_count}" &
 	done
 
 	wait
