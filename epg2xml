@@ -770,7 +770,6 @@ fn_generate_xml_programme_naver_thread() {
 		read -r -d "" result << EOF
 <programme start="${start}" stop="${end}" channel="I${channel}.schedule.epg.co.kr">
 	<title lang="ko">${desc}</title>
-	<sub-title lang="ko">${title} ${subtitle}</sub-title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="en">${category_en}</category>
@@ -917,7 +916,6 @@ fn_generate_xml_programme_epg_thread() {
 	read -r -d "" result << EOF
 <programme start="${start}" stop="${end}" channel="I${channel_no}.schedule.epg.co.kr">
 	<title lang="ko">${desc}</title>
-	<sub-title lang="ko">${subtitle}</sub-title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="en">${category_en}</category>
@@ -1009,7 +1007,6 @@ fn_generate_xml_programme_cnm_thread() {
 			read -r -d "" result << EOF
 <programme start="${start}" stop="${end}" channel="I${ch}.schedule.epg.co.kr">
 	<title lang="ko">${desc}</title>
-	<sub-title lang="ko">${subtitle}</sub-title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="en"></category>
@@ -1165,7 +1162,6 @@ fn_generate_xml_programme_hcn_thread() {
 			read -r -d "" result << EOF
 <programme start="${start}" stop="${end}" channel="I${channel_no}.schedule.epg.co.kr">
 	<title lang="ko">${desc}</title>
-	<sub-title lang="ko">${subtitle}</sub-title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="en">${category_en}</category>
@@ -1230,7 +1226,7 @@ fn_cleanup() {
 
 	wait
 
-	"${SED}" -i -e "s/>[[:space:]]\+<\//><\//g" -e "/<sub-title lang=\"ko\"><\/sub-title>/d" -e "/<episode-num system=\"onscreen\"><\/episode-num>/d" -e "/[[:space:]]*<rating system=\"VCHIP\">.*/ {N;N; /[[:space:]]*<rating system=\"VCHIP\">.*<value>0\?<\/value>.*<\/rating>/d}" "${OUTPUT_FILE}"
+	"${SED}" -i -e "s/>[[:space:]]\+<\//><\//g" -e "/<episode-num system=\"onscreen\"><\/episode-num>/d" -e "/[[:space:]]*<rating system=\"VCHIP\">.*/ {N;N; /[[:space:]]*<rating system=\"VCHIP\">.*<value>0\?<\/value>.*<\/rating>/d}" "${OUTPUT_FILE}"
 
 	if [ "${XMLTV_FILE//\.gz/}" != "${XMLTV_FILE}" ]; then
 		gzip -9 "${OUTPUT_FILE}"
