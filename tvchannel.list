@@ -1436,3 +1436,599 @@ E,2,230,570,JTBC
 E,2,230,20,MBN
 E,2,230,569,TV 조선
 E,2,230,571,채널A
+
+##HCN
+#http://www.hcn.co.kr/ur/bs/ch/channelInfo.hcn?method=man_00&p_menu_id=1903&currentPage=1&ch_divide={ch_divide}&ch_id={ch_id}&year={yyyy}&month={mm}&date={dd}
+#ch_divide,ch_id,channel_name
+#HCN 서초(디지털)
+H,digi,21214,(U(HD) ) U MAX
+H,digi,21187,(HD) OBS
+H,digi,20239,(HD) MBC Every1
+H,digi,20659,(HD) SBS
+H,digi,11921,(HD) CJ오쇼핑
+H,digi,20657,(HD) KBS2
+H,digi,15061,(HD) 롯데홈쇼핑
+H,digi,20656,(HD) KBS1
+H,digi,20030,(HD) 현대홈쇼핑
+H,digi,20658,(HD) MBC
+H,digi,11502,(HD) GS SHOP
+H,digi,20655,(HD) EBS
+H,digi,21274,(HD) NS홈쇼핑
+H,digi,21003,(HD) 채널A
+H,digi,20953,(HD) MBN
+H,digi,20997,홈&쇼핑
+H,digi,21005,(HD) JTBC
+H,digi,21004,(HD) TV조선
+H,digi,20653,(HD) tvN
+H,digi,21272,(HD) 아임쇼핑
+H,digi,21000,(HD) 연합뉴스TV
+H,digi,20922,(HD) YTN
+H,digi,20950,(HD) SBS Plus
+H,digi,21083,(HD) KBS W
+H,digi,21109,(HD) K쇼핑
+H,digi,20649,(HD) MBC드라마넷
+H,digi,21261,(HD) 쇼핑&T
+H,digi,20650,(HD) Story On
+H,digi,15073,(HD) MBC MUSIC
+H,digi,20652,(HD) CH CGV
+H,digi,20746,(HD) 채널칭
+H,digi,20648,(HD) OCN
+H,digi,20663,TVB KOREA
+H,digi,20651,(HD) SUPER ACTION
+H,digi,20744,(HD) 스크린
+H,digi,20808,씨네프
+H,digi,20546,(HD) MPLEX
+H,digi,20164,더 무비
+H,digi,20809,인디필름
+H,digi,20929,(HD) CNTV
+H,digi,20500,중화TV
+H,digi,20520,(HD) AXN
+H,digi,20898,(HD) 텔레노벨라
+H,digi,21188,(HD) OCN Series
+H,digi,14863,(HD) 캐치온
+H,digi,20041,캐치온Plus
+H,digi,21213,캐치온포털
+H,digi,20924,(HD) 드라맥스
+H,digi,20921,(HD) KBS Drama
+H,digi,21167,(HD) 드라마H
+H,digi,20945,(HD) 드라마큐브
+H,digi,21166,(HD) FOX채널
+H,digi,20825,D.ONE
+H,digi,20722,(HD) 채널J
+H,digi,20234,(HD) HighlightTV
+H,digi,20745,(HD) SkyDrama
+H,digi,20726,FX
+H,digi,21157,(HD) 큐브TV
+H,digi,21176,(HD) EDGE TV
+H,digi,21212,채널W
+H,digi,20926,(HD) KBS Joy
+H,digi,20831,(HD) TRENDY
+H,digi,20757,(HD) SBS funE
+H,digi,20927,(HD) 코미디TV
+H,digi,11215,(HD) E채널
+H,digi,12045,(HD) K STAR
+H,digi,20654,(HD) XTM
+H,digi,20806,(HD) QTV
+H,digi,21172,(HD) CMC가족오락TV
+H,digi,11158,ETN연예TV
+H,digi,21160,(HD) SkyENT
+H,digi,21152,(HD) Fun TV
+H,digi,21264,(HD) 채널A Plus
+H,digi,21174,(HD) SBS MTV
+H,digi,20928,(HD) m.net
+H,digi,21173,(HD) I.NET
+H,digi,21175,(HD) 이벤트TV
+H,digi,20946,(HD) 예술TV Arte
+H,digi,21189,GMTV
+H,digi,11217,(HD) Olive
+H,digi,12892,(HD) 동아TV
+H,digi,20930,(HD) GTV
+H,digi,21169,(HD) On Style
+H,digi,21170,(HD) 패션앤
+H,digi,20049,(HD) MBC Queen
+H,digi,20893,(HD) 홈스토리
+H,digi,20892,(HD) FoodTV
+H,digi,20727,FOXlife
+H,digi,20016,육아방송
+H,digi,21159,(HD) TLC KOREA
+H,digi,21161,(HD) 라이프엔
+H,digi,21262,(HD) SkyPetpark
+H,digi,21205,DOG TV
+H,digi,21256,채널 해피독
+H,digi,12222,(HD) 어린이TV
+H,digi,21168,(HD) JEI재능TV
+H,digi,21178,(HD) 투니버스
+H,digi,20523,(HD) 디즈니채널
+H,digi,21179,(HD) 카툰네트워크
+H,digi,20933,(HD) 애니박스
+H,digi,20340,(HD) 애니플러스
+H,digi,20613,(HD) 애니맥스
+H,digi,20317,챔프
+H,digi,20527,Nickelodeon
+H,digi,20534,(HD) 디즈니주니어
+H,digi,21047,(HD) KBS Kids
+H,digi,21154,(HD) EBS U
+H,digi,21164,(HD) 디스커버리
+H,digi,20944,(HD) 리얼TV
+H,digi,20723,(HD) 내셔널지오그래픽
+H,digi,21171,(HD) 채널뷰
+H,digi,20917,다큐스토리
+H,digi,20645,EBS English
+H,digi,20535,JEI EnglishTV
+H,digi,20805,정철영어TV
+H,digi,15083,EBS PLUS1
+H,digi,15084,EBS PLUS2
+H,digi,11369,방송대학TV
+H,digi,21177,(HD) 헬스메디TV
+H,digi,20979,(HD) YTN 웨더&amp;라이프
+H,digi,20640,(HD) MBC NET
+H,digi,20738,사이언스TV
+H,digi,20826,OBS W
+H,digi,20908,세이프TV
+H,digi,20345,tbsTV
+H,digi,20724,법률TV
+H,digi,21162,(HD) SkyICT
+H,digi,21192,소비자TV
+H,digi,21273,(HD) 생활건강TV
+H,digi,21180,(HD) 한국경제TV
+H,digi,21181,(HD) 토마토TV
+H,digi,21184,(HD) 이데일리
+H,digi,21182,(HD) MTN
+H,digi,20912,(HD) 아시아경제TV
+H,digi,21183,(HD) SBS CNBC
+H,digi,21041,(HD) 매일경제TV
+H,digi,21275,(HD) 서울경제TV
+H,digi,11185,부동산TV
+H,digi,21191,에스에스증권방송
+H,digi,20518,복지TV
+H,digi,20528,쿠키건강TV
+H,digi,21165,실버아이
+H,digi,20907,한국직업방송
+H,digi,21025,소상공인방송
+H,digi,21163,(HD) 아리랑TV
+H,digi,15072,KTV국민방송
+H,digi,20331,국회방송
+H,digi,20828,국방TV
+H,digi,11214,환경TV
+H,digi,21193,한국여론방송
+H,digi,20040,BBC World News
+H,digi,20610,BBC Entertainment
+H,digi,20057,CNN
+H,digi,20075,NHK World Premium
+H,digi,20740,BBC Knowledge
+H,digi,21197,CCTV News
+H,digi,21196,CCTV4
+H,digi,21153,(HD) CNN US (HD)
+H,digi,21045,(HD) 플레이보이
+H,digi,20607,(HD) 미드나잇
+H,digi,20807,(HD) 허니TV
+H,digi,20914,(HD) VIKI
+H,digi,21078,(HD) 펜트하우스
+H,digi,20955,(HD) MBC Sports+
+H,digi,20832,(HD) KBS N Sports
+H,digi,20830,(HD) SBS Sports
+H,digi,20889,(HD) SPOTV
+H,digi,20605,(HD) SkySPORTS
+H,digi,20934,(HD) ONT
+H,digi,20755,(HD) JTBC Golf
+H,digi,20833,(HD) SBS GOLF
+H,digi,21101,(HD) SPOTV+
+H,digi,21165,(HD) JTBC3
+H,digi,20915,BilliardsTV
+H,digi,20932,(HD) FTV
+H,digi,20015,(HD) FISHING TV
+H,digi,20539,(HD) MountainTV
+H,digi,21027,(HD) TV is
+H,digi,14947,리빙TV
+H,digi,20250,폴라리스TV
+H,digi,20895,(HD) SkyTravel
+H,digi,21155,(HD) NOLL TV
+H,digi,10036,OGN
+H,digi,11460,바둑TV
+H,digi,20506,브레인TV
+H,digi,21194,K-바둑
+H,digi,21115,SPOTV GAMES
+H,digi,21258,헝그리앱TV
+H,digi,11867,CTS기독교TV
+H,digi,20235,CBS
+H,digi,14724,BTN불교TV
+H,digi,14075,평화방송
+H,digi,20107,Goodtv
+H,digi,20729,상생방송
+H,digi,20874,불교방송(BBS-TV)
+H,digi,21190,C Channel
+#HCN 동작(디지털)
+H,digi,21214,(U(HD) ) U MAX
+H,digi,21187,(HD) OBS
+H,digi,20239,(HD) MBC Every1
+H,digi,20659,(HD) SBS
+H,digi,11921,(HD) CJ오쇼핑
+H,digi,20657,(HD) KBS2
+H,digi,15061,(HD) 롯데홈쇼핑
+H,digi,20656,(HD) KBS1
+H,digi,20030,(HD) 현대홈쇼핑
+H,digi,20658,(HD) MBC
+H,digi,11502,(HD) GS SHOP
+H,digi,20655,(HD) EBS
+H,digi,21274,(HD) NS홈쇼핑
+H,digi,21005,(HD) JTBC
+H,digi,20953,(HD) MBN
+H,digi,20997,홈&쇼핑
+H,digi,21003,(HD) 채널A
+H,digi,21004,(HD) TV조선
+H,digi,20653,(HD) tvN
+H,digi,21272,(HD) 아임쇼핑
+H,digi,21000,(HD) 연합뉴스TV
+H,digi,20922,(HD) YTN
+H,digi,20950,(HD) SBS Plus
+H,digi,21083,(HD) KBS W
+H,digi,21109,(HD) K쇼핑
+H,digi,20649,(HD) MBC드라마넷
+H,digi,21261,(HD) 쇼핑&T
+H,digi,20650,(HD) Story On
+H,digi,15073,(HD) MBC MUSIC
+H,digi,20652,(HD) CH CGV
+H,digi,20746,(HD) 채널칭
+H,digi,20648,(HD) OCN
+H,digi,20663,TVB KOREA
+H,digi,20651,(HD) SUPER ACTION
+H,digi,20744,(HD) 스크린
+H,digi,20808,씨네프
+H,digi,20546,(HD) MPLEX
+H,digi,20164,더 무비
+H,digi,20809,인디필름
+H,digi,20929,(HD) CNTV
+H,digi,20500,중화TV
+H,digi,20520,(HD) AXN
+H,digi,20898,(HD) 텔레노벨라
+H,digi,21188,(HD) OCN Series
+H,digi,14863,(HD) 캐치온
+H,digi,20041,캐치온Plus
+H,digi,21213,캐치온포털
+H,digi,20924,(HD) 드라맥스
+H,digi,20921,(HD) KBS Drama
+H,digi,21167,(HD) 드라마H
+H,digi,20945,(HD) 드라마큐브
+H,digi,21166,(HD) FOX채널
+H,digi,20825,D.ONE
+H,digi,20722,(HD) 채널J
+H,digi,20234,(HD) HighlightTV
+H,digi,20745,(HD) SkyDrama
+H,digi,20726,FX
+H,digi,21157,(HD) 큐브TV
+H,digi,21176,(HD) EDGE TV
+H,digi,21212,채널W
+H,digi,20926,(HD) KBS Joy
+H,digi,20831,(HD) TRENDY
+H,digi,20757,(HD) SBS funE
+H,digi,20927,(HD) 코미디TV
+H,digi,11215,(HD) E채널
+H,digi,12045,(HD) K STAR
+H,digi,20654,(HD) XTM
+H,digi,20806,(HD) QTV
+H,digi,21172,(HD) CMC가족오락TV
+H,digi,11158,ETN연예TV
+H,digi,21160,(HD) SkyENT
+H,digi,21152,(HD) Fun TV
+H,digi,21264,(HD) 채널A Plus
+H,digi,21174,(HD) SBS MTV
+H,digi,20928,(HD) m.net
+H,digi,21173,(HD) I.NET
+H,digi,21175,(HD) 이벤트TV
+H,digi,20946,(HD) 예술TV Arte
+H,digi,21189,GMTV
+H,digi,11217,(HD) Olive
+H,digi,12892,(HD) 동아TV
+H,digi,20930,(HD) GTV
+H,digi,21169,(HD) On Style
+H,digi,21170,(HD) 패션앤
+H,digi,20049,(HD) MBC Queen
+H,digi,20893,(HD) 홈스토리
+H,digi,20892,(HD) FoodTV
+H,digi,20727,FOXlife
+H,digi,20016,육아방송
+H,digi,21159,(HD) TLC KOREA
+H,digi,21161,(HD) 라이프엔
+H,digi,21262,(HD) SkyPetpark
+H,digi,21205,DOG TV
+H,digi,21256,채널 해피독
+H,digi,12222,(HD) 어린이TV
+H,digi,21168,(HD) JEI재능TV
+H,digi,21178,(HD) 투니버스
+H,digi,20523,(HD) 디즈니채널
+H,digi,21179,(HD) 카툰네트워크
+H,digi,20933,(HD) 애니박스
+H,digi,20947,(HD) 애니플러스
+H,digi,20613,(HD) 애니맥스
+H,digi,20317,챔프
+H,digi,20527,Nickelodeon
+H,digi,20534,(HD) 디즈니주니어
+H,digi,21047,(HD) KBS Kids
+H,digi,21154,(HD) EBS U
+H,digi,21164,(HD) 디스커버리
+H,digi,20944,(HD) 리얼TV
+H,digi,20723,(HD) 내셔널지오그래픽
+H,digi,21171,(HD) 채널뷰
+H,digi,20917,다큐스토리
+H,digi,20645,EBS English
+H,digi,20535,JEI EnglishTV
+H,digi,20805,정철영어TV
+H,digi,15083,EBS PLUS1
+H,digi,15084,EBS PLUS2
+H,digi,11369,방송대학TV
+H,digi,21177,(HD) 헬스메디TV
+H,digi,20979,(HD) YTN 웨더&amp;라이프
+H,digi,20640,(HD) MBC NET
+H,digi,20738,사이언스TV
+H,digi,20826,OBS W
+H,digi,20908,세이프TV
+H,digi,20345,tbsTV
+H,digi,20869,법률TV
+H,digi,21162,(HD) SkyICT
+H,digi,21192,소비자TV
+H,digi,21273,(HD) 생활건강TV
+H,digi,21180,(HD) 한국경제TV
+H,digi,21181,(HD) 토마토TV
+H,digi,21184,(HD) 이데일리
+H,digi,21182,(HD) MTN
+H,digi,20912,(HD) 아시아경제TV
+H,digi,21183,(HD) SBS CNBC
+H,digi,21041,(HD) 매일경제TV
+H,digi,21275,(HD) 서울경제TV
+H,digi,11185,부동산TV
+H,digi,21191,에스에스증권방송
+H,digi,20518,복지TV
+H,digi,20528,쿠키건강TV
+H,digi,21165,실버아이
+H,digi,20907,한국직업방송
+H,digi,21025,소상공인방송
+H,digi,21163,(HD) 아리랑TV
+H,digi,15072,KTV국민방송
+H,digi,20331,국회방송
+H,digi,20828,국방TV
+H,digi,11214,환경TV
+H,digi,21193,한국여론방송
+H,digi,20040,BBC World News
+H,digi,20610,BBC Entertainment
+H,digi,20057,CNN
+H,digi,20075,NHK World Premium
+H,digi,20740,BBC Knowledge
+H,digi,21197,CCTV News
+H,digi,21196,CCTV4
+H,digi,21153,(HD) CNN US (HD)
+H,digi,21045,(HD) 플레이보이
+H,digi,20607,(HD) 미드나잇
+H,digi,20807,(HD) 허니TV
+H,digi,20914,(HD) VIKI
+H,digi,21078,(HD) 펜트하우스
+H,digi,20955,(HD) MBC Sports+
+H,digi,20832,(HD) KBS N Sports
+H,digi,20830,(HD) SBS Sports
+H,digi,20889,(HD) SPOTV
+H,digi,20605,(HD) SkySPORTS
+H,digi,20934,(HD) ONT
+H,digi,20755,(HD) JTBC Golf
+H,digi,20833,(HD) SBS GOLF
+H,digi,21101,(HD) SPOTV+
+H,digi,21165,(HD) JTBC3
+H,digi,20915,BilliardsTV
+H,digi,20932,(HD) FTV
+H,digi,20015,(HD) FISHING TV
+H,digi,20539,(HD) MountainTV
+H,digi,21027,(HD) TV is
+H,digi,14947,리빙TV
+H,digi,20250,폴라리스TV
+H,digi,20895,(HD) SkyTravel
+H,digi,21155,(HD) NOLL TV
+H,digi,10036,OGN
+H,digi,11460,바둑TV
+H,digi,20506,브레인TV
+H,digi,21194,K-바둑
+H,digi,21115,SPOTV GAMES
+H,digi,21258,헝그리앱TV
+H,digi,11867,CTS기독교TV
+H,digi,20235,CBS
+H,digi,14724,BTN불교TV
+H,digi,14075,평화방송
+H,digi,20107,Goodtv
+H,digi,20729,상생방송
+H,digi,20874,불교방송(BBS-TV)
+H,digi,21190,C Channel
+#HCN 관악(디지털)
+H,digi,21214,(U(HD) ) U MAX
+H,digi,21187,(HD) OBS
+H,digi,20239,(HD) MBC Every1
+H,digi,20659,(HD) SBS
+H,digi,11921,(HD) CJ오쇼핑
+H,digi,20657,(HD) KBS2
+H,digi,15061,(HD) 롯데홈쇼핑
+H,digi,20656,(HD) KBS1
+H,digi,20030,(HD) 현대홈쇼핑
+H,digi,20658,(HD) MBC
+H,digi,11502,(HD) GS SHOP
+H,digi,20655,(HD) EBS
+H,digi,21274,(HD) NS홈쇼핑
+H,digi,21005,(HD) JTBC
+H,digi,20953,(HD) MBN
+H,digi,20997,홈&쇼핑
+H,digi,21003,(HD) 채널A
+H,digi,21004,(HD) TV조선
+H,digi,20653,(HD) tvN
+H,digi,21272,(HD) 아임쇼핑
+H,digi,21000,(HD) 연합뉴스TV
+H,digi,20922,(HD) YTN
+H,digi,20950,(HD) SBS Plus
+H,digi,21083,(HD) KBS W
+H,digi,21109,(HD) K쇼핑
+H,digi,20649,(HD) MBC드라마넷
+H,digi,21261,(HD) 쇼핑&T
+H,digi,20650,(HD) Story On
+H,digi,15073,(HD) MBC MUSIC
+H,digi,20652,(HD) CH CGV
+H,digi,20746,(HD) 채널칭
+H,digi,20648,(HD) OCN
+H,digi,20663,TVB KOREA
+H,digi,20651,(HD) SUPER ACTION
+H,digi,20744,(HD) 스크린
+H,digi,20808,씨네프
+H,digi,20546,(HD) MPLEX
+H,digi,20164,더 무비
+H,digi,20809,인디필름
+H,digi,20929,(HD) CNTV
+H,digi,20500,중화TV
+H,digi,20520,(HD) AXN
+H,digi,20898,(HD) 텔레노벨라
+H,digi,21188,(HD) OCN Series
+H,digi,14863,(HD) 캐치온
+H,digi,20041,캐치온Plus
+H,digi,21213,캐치온포털
+H,digi,20924,(HD) 드라맥스
+H,digi,20921,(HD) KBS Drama
+H,digi,21167,(HD) 드라마H
+H,digi,20945,(HD) 드라마큐브
+H,digi,21166,(HD) FOX채널
+H,digi,20825,D.ONE
+H,digi,20722,(HD) 채널J
+H,digi,20234,(HD) HighlightTV
+H,digi,20745,(HD) SkyDrama
+H,digi,20726,FX
+H,digi,21157,(HD) 큐브TV
+H,digi,21176,(HD) EDGE TV
+H,digi,21212,채널W
+H,digi,20926,(HD) KBS Joy
+H,digi,20831,(HD) TRENDY
+H,digi,20757,(HD) SBS funE
+H,digi,20927,(HD) 코미디TV
+H,digi,11215,(HD) E채널
+H,digi,12045,(HD) K STAR
+H,digi,20654,(HD) XTM
+H,digi,20806,(HD) QTV
+H,digi,21172,(HD) CMC가족오락TV
+H,digi,11158,ETN연예TV
+H,digi,21160,(HD) SkyENT
+H,digi,21152,(HD) Fun TV
+H,digi,21264,(HD) 채널A Plus
+H,digi,21174,(HD) SBS MTV
+H,digi,20928,(HD) m.net
+H,digi,21173,(HD) I.NET
+H,digi,21175,(HD) 이벤트TV
+H,digi,20946,(HD) 예술TV Arte
+H,digi,21189,GMTV
+H,digi,11217,(HD) Olive
+H,digi,12892,(HD) 동아TV
+H,digi,20930,(HD) GTV
+H,digi,21169,(HD) On Style
+H,digi,21170,(HD) 패션앤
+H,digi,20049,(HD) MBC Queen
+H,digi,20893,(HD) 홈스토리
+H,digi,20892,(HD) FoodTV
+H,digi,20727,FOXlife
+H,digi,20016,육아방송
+H,digi,21159,(HD) TLC KOREA
+H,digi,21161,(HD) 라이프엔
+H,digi,21262,(HD) SkyPetpark
+H,digi,21205,DOG TV
+H,digi,21256,채널 해피독
+H,digi,12222,(HD) 어린이TV
+H,digi,21168,(HD) JEI재능TV
+H,digi,21178,(HD) 투니버스
+H,digi,20523,(HD) 디즈니채널
+H,digi,21179,(HD) 카툰네트워크
+H,digi,20933,(HD) 애니박스
+H,digi,20340,(HD) 애니플러스
+H,digi,20613,(HD) 애니맥스
+H,digi,20317,챔프
+H,digi,20527,Nickelodeon
+H,digi,20534,(HD) 디즈니주니어
+H,digi,21047,(HD) KBS Kids
+H,digi,21154,(HD) EBS U
+H,digi,21164,(HD) 디스커버리
+H,digi,20944,(HD) 리얼TV
+H,digi,20723,(HD) 내셔널지오그래픽
+H,digi,21171,(HD) 채널뷰
+H,digi,20917,다큐스토리
+H,digi,20645,EBS English
+H,digi,20535,JEI EnglishTV
+H,digi,20805,정철영어TV
+H,digi,15083,EBS PLUS1
+H,digi,15084,EBS PLUS2
+H,digi,11369,방송대학TV
+H,digi,21177,(HD) 헬스메디TV
+H,digi,20979,(HD) YTN 웨더&amp;라이프
+H,digi,20640,(HD) MBC NET
+H,digi,20738,사이언스TV
+H,digi,20826,OBS W
+H,digi,20908,세이프TV
+H,digi,20345,tbsTV
+H,digi,20724,법률TV
+H,digi,21162,(HD) SkyICT
+H,digi,21192,소비자TV
+H,digi,21273,(HD) 생활건강TV
+H,digi,21180,(HD) 한국경제TV
+H,digi,21181,(HD) 토마토TV
+H,digi,21184,(HD) 이데일리
+H,digi,21182,(HD) MTN
+H,digi,20912,(HD) 아시아경제TV
+H,digi,21183,(HD) SBS CNBC
+H,digi,21041,(HD) 매일경제TV
+H,digi,21275,(HD) 서울경제TV
+H,digi,20721,(HD) 비즈니스앤
+H,digi,11185,부동산TV
+H,digi,21191,에스에스증권방송
+H,digi,20518,복지TV
+H,digi,20528,쿠키건강TV
+H,digi,21165,실버아이
+H,digi,20907,한국직업방송
+H,digi,21025,소상공인방송
+H,digi,21163,(HD) 아리랑TV
+H,digi,15072,KTV국민방송
+H,digi,20331,국회방송
+H,digi,20828,국방TV
+H,digi,11214,환경TV
+H,digi,21193,한국여론방송
+H,digi,20040,BBC World News
+H,digi,20610,BBC Entertainment
+H,digi,20057,CNN
+H,digi,20075,NHK World Premium
+H,digi,20740,BBC Knowledge
+H,digi,21197,CCTV News
+H,digi,21196,CCTV4
+H,digi,21153,(HD) CNN US (HD)
+H,digi,21045,(HD) 플레이보이
+H,digi,20607,(HD) 미드나잇
+H,digi,20807,(HD) 허니TV
+H,digi,20914,(HD) VIKI
+H,digi,21078,(HD) 펜트하우스
+H,digi,20955,(HD) MBC Sports+
+H,digi,20832,(HD) KBS N Sports
+H,digi,20830,(HD) SBS Sports
+H,digi,20889,(HD) SPOTV
+H,digi,20605,(HD) SkySPORTS
+H,digi,20934,(HD) ONT
+H,digi,20755,(HD) JTBC Golf
+H,digi,20833,(HD) SBS GOLF
+H,digi,21101,(HD) SPOTV+
+H,digi,21165,(HD) JTBC3
+H,digi,20915,BilliardsTV
+H,digi,20932,(HD) FTV
+H,digi,20015,(HD) FISHING TV
+H,digi,20539,(HD) MountainTV
+H,digi,21027,(HD) TV is
+H,digi,14947,리빙TV
+H,digi,20250,폴라리스TV
+H,digi,20895,(HD) SkyTravel
+H,digi,21155,(HD) NOLL TV
+H,digi,10036,OGN
+H,digi,11460,바둑TV
+H,digi,20506,브레인TV
+H,digi,21194,K-바둑
+H,digi,21115,SPOTV GAMES
+H,digi,21258,헝그리앱TV
+H,digi,11867,CTS기독교TV
+H,digi,20235,CBS
+H,digi,14724,BTN불교TV
+H,digi,14075,평화방송
+H,digi,20107,Goodtv
+H,digi,20729,상생방송
+H,digi,20874,불교방송(BBS-TV)
+H,digi,21190,C Channel
