@@ -111,7 +111,7 @@ fn_validation() {
 	fi
 }
 
-fn_prepare() {
+fn_preproc() {
 	fn_md5 "${TV_CHANNEL_CONF}" > "${TIMESTAMP}"
 	date +"%F %T" >> "${TIMESTAMP}"
 
@@ -1244,11 +1244,22 @@ fn_cleanup() {
 	echo
 }
 
+fn_postproc() {
+	if [ -e "${XMLTV_FILE}" -a -x ./postproc.sh ]; then
+		echo_green "==> " "Start Postproc"
+
+		./postproc.sh "${XMLTV_FILE}"
+
+		echo_green "==> " "Done."
+		echo
+	fi
+}
+
 #Validation
 fn_validation
 
-#Prepare
-fn_prepare
+#Preproc
+fn_preproc
 
 #Download
 fn_download
@@ -1258,6 +1269,9 @@ fn_generate_xml
 
 #Cleanup
 fn_cleanup
+
+#Postproc
+fn_postproc
 
 exit
 
