@@ -606,7 +606,7 @@ fn_generate_xml_channel() {
 
 	fn_count_reset
 
-	local channels="$("${SED}" -e "/^\([^#].*,.*\):\+.*$/!d" -e "/^#/d" -e "s/^\(.*,.*\):\+.*$/\1/g" "${TV_CHANNEL_CONF}")"
+	local channels="$("${SED}" -e "/^\([^#][^,]*,[^:]*\).*$/!d" -e "/^#/d" -e "s/^\([^,]*,[^:]*\).*$/\1/g" "${TV_CHANNEL_CONF}")"
 	local channels_count="$(wc -l <<< "${channels}")"
 
 	local line=
