@@ -49,15 +49,13 @@ else
 	WORKING_DIR=./working
 fi
 COUNT="${WORKING_DIR}/count"
+BASE_URL_UPLUS='http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd={date_ymd}'
 BASE_URL_NAVER='http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcast_type}&channelGroup={channel_group}&date={date_ymd}'
-BASE_URL_EPG='http://schedule.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date}&{channel}'
+BASE_URL_EPG='http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date}&{channel}'
 BASE_URL_EPG_CHECKCHANNEL='checkchannel%5B{channel_id}%5D={channel_no}'
-BASE_URL_CNM='http://www.epg.co.kr/epg-cgi/extern/cnm_guide_type_v070530.cgi?beforegroup={group}&select_group={group}&checkchannel={channel}&start_date={date_ymd}&soid={soid}&mode=print'
-BASE_URL_HCN='http://www.hcn.co.kr/ur/bs/ch/channelInfo.hcn?method=man_00&p_menu_id=1903&currentPage=1&ch_divide={ch_divide}&ch_id={ch_id}&year={date_yyyy}&month={date_mm}&date={date_dd}'
+WORKING_UPLUS="${WORKING_DIR}/working_uplus"
 WORKING_NAVER="${WORKING_DIR}/working_naver"
 WORKING_EPG="${WORKING_DIR}/working_epg"
-WORKING_CNM="${WORKING_DIR}/working_cnm"
-WORKING_HCN="${WORKING_DIR}/working_hcn"
 OUTPUT_FILE="${WORKING_DIR}/xmltv.xml"
 XMLTV_FILE="./xmltv.xml.gz"
 TIMESTAMP=".timestamp"
@@ -173,6 +171,80 @@ fn_file_write() {
 			echo "${2}" >> "${1}"
 		fi
 	) 300>"${1}.lock"
+}
+
+fn_download_uplus() {
+	local channels="$("${SED}" -e "/^[^#].*:U,.*$/!d" "${TV_CHANNEL_CONF}")"
+	if [ -z "${channels}" ]; then
+		return
+	fi
+
+	local download_list=()
+
+	echo_blue " -> " "Generate Download URL(uplus)"
+
+	local line=
+	while read -r line
+   	do
+		local channel_no="$("${SED}" -e "s/^\(.*\),\(.*\):U,\(.*\),.*$/\1/g" <<< "${line}")"
+		local channel_name="$("${SED}" -e "s/^\(.*\),\(.*\):U,\(.*\),.*$/\2/g" <<< "${line}")"
+		local channel_id="$("${SED}" -e "s/^\(.*\),\(.*\):U,\(.*\),.*$/\3/g" <<< "${line}")"
+
+		local url="${BASE_URL_UPLUS}"
+		url="${url//\{channelId\}/${channel_id}}"
+		download_list+=("$(echo "${channel_no},${channel_name},${url}")")
+	done <<< "${channels}"
+
+	echo_blue " -> " "Done."
+
+	echo_blue " -> " "Start Download(uplus)"
+
+	cat /dev/null > "${WORKING_UPLUS}"
+
+	local day=
+	for day in $(seq 0 $((DOWNLOAD_DATE - 1)))
+	do
+		fn_count_reset
+
+		local date_ymd="$(date +%Y%m%d -d "${day} days")"
+		local date_display="$(date +%Y-%m-%d -d "${day} days")"
+
+		local download_length=${#download_list[@]}
+		local download_count=
+		for download_count in $(seq 0 $((download_length - 1)))
+		do
+			while [ $(jobs -rp | wc -l) -ge 16 ]
+			do
+				sleep 0.1
+			done
+			job &> /dev/null
+
+			echo -ne " -> ${date_display} $(fn_count_get)/${#download_list[@]}\033[0K\r"
+			local url="${download_list[${download_count}]}"
+			local url1="$("${SED}" -e "s/^\(.*\),\(.*\),\(.*\)$/\1/g" <<< "${url}")"
+			local url2="$("${SED}" -e "s/^\(.*\),\(.*\),\(.*\)$/\2/g" <<< "${url}")"
+			local url3="$("${SED}" -e "s/^\(.*\),\(.*\),\(.*\)$/\3/g" <<< "${url}")"
+
+			fn_download_uplus_thread "${url3/\{date_ymd\}/${date_ymd}}" "${url1}" "${url2}" "${date_ymd}" &
+		done
+
+		wait
+
+		echo
+	done
+
+	echo_blue " -> " "Done."
+}
+
+fn_download_uplus_thread() {
+	local url="${1}"
+	local url1="${2}"
+	local url2="${3}"
+	local date_ymd="${4}"
+	local html="$(curl -s "${url}" | iconv -f cp949 -t utf-8)"
+	if [ -z "$(grep '조회내역이 없습니다.' <<< "${html}")" ]; then
+		"${SED}" -e "/datatype_head/,/<tbody>/d" -e "/<\/tbody>/,\$d" -e "s/^\s\+//g" <<< "${html}" | tr -d "\r" | "${SED}" -e "/^$/d" -e "s/^.*txtcon_grade_[[:alpha:]]\+\([[:digit:]]\+\).*$/\1/g" -e "s/^.*txtcon_all.*$//g" -e "/txtcon/d" -e "s/<td>\([[:digit:]]\+\):\([[:digit:]]\+\)<\/td>/${url1}${D}'${url2}'${D}${date_ymd}\1\2/g" -e "s/^<td class=\"title\">\(.*\)$/'\1'/g" -e "/<td>\|<\/td>/d" | "${SED}" -e "/<tr>.*/{N;N;N;N; s/\n/${D}/g}" | "${SED}" -e "s/^<tr>${D}//g" -e "/<\/tr>/d" | fn_file_write "${WORKING_UPLUS}"
+	fi
 }
 
 fn_download_naver() {
@@ -323,264 +395,14 @@ fn_download_epg() {
 	echo_blue " -> " "Done."
 }
 
-fn_parser_cnm() {
-	local channels="${1}"
-	local working_date=$(date +%F)
-	local channel_list=()
-	local channel_seq=
-	local channel_skip=N
-	local time=
-	local ampm=AM
-	local step=0
-	while read -r data
-	do
-		if [ "${data}" = "=====" ]; then
-			working_date=$(date +%F)
-			channel_list=()
-			channel_seq=
-			channel_skip=N
-			time=
-			ampm=AM
-			step=0
-		else
-			if [ "${data//Channel : /}" != "${data}" ]; then
-				channel_seq=0
-				step=$((step + 1))
-				if [ "${channel_skip}" = "Y" ]; then
-					ampm=PM
-					continue
-				fi
-				channel_list+=("${data//Channel : /}")
-			else
-				channel_skip=Y
-				if [ "${data//Time : /}" != "${data}" ]; then
-					channel_seq=0
-					time="${data//Time : /}"
-				elif [ "${data//-----/}" != "${data}" ]; then
-					channel_seq=$((channel_seq + 1))
-				else
-					seq=$((channel_seq - 1))
-					min="$("${SED}" -e "s/\([[:digit:]]\+\) [[:alnum:]]\+ .*/\1/g" <<< "${data}")"
-					pid="$("${SED}" -e "s/[[:digit:]]\+ \([[:alnum:]]\+\) .*/\1/g" <<< "${data}")"
-					title="$("${SED}" -e "s/[[:digit:]]\+ [[:alnum:]]\+ \(.*\)/\1/g" <<< "${data}")"
-					if [ "${ampm}" = "PM" -a "${time}" = "12" -a $((${step} / ${#channel_list[@]})) -eq 3 ]; then
-						ampm="AM"
-						working_date="$(date -d "${working_date} 1 days" +%F)"
-					fi
-					date_time="$(date -d "${working_date} ${time}:${min} ${ampm}" +"%F %T")"
-					while read -r ch
-					do
-						local channel_no="$("${SED}" -e "s/^\(.*\),.*:C,.*,.*,.*,.*/\1/g" <<< "${ch}")"
-						echo "'${channel_no}','${title}','${date_time}'"
-					done <<< $("${SED}" -e "/.*,.*:C,.*,.*,.*,${channel_list[${seq}]}/!d" <<< "${channels}" | sort -u)
-				fi
-			fi
-		fi
-	done
-}
-
-fn_download_cnm() {
-	local channels="$("${SED}" -e "/^[^#].*,.*:C,.*,.*,.*,.*$/!d" "${TV_CHANNEL_CONF}")"
-	if [ -z "${channels}" ]; then
-		return
-	fi
-
-	local download_list=()
-
-	echo_blue " -> " "Generate Download URL(c&m)"
-
-	local line=
-	while read -r line
-	do
-		local soid="$("${SED}" -e "s/^\(.*\),.*$/\1/g" <<< "${line}")"
-		local group="$("${SED}" -e "s/^.*,\(.*\)$/\1/g" <<< "${line}")"
-		local checkchannel=
-		local loop_seq=1
-		local line=
-		while read -r channel
-	   	do
-			local channelno="$("${SED}" -e "s/^[^#].*,.*:C,.*,.*,\(.*\),.*$/\1/g" <<< "${channel}")"
-			checkchannel+="${channelno},"
-
-			if [ "$((loop_seq % 3))" = "0" ]; then
-				local url="${BASE_URL_CNM}"
-				url="${url//\{soid\}/${soid}}"
-				url="${url//\{group\}/${group}}"
-				url="${url//\{channel\}/${checkchannel:0:-1}}"
-				download_list+=("${url}")
-				checkchannel=""
-			fi
-
-			loop_seq=$((loop_seq + 1))
-		done <<< "$("${SED}" -e "/^.*,.*:C,${soid},${group},.*,.*/!d" <<< "${channels}")"
-
-		if [ ! -z "${checkchannel}" ]; then
-			local url="${BASE_URL_CNM}"
-			url="${url//\{soid\}/${soid}}"
-			url="${url//\{group\}/${group}}"
-			url="${url//\{channel\}/${checkchannel:0:-1}}"
-			download_list+=("${url}")
-			checkchannel=""
-		fi
-	done <<< "$("${SED}" -e "s/^[^#].*,.*:C,\(.*,.*\),.*,.*$/\1/g" <<< "${channels}" | sort -u)"
-
-	echo_blue " -> " "Done."
-
-	echo_blue " -> " "Start Download(c&m)"
-
-	cat /dev/null > "${WORKING_CNM}"
-
-	local day=
-	for day in $(seq 0 $((DOWNLOAD_DATE - 1)))
-	do
-		fn_count_reset
-
-		local date_ymd="$(date +%Y%m%d -d "${day} days")"
-		local date_progress="$(date +%Y-%m-%d -d "${day} days")"
-
-		for url in ${download_list[@]}
-		do
-			while [ $(jobs -rp | wc -l) -ge 16 ]
-			do
-				sleep 0.1
-			done
-			job &> /dev/null
-
-			echo -ne " -> ${date_progress} $(fn_count_get)/${#download_list[@]}\033[0K\r"
-			curl -s "${url/\{date\}/${date_ymd}}" | iconv -f cp949 -t utf-8 | "${SED}" -e "/<td align=\"center\" width=\"[[:digit:]]\+%\" >.*<\/td>\|[[:digit:]]\+시\s\+<\/td>\|<td valign=top height=\"25\">\[.*\]<\/td>\|<td height=\"25\" valign=top >\|<table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">\|<\/html>/!d" | "${SED}" -e "s/\s\+<td><table  border=\"0\" cellpadding=\"0\" cellspacing=\"1\">/-----/g" -e "s/<\/html>/=====/g" | "${SED}" -e "s/\s\+<td align=\"center\" width=\"[[:digit:]]\+%\" >\(.*\)<\/td>/Channel : \1/g" | "${SED}" -e "s/^\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" -e "s/^\s\+<td colspan=\"2\">\([[:digit:]]\+\)시\s\+<\/td>/Time : \1/g" | "${SED}" -e "/<tr><td valign=top height=\"25\">\[.*\]<\/td>/ {N; s/<tr><td valign=top height=\"25\">\[\(.*\)\]<\/td>.*<td height=\"25\" valign=top > <a href=\"JavaScript:ViewContent('\(.*\)')\">\(.*\)<\/b>.*<\/td><\/tr>/\1 \2 \3/g}" | "${SED}" -e "/^$/d" | fn_parser_cnm "${channels}" | fn_file_write "${WORKING_CNM}" &
-		done
-
-		wait
-
-		echo
-
-	done
-
-	wait
-
-	echo_blue " -> " "Done."
-}
-
-fn_download_hcn_thread() {
-	local channel_no="${1}"
-	local date_yyyy="${2}"
-	local url="${3}"
-
-	local download="$(curl -s "${url}" | iconv -f cp949 -t utf-8 | sed -e "/채널편성표 목록<\/caption>\|<strong class=\"color9\">\|<td class=\"L\">\|<td class=\"rnb\">/!d")"
-
-	while read -r data
-	do
-		if [ "${data//채널편성표 목록<\/caption>/}" != "${data}" ]; then
-			date_mm="$(sed -e "s/\s*<caption>\(.*\)월.*일 .*의 채널편성표 목록<\/caption>.*$/\1/g" <<< "${data}")"
-			date_dd="$(sed -e "s/\s*<caption>.*월\(.*\)일 .*의 채널편성표 목록<\/caption>.*$/\1/g" <<< "${data}")"
-		else
-			if [ "${data//color9/}" != "${data}" ]; then
-				if [ ! -z "${title}" ]; then
-					if [ ! -z "${prev_date_mm}" ]; then
-						if [ ${prev_date_mm} -gt ${date_mm} ]; then
-							date_yyyy=$((date_yyyy + 1))
-						fi
-					fi
-					#'channel_no','title','start','category'
-					echo "'${channel_no}'${D}'${title}'${D}'${date_yyyy}-${date_mm}-${date_dd} ${time}'${D}'${category}'" | fn_file_write "${WORKING_HCN}" &
-					local prev_date_mm="${date_mm}"
-				fi
-				local prev_time="${time}"
-				time="$(sed -e "s/^.*<strong class=\".*\">\(.*\)<\/strong>.*$/\1/g" <<< "${data}")"
-				if [ ! -z "${prev_time}" -a ! -z "${time}" ]; then
-					if [ "${time/:*/}" -lt "${prev_time/:*/}" ]; then
-						break
-					fi
-				fi
-				title=
-				category=
-			elif [ "${data//javascript:detailSheet/}" != "${data}" ]; then
-				title="$(sed -e "s/^.*javascript:detailSheet('.*')\">\(.*\)<\/a>.*$/\1/g" <<< "${data}")"
-			elif [ "${data//<span class=\"f11\">/}" != "${data}" ]; then
-				category="$(sed -e "s/^.*<span class=\"f11\">\(.*\)<\/span>.*$/\1/g" <<< "${data}")"
-				category="${category/\(*/}"
-			fi
-		fi
-	done <<< "${download}"
-}
-
-fn_download_hcn() {
-	local channels="$("${SED}" -e "/^[^#].*,.*:H,.*,.*,.*$/!d" "${TV_CHANNEL_CONF}")"
-	if [ -z "${channels}" ]; then
-		return
-	fi
-
-	local download_list=()
-
-	echo_blue " -> " "Generate Download URL(HCN)"
-
-	local channel_no=
-	local channel_id=
-	while read -r channel_no ch_divide ch_id
-	do
-		local url="${BASE_URL_HCN}"
-		url="${url//\{ch_divide\}/${ch_divide}}"
-		url="${url//\{ch_id\}/${ch_id}}"
-		download_list+=("${channel_no}${D}${url}")
-		checkchannel=""
-	done <<< "$("${SED}" -e "s/^\([^#].*\),.*:H,\(.*\),\(.*\),.*$/\1 \2 \3/g" <<< "${channels}" | sort -u)"
-
-	echo_blue " -> " "Done."
-
-	echo_blue " -> " "Start Download(HCN)"
-
-	cat /dev/null > "${WORKING_HCN}"
-
-	local day=
-	for day in $(seq 0 $((DOWNLOAD_DATE - 1)))
-	do
-		fn_count_reset
-
-		local date_yyyy="$(date +%Y -d "${day} days")"
-		local date_mm="$(date +%m -d "${day} days")"
-		local date_dd="$(date +%d -d "${day} days")"
-		local date_display="$(date +%Y-%m-%d -d "${day} days")"
-
-		local channel_no_url=
-		for channel_no_url in "${download_list[@]}"
-		do
-			while [ $(jobs -rp | wc -l) -ge 16 ]
-			do
-				sleep 0.1
-			done
-			job &> /dev/null
-
-			echo -ne " -> ${date_display} $(fn_count_get)/${#download_list[@]}\033[0K\r"
-			local channel_no="${channel_no_url/${D}*/}"
-			local url="${channel_no_url/*${D}/}"
-			url="${url//\{date_yyyy\}/${date_yyyy}}"
-			url="${url//\{date_mm\}/${date_mm}}"
-			url="${url//\{date_dd\}/${date_dd}}"
-
-			fn_download_hcn_thread "${channel_no}" "${date_yyyy}" "${url}" &
-		done
-
-		wait
-
-		echo
-
-	done
-
-	wait
-
-	echo_blue " -> " "Done."
-}
-
 fn_download() {
 	echo_green "==> " "Start Download"
+
+	fn_download_uplus
 
 	fn_download_naver
 
 	fn_download_epg
-
-	fn_download_cnm
-
-	fn_download_hcn
 
 	echo_green "==> " "Done."
 	echo
@@ -594,7 +416,7 @@ fn_generate_xml_header() {
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE tv SYSTEM "xmltv.dtd">
 
-<tv source-info-name="epg.co.kr" generator-info-name="forumi0721" generator-info-url="mailto:forumi0721@gmail.com">
+<tv source-info-name="forumi0721.ddns.net" generator-info-name="forumi0721" generator-info-url="mailto:forumi0721@gmail.com">
 EOF
 	fn_file_write "${OUTPUT_FILE}" "${result}"
 
@@ -622,7 +444,7 @@ fn_generate_xml_channel() {
 
 		local result=
 		read -r -d "" result << EOF
-<channel id="I${channel_no}.schedule.epg.co.kr">
+<channel id="I${channel_no}.forumi0721.ddns.net">
 	<display-name>${channel_no} ${channel_name}</display-name>
 	<display-name>${channel_no}</display-name>
 	<display-name>${channel_name}</display-name>
@@ -633,6 +455,160 @@ EOF
 
 	echo
 	echo_blue " -> " "Done."
+}
+
+fn_generate_xml_programme_uplus() {
+	if [ ! -e "${WORKING_UPLUS}" ]; then
+		return
+	fi
+
+	local channels=($("${SED}" -e "s/^\(.*\)^#^'.*'^#^.*^#^'.*'^#^.*^#^.*/\1/g" "${WORKING_UPLUS}" | sort -u))
+	local total_count="$(wc -l < "${WORKING_UPLUS}")"
+	if [ "${total_count}" -le 0 ]; then
+		return
+	fi
+
+	echo_blue " -> " "Generate Programme(uplus)"
+
+	fn_count_reset
+
+	local ch=
+	for ch in ${channels[@]}
+	do
+		while [ $(jobs -rp | wc -l) -ge 16 ]
+		do
+			sleep 0.1
+		done
+		job &> /dev/null
+
+		fn_generate_xml_programme_uplus_thread "${ch}" "$("${SED}" -e "/^${ch}${D}/!d" "${WORKING_UPLUS}")" "${total_count}" &
+	done
+
+	wait
+
+	echo
+	echo_blue " -> " "Done."
+
+}
+
+fn_generate_xml_programme_uplus_thread() {
+	local channel_no="${1}"
+	local info="${2}"
+	local total_count="${3}"
+
+	local prev_info=
+
+	local line=
+	while read -r line
+	do
+		if [ ! -z "${prev_info}" ]; then
+			echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
+
+			local title="$("${SED}" -e "s/^.*${D}'.*'${D}.*${D}'\(.*\)'${D}.*${D}.*$/\1/g" <<< "${prev_info}")"
+
+			local episode="$("${SED}" -e "s/^.*(\([[:digit:]]\+회\))/\1/g" <<< "${title}")"
+			if [ "${episode}" = "${title}" ]; then
+				episode=""
+			else
+				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*([[:digit:]]\+회)/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
+			fi
+
+			local subtitle="$("${SED}" -e "s/^.*&lt;\(.*\)&gt;$/\1/g" <<< "${title}")"
+			if [ "${subtitle}" = "${title}" ]; then
+				subtitle=""
+			else
+				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
+			fi
+
+			local desc="${title}"
+			if [ ! -z "${subtitle}" ]; then
+				desc+=" &lt;${subtitle}&gt;"
+			fi
+			if [ ! -z "${episode}" ]; then
+				desc+=" (${episode})"
+			fi
+
+			local start="$("${SED}" -e "s/^.*${D}'.*'${D}\(.*\)${D}'.*'${D}.*${D}.*$/\1/g" <<< "${prev_info}")"
+			local end="$("${SED}" -e "s/^.*${D}'.*'${D}\(.*\)${D}'.*'${D}.*${D}.*$/\1/g" <<< "${line}")"
+
+			local category="$("${SED}" -e "s/^.*${D}'.*'${D}.*${D}'.*'${D}.*${D}\(.*\)$/\1/g" <<< "${prev_info}")"
+			local category_en=
+			case ${category//-*/} in
+				드라마) #드라마
+					category="드라마"
+					category_en="Movie / Drama"
+					;;
+				영화) #영화
+					category="영화"
+					category_en="Movie / Drama"
+					;;
+				만화) #만화
+					category="만화"
+					category_en="Children's / Youth programmes"
+					;;
+				연예/오락) #연예/오락
+					category="연예/오락"
+					category_en="Show / Games"
+					;;
+				스포츠) #스포츠
+					category="스포츠"
+					category_en="Sports"
+					;;
+				라이프) #라이프
+					category="라이프"
+					category_en="Leisure hobbies"
+					;;
+				공연/음악) #공연/음악
+					category="공연/음악"
+					category_en="Music / Ballet / Dance"
+					;;
+				교육) #교육
+					category="교육"
+					category_en="Education / Science / Factual topics"
+					;;
+				뉴스/정보) #뉴스/정보
+					category="뉴스/정보"
+					category_en="News / Current affairs"
+					;;
+				다큐) #다큐
+					category="다큐"
+					category_en="Social / Political issues / Economics"
+					;;
+				예술) #예술
+					category="예술"
+					category_en="Arts / Culture (without music)"
+					;;
+				*) #기타
+					category=""
+					category_en=""
+					;;
+			esac
+
+			local rating="$("${SED}" -e "s/^.*${D}'.*'${D}.*${D}'.*'${D}\(.*\)${D}.*$/\1/g" <<< "${prev_info}")"
+
+			local result=
+			read -r -d "" result << EOF
+<programme start="${start} +0900" stop="${end} +0900" channel="I${ch}.forumi0721.ddns.net">
+	<title lang="ko">${desc}</title>
+	<desc lang="ko">${desc}</desc>
+	<episode-num system="onscreen">${episode}</episode-num>
+	<category lang="en">${category_en}</category>
+	<category lang="ko">${category}</category>
+	<language>ko</language>
+	<rating system="VCHIP">
+		<value>${rating}</value>
+	</rating>
+	<generate-source name="http://www.uplus.co.kr/"/>
+</programme>
+EOF
+			fn_file_write "${OUTPUT_FILE}" "${result}"
+		else
+			echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
+		fi
+		prev_info="${line}"
+	done <<< "${info}"
+
+	return
 }
 
 fn_generate_xml_programme_naver() {
@@ -714,8 +690,8 @@ fn_generate_xml_programme_naver_thread() {
 				category="만화"
 				category_en="Children's / Youth programmes"
 				;;
-			D) #연애/오락
-				category="연애/오락"
+			D) #연예/오락
+				category="연예/오락"
 				category_en="Show / Games"
 				;;
 			E) #스포츠
@@ -768,7 +744,7 @@ fn_generate_xml_programme_naver_thread() {
 	
 		local result=
 		read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${channel}.schedule.epg.co.kr">
+<programme start="${start}" stop="${end}" channel="I${channel}.forumi0721.ddns.net">
 	<title lang="ko">${desc}</title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
@@ -778,7 +754,7 @@ fn_generate_xml_programme_naver_thread() {
 	<rating system="VCHIP">
 		<value>${rating}</value>
 	</rating>
-	<generate-source name="Naver"/>
+	<generate-source name="http://tvguide.naver.com/"/>
 </programme>
 EOF
 		fn_file_write "${OUTPUT_FILE}" "${result}"
@@ -870,8 +846,8 @@ fn_generate_xml_programme_epg_thread() {
 			category="만화"
 			category_en="Children's / Youth programmes"
 			;;
-		연애/오락) #연애/오락
-			category="연애/오락"
+		연예/오락) #연예/오락
+			category="연예/오락"
 			category_en="Show / Games"
 			;;
 		스포츠) #스포츠
@@ -914,285 +890,30 @@ fn_generate_xml_programme_epg_thread() {
 
 	local result=
 	read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${channel_no}.schedule.epg.co.kr">
+<programme start="${start}" stop="${end}" channel="I${channel_no}.forumi0721.ddns.net">
 	<title lang="ko">${desc}</title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
 	<category lang="en">${category_en}</category>
 	<category lang="ko">${category}</category>
 	<language>ko</language>
-	<generate-source name="EPG"/>
+	<generate-source name="http://www.epg.co.kr/"/>
 </programme>
 EOF
 	fn_file_write "${OUTPUT_FILE}" "${result}"
 }
 
-fn_generate_xml_programme_cnm() {
-	if [ ! -e "${WORKING_CNM}" ]; then
-		return
-	fi
-
-	local channels=($("${SED}" -e "s/^'\(.*\)','.*','.*'$/\1/g" "${WORKING_CNM}" | sort -u))
-	local total_count="$(($(wc -l < "${WORKING_CNM}") - ${#channels[@]}))"
-	if [ "${total_count}" -le 0 ]; then
-		return
-	fi
-
-	echo_blue " -> " "Generate Programme(cnm)"
-
-	fn_count_reset
-
-	local ch=
-	for ch in ${channels[@]}
-	do
-		while [ $(jobs -rp | wc -l) -ge 16 ]
-		do
-			sleep 0.1
-		done
-		job &> /dev/null
-
-		fn_generate_xml_programme_cnm_thread "${ch}" "$("${SED}" -e "/^'${ch}',/!d" "${WORKING_CNM}")" "${total_count}" &
-	done
-
-	wait
-
-	echo
-	echo_blue " -> " "Done."
-
-}
-
-fn_generate_xml_programme_cnm_thread() {
-	local channel_no="${1}"
-	local info="${2}"
-	local total_count="${3}"
-
-	local prev_info=
-
-	while read -r line
-	do
-		if [ ! -z "${prev_info}" ]; then
-			echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
-
-			local title="$("${SED}" -e "s/^'.*','\(.*\)','.*'/\1/g" <<< "${prev_info}")"
-
-			local episode="$("${SED}" -e "s/^.*(\([[:digit:]]\+회\))/\1/g" <<< "${title}")"
-			if [ "${episode}" = "${title}" ]; then
-				episode=""
-			else
-				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*([[:digit:]]\+회)/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
-			fi
-
-			local subtitle="$("${SED}" -e "s/^.*&lt;\(.*\)&gt;$/\1/g" <<< "${title}")"
-			if [ "${subtitle}" = "${title}" ]; then
-				subtitle=""
-			else
-				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
-			fi
-
-			local desc="${title}"
-			if [ ! -z "${subtitle}" ]; then
-				desc+=" &lt;${subtitle}&gt;"
-			fi
-			if [ ! -z "${episode}" ]; then
-				desc+=" (${episode})"
-			fi
-
-			local start="$("${SED}" -e "s/^'.*','.*','\(.*\)'/\1/g" <<< "${prev_info}")"
-			start="$(date -d "${start}" '+%Y%m%d%H%M%S %z')"
-
-			local end="$("${SED}" -e "s/^'.*','.*','\(.*\)'/\1/g" <<< "${line}")"
-			end="$(date -d "${end}" '+%Y%m%d%H%M%S %z')"
-
-			local result=
-			read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${ch}.schedule.epg.co.kr">
-	<title lang="ko">${desc}</title>
-	<desc lang="ko">${desc}</desc>
-	<episode-num system="onscreen">${episode}</episode-num>
-	<category lang="en"></category>
-	<category lang="ko"></category>
-	<language>ko</language>
-	<generate-source name="C&amp;M"/>
-</programme>
-EOF
-			fn_file_write "${OUTPUT_FILE}" "${result}"
-		fi
-		prev_info="${line}"
-	done <<< "${info}"
-
-	return
-}
-
-fn_generate_xml_programme_hcn() {
-	if [ ! -e "${WORKING_HCN}" ]; then
-		return
-	fi
-
-	#'channel_no','title','start','category'
-	local channels=($("${SED}" -e "s/^'\(.*\)'${D}'.*'${D}'.*'${D}'.*'$/\1/g" "${WORKING_HCN}" | sort -u))
-	local total_count="$(($(wc -l < "${WORKING_HCN}") - ${#channels[@]}))"
-	if [ "${total_count}" -le 0 ]; then
-		return
-	fi
-
-	echo_blue " -> " "Generate Programme(hcn)"
-
-	fn_count_reset
-
-	local channel=
-	for channel in ${channels[@]}
-	do
-		while [ $(jobs -rp | wc -l) -ge 16 ]
-		do
-			sleep 0.1
-		done
-		job &> /dev/null
-
-		fn_generate_xml_programme_hcn_thread "${channel}" "${total_count}" 
-	done
-
-	wait
-
-	echo
-	echo_blue " -> " "Done."
-
-}
-
-fn_generate_xml_programme_hcn_thread() {
-	local channel_no="${1}"
-	local total_count="${2}"
-
-	local prev_info=
-
-	while read -r line
-	do
-		if [ ! -z "${prev_info}" ]; then
-			echo -ne " -> $(fn_count_get)/${total_count}\033[0K\r"
-
-			#'channel_no','title','start','category'
-
-			local title="$("${SED}" -e "s/^'.*'${D}'\(.*\)'${D}'.*'${D}'.*'/\1/g" <<< "${prev_info}")"
-
-			local episode="$("${SED}" -e "s/^.*(\([[:digit:]]\+회\))/\1/g" <<< "${title}")"
-			if [ "${episode}" = "${title}" ]; then
-				episode=""
-			else
-				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*([[:digit:]]\+회)/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
-			fi
-
-			local subtitle="$("${SED}" -e "s/^.*&lt;\(.*\)&gt;$/\1/g" <<< "${title}")"
-			if [ "${subtitle}" = "${title}" ]; then
-				subtitle=""
-			else
-				title="$("${SED}" -e "s/^\(.*\)[[:space:]]*&lt;.*&gt;$/\1/g" <<< "${title}" | "${SED}" -e "s/[[:space:]]\+$//g")"
-			fi
-
-			local desc="${title}"
-			if [ ! -z "${subtitle}" ]; then
-				desc+=" &lt;${subtitle}&gt;"
-			fi
-			if [ ! -z "${episode}" ]; then
-				desc+=" (${episode})"
-			fi
-
-			local category="$("${SED}" -e "s/^'.*'${D}'.*'${D}'.*'${D}'\(.*\)'/\1/g" <<< "${line}")"
-			local category_en=
-			case ${category//-*/} in
-				드라마) #드라마
-					category="드라마"
-					category_en="Movie / Drama"
-					;;
-				영화) #영화
-					category="영화"
-					category_en="Movie / Drama"
-					;;
-				만화) #만화
-					category="만화"
-					category_en="Children's / Youth programmes"
-					;;
-				연애/오락) #연애/오락
-					category="연애/오락"
-					category_en="Show / Games"
-					;;
-				스포츠) #스포츠
-					category="스포츠"
-					category_en="Sports"
-					;;
-				취미/레저) #취미/레저
-					category="취미/레저"
-					category_en="Leisure hobbies"
-					;;
-				음악) #음악
-					category="음악"
-					category_en="Music / Ballet / Dance"
-					;;
-				교육) #교육
-					category="교육"
-					category_en="Education / Science / Factual topics"
-					;;
-				뉴스) #뉴스
-					category="뉴스"
-					category_en="News / Current affairs"
-					;;
-				시사/다큐) #시사/다큐
-					category="시사/다큐"
-					category_en="Social / Political issues / Economics"
-					;;
-				교양/정보) #교양/정보
-					category="교양/정보"
-					category_en="Arts / Culture (without music)"
-					;;
-				홈쇼핑) #홍쇼핑
-					category="홈쇼핑"
-					category_en=""
-					;;
-				*) #기타
-					category=""
-					category_en=""
-					;;
-			esac
-
-			local start="$("${SED}" -e "s/^'.*'${D}'.*'${D}'\(.*\)'${D}'.*'/\1/g" <<< "${prev_info}")"
-			start="$(date -d "${start}" '+%Y%m%d%H%M%S %z')"
-
-			local end="$("${SED}" -e "s/^'.*'${D}'.*'${D}'\(.*\)'${D}'.*'/\1/g" <<< "${line}")"
-			end="$(date -d "${end}" '+%Y%m%d%H%M%S %z')"
-
-			local result=
-			read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${channel_no}.schedule.epg.co.kr">
-	<title lang="ko">${desc}</title>
-	<desc lang="ko">${desc}</desc>
-	<episode-num system="onscreen">${episode}</episode-num>
-	<category lang="en">${category_en}</category>
-	<category lang="ko">${category}</category>
-	<language>ko</language>
-	<generate-source name="HCN"/>
-</programme>
-EOF
-			fn_file_write "${OUTPUT_FILE}" "${result}"
-		fi
-		prev_info="${line}"
-	done <<< "$("${SED}" -e "/^'${channel_no}'${D}/!d" "${WORKING_HCN}")"
-
-	return
-}
-
 fn_generate_xml_programme() {
+	if [ -e "${WORKING_UPLUS}" ]; then
+		fn_generate_xml_programme_uplus
+	fi
+
 	if [ -e "${WORKING_NAVER}" ]; then
 		fn_generate_xml_programme_naver
 	fi
 
 	if [ -e "${WORKING_EPG}" ]; then
 		fn_generate_xml_programme_epg
-	fi
-
-	if [ -e "${WORKING_CNM}" ]; then
-		fn_generate_xml_programme_cnm
-	fi
-
-	if [ -e "${WORKING_HCN}" ]; then
-		fn_generate_xml_programme_hcn
 	fi
 }
 
