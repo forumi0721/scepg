@@ -243,7 +243,7 @@ fn_download_uplus_thread() {
 	local date_ymd="${4}"
 	local html="$(curl -s "${url}" | iconv -f cp949 -t utf-8)"
 	if [ -z "$(grep '조회내역이 없습니다.' <<< "${html}")" ]; then
-		"${SED}" -e "/datatype_head/,/<tbody>/d" -e "/<\/tbody>/,\$d" -e "s/^\s\+//g" <<< "${html}" | tr -d "\r" | "${SED}" -e "/^$/d" -e "s/^.*txtcon_grade_[[:alpha:]]\+\([[:digit:]]\+\).*$/\1/g" -e "s/^.*txtcon_all.*$//g" -e "/txtcon/d" -e "s/<td>\([[:digit:]]\+\):\([[:digit:]]\+\)<\/td>/${url1}${D}'${url2}'${D}${date_ymd}\1\2/g" -e "s/^<td class=\"title\">\(.*\)$/'\1'/g" -e "/<td>\|<\/td>/d" | "${SED}" -e "/<tr>.*/{N;N;N;N; s/\n/${D}/g}" | "${SED}" -e "s/^<tr>${D}//g" -e "/<\/tr>/d" | fn_file_write "${WORKING_UPLUS}"
+		"${SED}" -e "/datatype_head/,/<tbody>/d" -e "/<\/tbody>/,\$d" -e "s/^\s\+//g" <<< "${html}" | tr -d "\r" | "${SED}" -e "/^$/d" -e "s/^.*txtcon_grade_[[:alpha:]]\+\([[:digit:]]\+\).*$/\1/g" -e "s/^.*txtcon_all.*$//g" -e "/txtcon/d" -e "s/<td>\([[:digit:]]\+\):\([[:digit:]]\+\)<\/td>/${url1}${D}'${url2}'${D}${date_ymd}\1\2/g" -e "s/^<td class=\"title\">\(.*\)$/'\1'/g" -e "/<td>\|<\/td>/d" | "${SED}" -e "/<tr>.*/{N;N;N;N; s/\n/${D}/g}" | "${SED}" -e "s/^<tr>${D}//g" -e "/<\/tr>/d" | "${SED}" -e "s/&/&amp;/g" -e "s/>/\&gt;/g" -e "s/</\&lt;/g" -e "s/%/\&#37;/g" -e "s/&amp;amp;/\&amp;/g" -e "s/&amp;gt;/\&gt;/g" -e "s/&amp;lt;/\&lt;/g" -e "s/&amp;#37;/\&#37;/g" | fn_file_write "${WORKING_UPLUS}"
 	fi
 }
 
