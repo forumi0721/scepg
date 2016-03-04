@@ -51,7 +51,7 @@ fi
 COUNT="${WORKING_DIR}/count"
 BASE_URL_UPLUS='http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd={date_ymd}'
 BASE_URL_NAVER='http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcast_type}&channelGroup={channel_group}&date={date_ymd}'
-BASE_URL_EPG='http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date}&{channel}'
+BASE_URL_EPG='http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date}&{channel}'
 BASE_URL_EPG_CHECKCHANNEL='checkchannel%5B{channel_id}%5D={channel_no}'
 WORKING_UPLUS="${WORKING_DIR}/working_uplus"
 WORKING_NAVER="${WORKING_DIR}/working_naver"
@@ -241,7 +241,7 @@ fn_download_uplus_thread() {
 	local url1="${2}"
 	local url2="${3}"
 	local date_ymd="${4}"
-	local html="$(curl -s "${url}" | iconv -f cp949 -t utf-8)"
+	local html="$(curl -s "${url}" | iconv -c -f cp949 -t utf-8)"
 	if [ -z "$(grep '조회내역이 없습니다.' <<< "${html}")" ]; then
 		"${SED}" -e "/datatype_head/,/<tbody>/d" -e "/<\/tbody>/,\$d" -e "s/^\s\+//g" <<< "${html}" | tr -d "\r" | "${SED}" -e "/^$/d" -e "s/^.*txtcon_grade_[[:alpha:]]\+\([[:digit:]]\+\).*$/\1/g" -e "s/^.*txtcon_all.*$//g" -e "/txtcon/d" -e "s/<td>\([[:digit:]]\+\):\([[:digit:]]\+\)<\/td>/${url1}${D}'${url2}'${D}${date_ymd}\1\2/g" -e "s/^<td class=\"title\">\(.*\)$/'\1'/g" -e "/<td>\|<\/td>/d" | "${SED}" -e "/<tr>.*/{N;N;N;N; s/\n/${D}/g}" | "${SED}" -e "s/^<tr>${D}//g" -e "/<\/tr>/d" | "${SED}" -e "s/&/&amp;/g" -e "s/>/\&gt;/g" -e "s/</\&lt;/g" -e "s/%/\&#37;/g" -e "s/&amp;amp;/\&amp;/g" -e "s/&amp;gt;/\&gt;/g" -e "s/&amp;lt;/\&lt;/g" -e "s/&amp;#37;/\&#37;/g" | fn_file_write "${WORKING_UPLUS}"
 	fi
@@ -381,7 +381,7 @@ fn_download_epg() {
 			echo -ne " -> ${date_progress} $(fn_count_get)/${#download_list[@]}\033[0K\r"
 			#'channel_no','title','start','end','category'
 			#Todo : New year
-			curl -s "${url/\{date\}/${date}}" | iconv -f cp949 -t utf-8 | "${SED}" -e "/onMouseOver=\"Preview(/!d" -e "s/.*onMouseOver=\"Preview(\(.*\))\" onMouseOut=.*$/\1/g" -e "s/<br>//g" -e "s/\\\'/'/g" | "${SED}" -e "s/^'.*',\('.*'\),\('.*'\),\('.*'\),\('.*'\),'.*','.*'/\2${D}\1${D}\3${D}\4/g" -e "s/'\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)~\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)'/'${year}\/\1 \3 \2'${D}'${year}\/\4 \6 \5'/g" | fn_file_write "${WORKING_EPG}" &
+			curl -s "${url/\{date\}/${date}}" | iconv -c -f cp949 -t utf-8 | "${SED}" -e "/onMouseOver=\"Preview(/!d" -e "s/.*onMouseOver=\"Preview(\(.*\))\" >.*$/\1/g" -e "s/<br>//g" -e "s/\\\'/'/g" | "${SED}" -e "s/^'.*',\('.*'\),\('.*'\),\('.*'\),\('.*'\),'.*','.*'/\2${D}\1${D}\3${D}\4/g" -e "s/'\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)~\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)'/'${year}\/\1 \3 \2'${D}'${year}\/\4 \6 \5'/g" | fn_file_write "${WORKING_EPG}" &
 		done
 
 		wait
