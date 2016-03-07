@@ -383,7 +383,7 @@ fn_download_epg() {
 			echo -ne " -> ${date_progress} $(fn_count_get)/${#download_list[@]}\033[0K\r"
 			#'channel_no','title','start','end','category'
 			#Todo : New year
-			curl -s "${url/\{date\}/${date}}" | iconv -c -f cp949 -t utf-8 | "${SED}" -e "/onMouseOver=\"Preview(/!d" -e "s/.*onMouseOver=\"Preview(\(.*\))\" >.*$/\1/g" -e "s/<br>//g" -e "s/\\\'/'/g" | "${SED}" -e "s/^'.*',\('.*'\),\('.*'\),\('.*'\),\('.*'\),'.*','.*'/\2${D}\1${D}\3${D}\4/g" -e "s/'\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)~\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)'/'${year}\/\1 \3 \2'${D}'${year}\/\4 \6 \5'/g" | fn_file_write "${WORKING_EPG}" &
+			curl -s "${url/\{date\}/${date}}" | iconv -c -f cp949 -t utf-8 |  "${SED}" -e "/JavaScript:ViewContent/!d" -e "s/JavaScript:ViewContent/\n/g" | "${SED}" -e "/onMouseOver=\"Preview(/!d" | "${SED}" -e "s/.*onMouseOver=\"Preview(\(.*\))\" >.*$/\1/g" -e "s/<br>//g" -e "s/\\\'/'/g" | "${SED}" -e "s/^'.*',\('.*'\),\('.*'\),\('.*'\),\('.*'\),'.*','.*'/\2${D}\1${D}\3${D}\4/g" -e "s/'\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)~\([[:digit:]]\+\/[[:digit:]]\+\) \([AP]M\) \([[:digit:]]\+:[[:digit:]]\+\)'/'${year}\/\1 \3 \2'${D}'${year}\/\4 \6 \5'/g" | fn_file_write "${WORKING_EPG}" &
 		done
 
 		wait
