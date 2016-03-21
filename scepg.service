@@ -1,0 +1,7 @@
+[Unit]
+Description=scepg
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/lib/scepg
+ExecStart=/var/lib/scepg/scepg

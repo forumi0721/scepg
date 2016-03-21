@@ -41,7 +41,7 @@ TV_CHANNEL_CONF="tvchannel.conf"
 WORKING_DIR=
 if [ -d "/dev/shm" -a -w "/dev/shm" ]; then
 	if [ "${DEBUG}" = 0 ] ; then
-		WORKING_DIR="/dev/shm/epg2xml_${USER}"
+		WORKING_DIR="/dev/shm/scepg_${USER}"
 	else
 		WORKING_DIR=./working
 	fi
