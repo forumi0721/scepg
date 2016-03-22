@@ -50,9 +50,9 @@ def progressLog(progress, totalCount):
     if progress >= totalCount:
         printLog("")
 
-def printLog(log, end = "\n", flush = False):
+def printLog(log, end = "\n", flush = False, error = False):
     out = []
-    if args.v:
+    if args.v or error:
         out = sys.stderr
     else:
         out = sys.stdout
@@ -154,22 +154,75 @@ def printXml():
     printLog("===> Done.", end = "\n\n")
 
 def writeXml():
+    xml_list = output_xml.split(" ")
+    socket_list = output_socket.split(" ")
+    if not xml_list and not socket_list:
+        return
+
     printLog("===> Write XML")
-    progressLog(0, 1)
-    if not output_socket == "":
-        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as xml_socket:
-            xml_socket.connect(output_socket)
-            if __USE_LXML:
-                xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
-            else:
-                xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
-    if not output_xml == "":
-        with open(output_xml, "w") as f:
-            if __USE_LXML:
-                f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
-            else:
-                f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
-    progressLog(1, 1)
+    progress = 0
+    progressLog(progress, len(xml_list) + len(socket_list))
+
+    for xml_config in xml_list:
+        try:
+            with open(xml_config, "w") as f:
+                if __USE_LXML:
+                    f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
+                else:
+                    f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+        except PermissionError:
+            printLog(" => Permission denied : %s" % xml_config, error = True)
+            f.close()
+            progress += 1
+            progressLog(progress, len(xml_list) + len(socket_list))
+            continue
+
+        progress += 1
+        progressLog(progress, len(xml_list) + len(socket_list))
+
+    for socket_config in socket_list:
+        match_tcp = re.match("tcp:(.*):(.*)", socket_config)
+        if match_tcp:
+            xml_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
+            except ConnectionRefusedError:
+                printLog(" => Connection refuesed error : %s" % socket_config, error = True)
+                xml_socket.close()
+                progress += 1
+                progressLog(progress, len(xml_list) + len(socket_list))
+                continue
+            except socket.gaierror:
+                printLog(" => Name or service not known : %s" % socket_config, error = True)
+                xml_socket.close()
+                progress += 1
+                progressLog(progress, len(xml_list) + len(socket_list))
+                continue
+        else:
+            xml_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                xml_socket.connect(socket_config)
+            except FileNotFoundError:
+                printLog(" => File not found error : %s" % socket_config, error = True)
+                xml_socket.close()
+                progress += 1
+                progressLog(progress, len(xml_list) + len(socket_list))
+                continue
+            except PermissionError:
+                printLog(" => Permission denied : %s" % socket_config, error = True)
+                xml_socket.close()
+                progress += 1
+                progressLog(progress, len(xml_list) + len(socket_list))
+                continue
+        if __USE_LXML:
+            xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
+        else:
+            xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
+        xml_socket.close()
+
+        progress += 1
+        progressLog(progress, len(xml_list) + len(socket_list))
+
     printLog("===> Done.", end = "\n\n")
 
 def generateXmlRoot():
@@ -323,7 +376,7 @@ def generateXmlProgrammeUplus():
     generate_source = "http://www.uplus.co.kr/"
     base_url = "http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channel_code}&evntCmpYmd={date_ymd}"
 
-    printLog("===> Generate Programme (UPlus)")
+    printLog("===> Generate Programme (Uplus)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -339,15 +392,15 @@ def generateXmlProgrammeUplus():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             with urllib.request.urlopen(url) as f:
-                body = f.read().decode("cp949", "ignore").partition('<tbody>')[2].rpartition('</tbody>')[0]
+                body = f.read().decode("cp949", "ignore").partition("<tbody>")[2].rpartition("</tbody>")[0]
                 if __USE_BS:
                     if __USE_LXML:
                         soup = BeautifulSoup(body, "lxml")
                     else:
                         soup = BeautifulSoup(body, "html.parser")
-                    for tr in soup.find_all('tr'):
+                    for tr in soup.find_all("tr"):
                         row = 0
-                        for td in tr.find_all('td'):
+                        for td in tr.find_all("td"):
                             if row == 0:
                                 if dic_programme:
                                     dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
@@ -370,8 +423,8 @@ def generateXmlProgrammeUplus():
                                 dic_programme["category"] = str(td.next_element).strip()
                             row += 1
                 else:
-                    for programme in body.split('<tr>'):
-                        match = re.search('.*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>', programme, re.MULTILINE | re.DOTALL)
+                    for programme in body.split("<tr>"):
+                        match = re.search(".*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
                         if match:
                             if dic_programme:
                                 dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
@@ -410,8 +463,8 @@ def generateXmlProgrammeNaver():
 
     download_list = []
     for channel in channel_config:
-        broadcast_type = channel[1].split(',')[1]
-        channel_group = channel[1].split(',')[2]
+        broadcast_type = channel[1].split(",")[1]
+        channel_group = channel[1].split(",")[2]
         if [broadcast_type, channel_group] not in download_list:
             download_list.append([broadcast_type, channel_group])
 
@@ -423,26 +476,26 @@ def generateXmlProgrammeNaver():
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{broadcast_type}", broadcast_type).replace("{channel_group}", channel_group).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
             with urllib.request.urlopen(url) as f:
-                match = re.search('var PROGRAM_SCHEDULES=([^;]+});', f.read().decode('utf-8'), re.MULTILINE)
+                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", f.read().decode("utf-8"), re.MULTILINE)
                 if match:
                     js = json.loads(match.group(1))
                 else:
-                    js = json.loads(res.text.partition('PROGRAM_SCHEDULES=')[2].rpartition('};')[0]+'}')
-                for js_channel in js['channelList']:
+                    js = json.loads(res.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                for js_channel in js["channelList"]:
                     group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
                     if group_channel:
                         for programme_channel in group_channel:
                             channel_id = programme_channel[0]
                             channel_name = programme_channel[1]
 
-                            for js_program in js_channel['programList']:
+                            for js_program in js_channel["programList"]:
                                 dic_programme = {}
                                 dic_programme["channel_id"] = channel_id
                                 dic_programme["channel_name"] = channel_name
                                 dic_programme["generate_source"] = generate_source
                                 dic_programme["programme_start"] = js_program["beginDate"].replace("-","") + js_program["beginTime"].replace(":", "")
                                 if int(js_program["beginTime"].replace(":", "")) > int(js_program["endTime"].replace(":", "")):
-                                    dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], '%Y-%m-%d') + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
+                                    dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], "%Y-%m-%d") + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
                                 else:
                                     dic_programme["programme_stop"] = js_program["beginDate"].replace("-","") + js_program["endTime"].replace(":", "")
                                 if js_program["subtitle"] != "":
@@ -475,7 +528,7 @@ def generateXmlProgrammeEpg():
 
     generate_source = "http://www.epg.co.kr/"
     base_url = "http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date_y-m-d}&{checkchannel}"
-    base_url_epg_checkchannel = 'checkchannel%5B{channel_code}%5D={channel_id}'
+    base_url_epg_checkchannel = "checkchannel%5B{channel_code}%5D={channel_id}"
 
     printLog("===> Generate Programme(EPG)")
     progress = 0
@@ -505,7 +558,7 @@ def generateXmlProgrammeEpg():
                     download_date = (datetime.date.today() + datetime.timedelta(days = day))
                     url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
                     with urllib.request.urlopen(url) as f:
-                        match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode('cp949', 'ignore').replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
+                        match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                         for preview in match_preview:
                             match_program = re.match(r".*Preview\('[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
                             if match_program:
@@ -522,11 +575,11 @@ def generateXmlProgrammeEpg():
                                     match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
                                     if match_rating:
                                         dic_programme["rating"] = match_rating.group(1)
-                                    start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), '%Y %m/%d %p %I:%M')
+                                    start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), "%Y %m/%d %p %I:%M")
                                     if download_date.month == 12 and start_date.month == 1:
                                         start_date = start_date + datetime.timedelta(year = 1)
                                     dic_programme["programme_start"] = start_date.strftime("%Y%m%d%H%M")
-                                    end_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(4)), '%Y %m/%d %p %I:%M')
+                                    end_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(4)), "%Y %m/%d %p %I:%M")
                                     if download_date.month == 12 and end_date.month == 1:
                                         end_date = end_date + datetime.timedelta(year = 1)
                                     dic_programme["programme_stop"] = end_date.strftime("%Y%m%d%H%M")
