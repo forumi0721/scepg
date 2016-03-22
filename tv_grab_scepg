@@ -1,7 +1,9 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-	cat /var/lib/scepg/xmltv.xml
+	if [ -z /var/lib/scepg/xmltv.xml ]; then
+		cat /var/lib/scepg/xmltv.xml
+	fi
 	exit $?
 fi
 

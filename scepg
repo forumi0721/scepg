@@ -6,12 +6,17 @@ __USE_LXML = True
 
 ###Import(static)
 import sys
+import os
+import argparse
+import configparser
+import socket
 import time
 import datetime
 import urllib.request
 import re
 import json
 import html
+from subprocess import call
 ###Import(dynamic)
 #Check BeautifulSoup
 if __USE_BS:
@@ -31,65 +36,149 @@ if not __USE_LXML:
     from xml.dom import minidom
 
 ###Global Constant
-CONF_FILE = "tvchannel.conf"
-XML_FILE = "xmltv.xml"
-RETREIVE_DAY = 3
+CONFIG_FILE = "tvchannel.conf"
 
 ___START_TIME = time.time()
+
 
 def progressLog(progress, totalCount):
     totalLength = 10
     progressLength = int((progress / totalCount) * totalLength)
 
-    sys.stdout.write(" => Progress : [%s%s] (%d/%d)\r" % ("#" * progressLength, "-" * (totalLength - progressLength), progress, totalCount))
-    sys.stdout.flush()
+    printLog(" => Progress : [%s%s] (%d/%d)" % ("#" * progressLength, "-" * (totalLength - progressLength), progress, totalCount), end = "\r", flush = True)
 
     if progress >= totalCount:
-        sys.stdout.write("\n")
+        printLog("")
+
+def printLog(log, end = "\n", flush = False):
+    out = []
+    if args.v:
+        out = sys.stderr
+    else:
+        out = sys.stdout
+    out.write("%s%s" % (log, end))
+    if flush:
+        out.flush()
 
 def readConfig():
-    list_conf = []
+    global channel_list
+    global retrieve_days
+    global output_xml
+    global output_socket
+    global post_proc
+    global post_proc_args
 
-    print("==> Read channel file")
-    with open(CONF_FILE, "r") as f:
-        match_conf = re.findall("(^[^#].*:(U|N|E),.*$)", f.read(), re.MULTILINE)
-        progressLog(0, len(match_conf))
-        for conf in match_conf:
-            list_conf.append(conf[0])
-            progressLog(len(list_conf), len(match_conf))
-    print("==> Done.", end = "\n\n")
+    printLog("==> Read config file")
+    progressLog(0, 4)
 
-    return list_conf
+    config = configparser.RawConfigParser()
+    config.optionxform = str
+    config.read(CONFIG_FILE)
+
+    if not config.has_section("channel_list"):
+        sys.stdout.write("\n")
+        printLog(" => Config file not contains channel_list section")
+        exit(1)
+
+    progressLog(1, 4)
+
+    try:
+        channel_list = config.items("channel_list")
+    except configparser.Error:
+        sys.stdout.write("\n")
+        printLog(" => Config file not contains channel_list section")
+        exit(1)
+
+    if config.has_section("defaults"):
+        progressLog(2, 4)
+        if config.has_option("defaults", "retrieve_days"):
+            retrieve_days = config.getint("defaults", "retrieve_days")
+        if config.has_option("defaults", "output_xml"):
+            output_xml = config.get("defaults", "output_xml")
+        if config.has_option("defaults", "output_socket"):
+            output_socket = config.get("defaults", "output_socket")
+        if config.has_option("defaults", "post_proc"):
+            post_proc = config.get("defaults", "post_proc")
+        if config.has_option("defaults", "post_proc_args"):
+            post_proc_args = config.get("defaults", "post_proc_args")
+
+    progressLog(3, 4)
+
+    try:
+        if not retrieve_days:
+            retrieve_days = 3
+    except NameError:
+        retrieve_days = 3
+
+    try:
+        if not output_xml:
+            output_xml = ""
+    except NameError:
+        output_xml = ""
+
+    try:
+        if not output_socket:
+            output_socket = ""
+    except NameError:
+        output_socket = ""
+
+    try:
+        if not post_proc:
+            post_proc = ""
+    except NameError:
+        post_proc = ""
+
+    try:
+        if not post_proc_args:
+            post_proc_args = ""
+    except NameError:
+        post_proc_args = ""
+
+    if not args.v and output_xml == "" and output_socket == "":
+        printLog("")
+        printLog("-v 또는 output_xml, output_socket 값이 설정되지 않았습니다.")
+        exit(1)
+
+    progressLog(4, 4)
+
+    printLog("==> Done.", end = "\n\n")
 
 def printXml():
-    print("===> Print XML")
-    progressLog(0, 1)
-    sys.stdout.write("\n")
+    printLog("===> Print XML")
 
     if __USE_LXML:
         print(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
     else:
         print(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
 
-    progressLog(1, 1)
-    print("===> Done.", end = "\n\n")
+    printLog("===> Done.", end = "\n\n")
 
 def writeXml():
-    print("===> Write XML")
+    printLog("===> Write XML")
     progressLog(0, 1)
-    with open(XML_FILE, "w") as f:
-        if __USE_LXML:
-            f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
-        else:
-            f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+    if not output_socket == "":
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as xml_socket:
+            xml_socket.connect(output_socket)
+            if __USE_LXML:
+                xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
+            else:
+                xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
+    if not output_xml == "":
+        with open(output_xml, "w") as f:
+            if __USE_LXML:
+                f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
+            else:
+                f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
     progressLog(1, 1)
-    print("===> Done.", end = "\n\n")
+    printLog("===> Done.", end = "\n\n")
 
 def generateXmlRoot():
-    xml = []
+    global xml
 
-    print("==> Genreate XML Root")
+    printLog("==> Genreate XML Root")
+
     progressLog(0, 1)
+
     if __USE_LXML:
         xml = lxml.builder.ElementMaker().tv()
         xml.set("source-info-name", "forumi0721.ddns.net")
@@ -97,53 +186,54 @@ def generateXmlRoot():
         xml.set("generator-info-url", "mailto:forumi0721@gmail.com")
     else:
         xml = ET.Element("tv", {"source-info-name":"forumi0721.ddns.net", "generator-info-name":"forumi0721", "generator-info-url":"mailto:forumi0721@gmail.com"})
-    progressLog(1, 1)
-    print("==> Done.", end = "\n\n")
 
-    return xml
+    progressLog(1, 1)
+
+    printLog("==> Done.", end = "\n\n")
 
 def generateXmlChannel():
-    print("==> Generate XML Channel")
-    progressCount = 0;
-    progressLog(0, len(list_conf))
+    printLog("==> Generate XML Channel")
 
-    for conf_line in list_conf:
-        match_conf = re.match(r"(.*),(.*):.*", conf_line)
-        if match_conf:
-            channel_id = match_conf.group(1)
-            channel_name = match_conf.group(2)
+    progress = 0;
+    progressLog(0, len(channel_list))
 
-            if __USE_LXML:
-                xml_channel = etree.Element("channel", id = "I%s.forumi0721.ddns.net" % channel_id)
-                xml.append(xml_channel)
-                
-                xml_display_name1 = etree.Element("display-name")
-                xml_display_name1.text = "%s %s" % (channel_id, channel_name)
-                xml_channel.append(xml_display_name1)
-                
-                xml_display_name2 = etree.Element("display-name")
-                xml_display_name2.text = channel_id 
-                xml_channel.append(xml_display_name2)
-                
-                xml_display_name2 = etree.Element("display-name")
-                xml_display_name2.text = channel_name
-                xml_channel.append(xml_display_name2)
-            else:
-                se_channel = ET.SubElement(xml, "channel", {"id":"I%s.forumi0721.ddns.net" % channel_id})
+    for channel_config in channel_list:
+        channel = channel_config[0].split(",")
 
-                se_channel_1 = ET.SubElement(se_channel, "display-name")
-                se_channel_1.text = "%s %s" % (channel_id, channel_name)
+        channel_id = channel[0]
+        channel_name = channel[1]
 
-                se_channel_2 = ET.SubElement(se_channel, "display-name")
-                se_channel_2.text = channel_id
+        if __USE_LXML:
+            xml_channel = etree.Element("channel", id = "I%s.forumi0721.ddns.net" % channel_id)
+            xml.append(xml_channel)
+            
+            xml_display_name1 = etree.Element("display-name")
+            xml_display_name1.text = "%s %s" % (channel_id, channel_name)
+            xml_channel.append(xml_display_name1)
+            
+            xml_display_name2 = etree.Element("display-name")
+            xml_display_name2.text = channel_id 
+            xml_channel.append(xml_display_name2)
+            
+            xml_display_name2 = etree.Element("display-name")
+            xml_display_name2.text = channel_name
+            xml_channel.append(xml_display_name2)
+        else:
+            se_channel = ET.SubElement(xml, "channel", {"id":"I%s.forumi0721.ddns.net" % channel_id})
 
-                se_channel_3 = ET.SubElement(se_channel, "display-name")
-                se_channel_3.text = channel_name
+            se_channel_1 = ET.SubElement(se_channel, "display-name")
+            se_channel_1.text = "%s %s" % (channel_id, channel_name)
 
-        progressCount += 1
-        progressLog(progressCount, len(list_conf))
+            se_channel_2 = ET.SubElement(se_channel, "display-name")
+            se_channel_2.text = channel_id
 
-    print("==> Done.", end = "\n\n")
+            se_channel_3 = ET.SubElement(se_channel, "display-name")
+            se_channel_3.text = channel_name
+
+        progress += 1
+        progressLog(progress, len(channel_list))
+
+    printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgramme(dic_programme):
     if __USE_LXML:
@@ -154,14 +244,12 @@ def generateXmlProgramme(dic_programme):
         xml_title.text = dic_programme["title"]
         xml_programme.append(xml_title)
 
+        xml_desc = etree.Element("desc", lang = "ko" )
         if "desc" in dic_programme:
-            xml_desc = etree.Element("desc", lang = "ko" )
             xml_desc.text = dic_programme["desc"]
-            xml_programme.append(xml_desc)
         else:
-            xml_desc = etree.Element("desc", lang = "ko" )
             xml_desc.text = dic_programme["title"]
-            xml_programme.append(xml_desc)
+        xml_programme.append(xml_desc)
 
         if "episode_num" in dic_programme:
             xml_episode_num = etree.Element("episode-num", system = "onscreen" )
@@ -198,11 +286,10 @@ def generateXmlProgramme(dic_programme):
         se_title = ET.SubElement(se_programme, "title", {"lang":"ko"})
         se_title.text = dic_programme["title"]
 
+        se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
         if "desc" in dic_programme:
-            se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
             se_desc.text = dic_programme["desc"]
         else:
-            se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
             se_desc.text = dic_programme["title"]
 
         if "episode_num" in dic_programme:
@@ -229,24 +316,25 @@ def generateXmlProgramme(dic_programme):
         se_generate_source = ET.SubElement(se_programme, "generate-source", {"name":dic_programme["generate_source"]})
 
 def generateXmlProgrammeUplus():
+    channel_config = [[k, v] for k, v in channel_list if v[0] == "U"]
+    if len(channel_config) <= 0:
+        return
+
     generate_source = "http://www.uplus.co.kr/"
     base_url = "http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channel_code}&evntCmpYmd={date_ymd}"
 
-    print("===> Generate Programme (UPlus)")
-    progressCount = 0
+    printLog("===> Generate Programme (UPlus)")
+    progress = 0
+    progressLog(0, len(channel_config) * retrieve_days)
 
-    list_channel = [[m.group(1), m.group(2), m.group(3)] for l in list_conf for m in [re.search("(.*),(.*):U,(.*),.*", l)] if m]
-
-    progressLog(0, len(list_channel) * RETREIVE_DAY)
-
-    for channel in list_channel:
-        channel_id = channel[0]
-        channel_name = channel[1]
-        channel_code = channel[2]
+    for channel in channel_config:
+        channel_id = channel[0].split(",")[0]
+        channel_name = channel[0].split(",")[1]
+        channel_code = channel[1].split(",")[1]
 
         dic_programme = {}
 
-        for day in range(RETREIVE_DAY):
+        for day in range(retrieve_days):
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
@@ -271,12 +359,10 @@ def generateXmlProgrammeUplus():
                                 dic_programme["generate_source"] = generate_source
                                 dic_programme["programme_start"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
                             elif row == 1:
-                                match_episode_num = re.search("^(.*)[\(|\[](\d+[회|강])[\)|\]]$", td.next_element.strip())
+                                dic_programme["title"] = td.next_element.strip()
+                                match_episode_num = re.search("^(.*)[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
                                 if match_episode_num:
-                                    dic_programme["title"] = match_episode_num.group(1)
                                     dic_programme["episode_num"] = match_episode_num.group(2)
-                                else:
-                                    dic_programme["title"] = td.next_element.strip()
                                 match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", str(td.img), re.MULTILINE | re.DOTALL)
                                 if match_rating:
                                     dic_programme["rating"] = match_rating.group(1)
@@ -296,8 +382,8 @@ def generateXmlProgrammeUplus():
                             dic_programme["channel_name"] = channel_name
                             dic_programme["generate_source"] = generate_source
                             dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
-                            dic_programme["title"] =  match.group(3).rstrip()
-                            match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
+                            dic_programme["title"] = match.group(3).rstrip()
+                            match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", match.group(3).rstrip())
                             if match_episode_num:
                                 dic_programme["episode_num"] = match_episode_num.group(1)
                             dic_programme["category"] = match.group(5)
@@ -305,33 +391,35 @@ def generateXmlProgrammeUplus():
                             if match_rating:
                                 dic_programme["rating"] = match_rating.group(1)
 
-            progressCount += 1
-            progressLog(progressCount, len(list_channel) * RETREIVE_DAY)
+            progress += 1
+            progressLog(progress, len(channel_config) * retrieve_days)
 
-    print("===> Done.", end = "\n\n")
+    printLog("===> Done.", end = "\n\n")
 
 def generateXmlProgrammeNaver():
+    channel_config = [[k, v] for k, v in channel_list if v[0] == "N"]
+    if len(channel_config) <= 0:
+        return
+
     generate_source = "http://www.naver.co.kr/"
     base_url = "http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcast_type}&channelGroup={channel_group}&date={date_ymd}"
 
-    print("===> Generate Programme(Naver)")
-    progressCount = 0
+    printLog("===> Generate Programme(Naver)")
+    progress = 0
+    progressLog(0, len(channel_config) * retrieve_days)
 
-    list_channel = [[m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)] for l in list_conf for m in [re.search("(.*),(.*):N,(.*),(.*),(.*),.*", l)] if m]
+    download_list = []
+    for channel in channel_config:
+        broadcast_type = channel[1].split(',')[1]
+        channel_group = channel[1].split(',')[2]
+        if [broadcast_type, channel_group] not in download_list:
+            download_list.append([broadcast_type, channel_group])
 
-    progressLog(0, len(list_channel) * RETREIVE_DAY)
-
-    list_download = []
-    for channel in list_channel:
-        broadcast_type = channel[2]
-        channel_group = channel[3]
-        if [broadcast_type, channel_group] not in list_download:
-            list_download.append([broadcast_type, channel_group])
-
-    for group in list_download:
-        broadcast_type = group[0]
-        channel_group = group[1]
-        for day in range(RETREIVE_DAY):
+    for download in download_list:
+        broadcast_type = download[0]
+        channel_group = download[1]
+        download_channel_list = [[k.split(",")[0], k.split(",")[1], v.split(",")[3]] for k, v in channel_config if v.split(",")[1] == broadcast_type and v.split(",")[2] == channel_group]
+        for day in range(retrieve_days):
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{broadcast_type}", broadcast_type).replace("{channel_group}", channel_group).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
             with urllib.request.urlopen(url) as f:
@@ -341,89 +429,99 @@ def generateXmlProgrammeNaver():
                 else:
                     js = json.loads(res.text.partition('PROGRAM_SCHEDULES=')[2].rpartition('};')[0]+'}')
                 for js_channel in js['channelList']:
-                    channel_indices = [i for i, x in enumerate(list_conf) if re.search(".*,.*:N,%s,%s,%d,.*" % (broadcast_type, channel_group, js_channel["channelId"]), x)]
-                    if channel_indices:
-                        for channel_indice in channel_indices:
-                            match_channel = re.match("(.*),(.*):N,.*,.*,.*,.*", list_conf[channel_indice])
-                            if match_channel:
-                                channel_id = match_channel.group(1)
-                                channel_name = match_channel.group(2)
+                    group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
+                    if group_channel:
+                        for programme_channel in group_channel:
+                            channel_id = programme_channel[0]
+                            channel_name = programme_channel[1]
 
-                                for js_program in js_channel['programList']:
-                                    dic_programme = {}
-                                    dic_programme["channel_id"] = channel_id
-                                    dic_programme["channel_name"] = channel_name
-                                    dic_programme["generate_source"] = generate_source
-                                    dic_programme["programme_start"] = js_program["beginDate"].replace("-","") + js_program["beginTime"].replace(":", "")
-                                    if int(js_program["beginTime"].replace(":", "")) > int(js_program["endTime"].replace(":", "")):
-                                        dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], '%Y-%m-%d') + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
-                                    else:
-                                        dic_programme["programme_stop"] = js_program["beginDate"].replace("-","") + js_program["endTime"].replace(":", "")
-                                    dic_programme["title"] = js_program["scheduleName"]
-                                    if js_program["subtitle"] != "":
-                                        dic_programme["desc"] = js_program["subtitle"]
+                            for js_program in js_channel['programList']:
+                                dic_programme = {}
+                                dic_programme["channel_id"] = channel_id
+                                dic_programme["channel_name"] = channel_name
+                                dic_programme["generate_source"] = generate_source
+                                dic_programme["programme_start"] = js_program["beginDate"].replace("-","") + js_program["beginTime"].replace(":", "")
+                                if int(js_program["beginTime"].replace(":", "")) > int(js_program["endTime"].replace(":", "")):
+                                    dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], '%Y-%m-%d') + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
+                                else:
+                                    dic_programme["programme_stop"] = js_program["beginDate"].replace("-","") + js_program["endTime"].replace(":", "")
+                                if js_program["subtitle"] != "":
                                     if js_program["episodeNo"] != "":
+                                        dic_programme["title"] = "%s <%s> (%s)" % (js_program["scheduleName"], js_program["subtitle"], js_program["episodeNo"])
                                         dic_programme["episode_num"] = js_program["episodeNo"]
-                                    dic_programme["category"] = js_program["largeGenreId"]
-                                    if js_program["ageRating"] != 0:
-                                        dic_programme["rating"] = str(js_program["ageRating"])
+                                    else:
+                                        dic_programme["title"] = "%s <%s>" % (js_program["scheduleName"], js_program["subtitle"])
+                                else:
+                                    if js_program["episodeNo"] != "":
+                                        dic_programme["title"] = "%s (%s)" % (js_program["scheduleName"], js_program["episodeNo"])
+                                        dic_programme["episode_num"] = js_program["episodeNo"]
+                                    else:
+                                        dic_programme["title"] = js_program["scheduleName"]
+                                dic_programme["desc"] = dic_programme["title"]
+                                dic_programme["category"] = js_program["largeGenreId"]
+                                if js_program["ageRating"] != 0:
+                                    dic_programme["rating"] = str(js_program["ageRating"])
 
-                                    generateXmlProgramme(dic_programme)
-                            progressCount += 1
-                            progressLog(progressCount, len(list_channel) * RETREIVE_DAY)
-    print("===> Done.", end = "\n\n")
+                                generateXmlProgramme(dic_programme)
+
+                        progress += 1
+                        progressLog(progress, len(channel_config) * retrieve_days)
+    printLog("===> Done.", end = "\n\n")
 
 def generateXmlProgrammeEpg():
+    channel_config = [[k, v] for k, v in channel_list if v[0] == "E"]
+    if len(channel_config) <= 0:
+        return
+
     generate_source = "http://www.epg.co.kr/"
     base_url = "http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date_y-m-d}&{checkchannel}"
     base_url_epg_checkchannel = 'checkchannel%5B{channel_code}%5D={channel_id}'
 
-    print("===> Generate Programme(EPG)")
-    progressCount = 0
+    printLog("===> Generate Programme(EPG)")
+    progress = 0
+    progressLog(0, len(channel_config) * retrieve_days)
 
-    list_channel = [[m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)] for l in list_conf for m in [re.search("(.*),(.*):E,(.*),(.*),(.*),.*", l)] if m]
-    progressLog(0, len(list_channel) * RETREIVE_DAY)
+    download_list = []
+    for channel in channel_config:
+        top_channel_group = channel[1].split(",")[1]
+        sub_channel_group = channel[1].split(",")[2]
+        if [top_channel_group, sub_channel_group] not in download_list:
+            download_list.append([top_channel_group, sub_channel_group])
 
-    list_download = []
-    for channel in list_channel:
-        top_channel_group = channel[2]
-        sub_channel_group = channel[3]
-        if [top_channel_group, sub_channel_group] not in list_download:
-            list_download.append([top_channel_group, sub_channel_group])
-
-    for group in list_download:
-        top_channel_group = group[0]
-        sub_channel_group = group[1]
-        channel_indices = [i for i, x in enumerate(list_conf) if re.search(".*,.*:E,%s,%s,.*,.*" % (top_channel_group, sub_channel_group), x)]
+    for download in download_list:
+        top_channel_group = download[0]
+        sub_channel_group = download[1]
+        group_channel = [[k, v] for k, v in channel_config if v.split(",")[1] == top_channel_group and v.split(",")[2] == sub_channel_group]
         checkchannel = ""
         checkchannel_count = 0
-        dic_channel = {}
-        for index in range(len(channel_indices)):
-            match_conf = re.match("(.*),(.*):E,.*,.*,(.*),.*", list_conf[channel_indices[index]])
-            if match_conf:
-                channel_id = match_conf.group(1)
-                channel_name = match_conf.group(2)
-                dic_channel[channel_id] = channel_name
-                channel_code = match_conf.group(3)
-                checkchannel = checkchannel + "&" + base_url_epg_checkchannel.replace("{channel_code}", channel_code).replace("{channel_id}", channel_id)
-                checkchannel_count += 1
-                if (index + 1) % 5 == 0 or (index + 1) == len(channel_indices):
-                    for day in range(RETREIVE_DAY):
-                        download_date = (datetime.date.today() + datetime.timedelta(days = day))
-                        url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
-                        with urllib.request.urlopen(url) as f:
-                            match_preview = re.findall("Preview\(('[^']*','[^']*','[^']*','[^']*','[^']*','[^']*','[^']*')\)", f.read().decode('cp949', 'ignore'))
-                            for preview in match_preview:
-                                match_program = re.match(r"'[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'", preview)
-                                dic_programme = {}
-                                if match_program:
-                                    dic_programme["channel_id"] = match_program.group(2)
-                                    dic_programme["channel_name"] = dic_channel[channel_id]
+        for channel in group_channel:
+            channel_id = channel[0].split(",")[0]
+            channel_name = channel[0].split(",")[1]
+            channel_code = channel[1].split(",")[3]
+            checkchannel = checkchannel + "&" + base_url_epg_checkchannel.replace("{channel_code}", channel_code).replace("{channel_id}", channel_id)
+            checkchannel_count += 1
+            if (checkchannel_count) % 5 == 0 or checkchannel_count == len(group_channel):
+                for day in range(retrieve_days):
+                    download_date = (datetime.date.today() + datetime.timedelta(days = day))
+                    url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
+                    with urllib.request.urlopen(url) as f:
+                        match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode('cp949', 'ignore').replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
+                        for preview in match_preview:
+                            match_program = re.match(r".*Preview\('[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
+                            if match_program:
+                                programme_channel_list = [k for k, v in group_channel if k.split(",")[0] == match_program.group(2)]
+                                for programme_channel in programme_channel_list:
+                                    dic_programme = {}
+                                    dic_programme["channel_id"] = programme_channel.split(",")[0]
+                                    dic_programme["channel_name"] = programme_channel.split(",")[1]
                                     dic_programme["generate_source"] = generate_source
                                     dic_programme["title"] = html.unescape(match_program.group(1))
                                     match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
                                     if match_episode_num:
                                         dic_programme["episode_num"] = match_episode_num.group(1)
+                                    match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
+                                    if match_rating:
+                                        dic_programme["rating"] = match_rating.group(1)
                                     start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), '%Y %m/%d %p %I:%M')
                                     if download_date.month == 12 and start_date.month == 1:
                                         start_date = start_date + datetime.timedelta(year = 1)
@@ -434,15 +532,15 @@ def generateXmlProgrammeEpg():
                                     dic_programme["programme_stop"] = end_date.strftime("%Y%m%d%H%M")
                                     end = match_program.group(4)
                                     dic_programme["category"] = match_program.group(5).split("-")[0]
+
                                     generateXmlProgramme(dic_programme)
 
-                            progressCount += checkchannel_count
-                            progressLog(progressCount, len(list_channel) * RETREIVE_DAY)
+                        progress += checkchannel_count
+                        progressLog(progress, len(channel_config) * retrieve_days)
 
-                    checkchannel = ""
-                    checkchannel_count = 0
-                    dic_channel = {}
-    print("===> Done.", end = "\n\n")
+                checkchannel = ""
+                checkchannel_count = 0
+    printLog("===> Done.", end = "\n\n")
 
 def getCategory(category):
     if category == "드라마":
@@ -529,18 +627,36 @@ def getCategory(category):
 
     return category_ko, category_en
 
-list_conf = readConfig()
+def postProc():
+    if post_proc and os.path.exists(post_proc):
+        match_post_proc = re.match("^\w.*$", post_proc)
+        if match_post_proc:
+            call(["./%s" % post_proc, post_proc_args])
+        else:
+            call([post_proc, post_proc_args])
 
-xml = generateXmlRoot()
+argumentParser = argparse.ArgumentParser()
+argumentParser.add_argument("-v", "--v", action="store_true", help="verbose")
+args = argumentParser.parse_args()
+
+readConfig()
+
+generateXmlRoot()
 
 generateXmlChannel()
 
 generateXmlProgrammeUplus()
+
 generateXmlProgrammeNaver()
+
 generateXmlProgrammeEpg()
 
 writeXml()
-#printXml()
 
-print("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
+if args.v:
+    printXml()
+
+postProc()
+
+printLog("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
 
