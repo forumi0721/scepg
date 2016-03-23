@@ -299,6 +299,13 @@ def generateXmlProgramme(dic_programme):
         xml_title.text = dic_programme["title"]
         xml_programme.append(xml_title)
 
+        xml_sub_title = etree.Element("sub-title", lang = "ko" )
+        if "sub_title" in dic_programme:
+            xml_sub_title.text = dic_programme["sub_title"]
+        else:
+            xml_sub_title.text = dic_programme["title"]
+        xml_programme.append(xml_sub_title)
+
         xml_desc = etree.Element("desc", lang = "ko" )
         if "desc" in dic_programme:
             xml_desc.text = dic_programme["desc"]
@@ -340,6 +347,12 @@ def generateXmlProgramme(dic_programme):
 
         se_title = ET.SubElement(se_programme, "title", {"lang":"ko"})
         se_title.text = dic_programme["title"]
+
+        se_sub_title = ET.SubElement(se_programme, "sub-title", {"lang":"ko"})
+        if "sub_title" in dic_programme:
+            se_sub_title.text = dic_programme["sub_title"]
+        else:
+            se_sub_title.text = dic_programme["title"]
 
         se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
         if "desc" in dic_programme:
@@ -513,6 +526,7 @@ def generateXmlProgrammeNaver():
                                         dic_programme["episode_num"] = js_program["episodeNo"]
                                     else:
                                         dic_programme["title"] = js_program["scheduleName"]
+                                dic_programme["sub_title"] = dic_programme["title"]
                                 dic_programme["desc"] = dic_programme["title"]
                                 dic_programme["category"] = js_program["largeGenreId"]
                                 if js_program["ageRating"] != 0:
