@@ -4,6 +4,7 @@
 ###Library Config
 __USE_BS = True
 __USE_LXML = True
+__DEBUG = True
 
 ###Import(static)
 import sys
@@ -165,61 +166,61 @@ def writeXml():
     progressLog(progress, len(xml_list) + len(socket_list))
 
     for xml_config in xml_list:
+        f = None
         try:
-            with open(xml_config, "w") as f:
-                if __USE_LXML:
-                    f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
-                else:
-                    f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+            f = open(xml_config, "w")
+            if __USE_LXML:
+                f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
+            else:
+                f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
         except PermissionError:
             printLog(" => Permission denied : %s" % xml_config, error = True)
-            f.close()
+        except:
+            printLog(" => Unknown error : %s" % xml_config, error = True)
+        finally:
+            if f is not None:
+                f.close()
+
             progress += 1
             progressLog(progress, len(xml_list) + len(socket_list))
-            continue
-
-        progress += 1
-        progressLog(progress, len(xml_list) + len(socket_list))
 
     for socket_config in socket_list:
         match_tcp = re.match("tcp:(.*):(.*)", socket_config)
+        xml_socket = None
         if match_tcp:
             xml_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            connect = False
             try:
                 xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
             except ConnectionRefusedError:
                 printLog(" => Connection refuesed error : %s" % socket_config, error = True)
-                xml_socket.close()
-                progress += 1
-                progressLog(progress, len(xml_list) + len(socket_list))
-                continue
             except socket.gaierror:
                 printLog(" => Name or service not known : %s" % socket_config, error = True)
-                xml_socket.close()
-                progress += 1
-                progressLog(progress, len(xml_list) + len(socket_list))
-                continue
+            except:
+                printLog(" => Unknown error : %s" % socket_config, error = True)
+            else:
+                connect = True
         else:
             xml_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             try:
                 xml_socket.connect(socket_config)
             except FileNotFoundError:
                 printLog(" => File not found error : %s" % socket_config, error = True)
-                xml_socket.close()
-                progress += 1
-                progressLog(progress, len(xml_list) + len(socket_list))
-                continue
             except PermissionError:
                 printLog(" => Permission denied : %s" % socket_config, error = True)
-                xml_socket.close()
-                progress += 1
-                progressLog(progress, len(xml_list) + len(socket_list))
-                continue
-        if __USE_LXML:
-            xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
-        else:
-            xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
-        xml_socket.close()
+            except:
+                printLog(" => Unknown error : %s" % socket_config, error = True)
+            else:
+                connect = True
+
+        if connect:
+            if __USE_LXML:
+                xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
+            else:
+                xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
+
+        if xml_socket is not None:
+            xml_socket.close()
 
         progress += 1
         progressLog(progress, len(xml_list) + len(socket_list))
@@ -476,6 +477,7 @@ def generateXmlProgrammeNaver():
         for day in range(retrieve_days):
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{broadcast_type}", broadcast_type).replace("{channel_group}", channel_group).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
+
             with urllib.request.urlopen(url) as f:
                 match = re.search("var PROGRAM_SCHEDULES=([^;]+});", f.read().decode("utf-8"), re.MULTILINE)
                 if match:
@@ -558,6 +560,7 @@ def generateXmlProgrammeEpg():
                 for day in range(retrieve_days):
                     download_date = (datetime.date.today() + datetime.timedelta(days = day))
                     url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
+
                     with urllib.request.urlopen(url) as f:
                         match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                         for preview in match_preview:
