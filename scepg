@@ -66,6 +66,7 @@ def readConfig():
     global channel_list
     global retrieve_days
     global output_xml
+    global output_xml_pretty_print
     global output_socket
     global post_proc
     global post_proc_args
@@ -91,50 +92,19 @@ def readConfig():
         printLog(" => Config file not contains channel_list section")
         exit(1)
 
-    if config.has_section("defaults"):
-        progressLog(2, 4)
-        if config.has_option("defaults", "retrieve_days"):
-            retrieve_days = config.getint("defaults", "retrieve_days")
-        if config.has_option("defaults", "output_xml"):
-            output_xml = config.get("defaults", "output_xml")
-        if config.has_option("defaults", "output_socket"):
-            output_socket = config.get("defaults", "output_socket")
-        if config.has_option("defaults", "post_proc"):
-            post_proc = config.get("defaults", "post_proc")
-        if config.has_option("defaults", "post_proc_args"):
-            post_proc_args = config.get("defaults", "post_proc_args")
+    progressLog(2, 4)
+
+    retrieve_days = config.getint("defaults", "retrieve_days", fallback=1)
+    output_xml = config.get("defaults", "output_xml", fallback="")
+    output_xml_pretty_print = config.getboolean("defaults", "output_xml_pretty_print", fallback=False)
+    output_socket = config.get("defaults", "output_socket", fallback="")
+    post_proc = config.get("defaults", "post_proc", fallback="")
+    post_proc_args = config.get("defaults", "post_proc_args", fallback="")
 
     progressLog(3, 4)
 
-    try:
-        if not retrieve_days:
-            retrieve_days = 3
-    except NameError:
-        retrieve_days = 3
-
-    try:
-        if not output_xml:
-            output_xml = ""
-    except NameError:
-        output_xml = ""
-
-    try:
-        if not output_socket:
-            output_socket = ""
-    except NameError:
-        output_socket = ""
-
-    try:
-        if not post_proc:
-            post_proc = ""
-    except NameError:
-        post_proc = ""
-
-    try:
-        if not post_proc_args:
-            post_proc_args = ""
-    except NameError:
-        post_proc_args = ""
+    if args.b:
+        output_xml_pretty_print = True
 
     if not args.v and output_xml == "" and output_socket == "":
         printLog("")
@@ -149,9 +119,12 @@ def printXml():
     printLog("===> Print XML")
 
     if __USE_LXML:
-        print(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
+        print(etree.tostring(xml, pretty_print = output_xml_pretty_print, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
     else:
-        print(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+        if output_xml_pretty_print == True:
+            print(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+        else:
+            print(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
 
     printLog("===> Done.", end = "\n\n")
 
@@ -170,26 +143,31 @@ def writeXml():
         try:
             f = open(xml_config, "w")
             if __USE_LXML:
-                f.writelines(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
+                f.writelines(etree.tostring(xml, pretty_print = output_xml_pretty_print, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
             else:
-                f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+                if output_xml_pretty_print:
+                    print(1, output_xml_pretty_print)
+                    f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
+                else:
+                    print(2, output_xml_pretty_print)
+                    f.writelines(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
         except PermissionError:
             printLog(" => Permission denied : %s" % xml_config, error = True)
         except:
             printLog(" => Unknown error : %s" % xml_config, error = True)
-        finally:
-            if f is not None:
-                f.close()
 
-            progress += 1
-            progressLog(progress, len(xml_list) + len(socket_list))
+        if f is not None:
+            f.close()
+
+        progress += 1
+        progressLog(progress, len(xml_list) + len(socket_list))
 
     for socket_config in socket_list:
         match_tcp = re.match("tcp:(.*):(.*)", socket_config)
         xml_socket = None
+        connect = False
         if match_tcp:
             xml_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            connect = False
             try:
                 xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
             except ConnectionRefusedError:
@@ -215,7 +193,7 @@ def writeXml():
 
         if connect:
             if __USE_LXML:
-                xml_socket.send(etree.tostring(xml, pretty_print = True, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
+                xml_socket.send(etree.tostring(xml, pretty_print = False, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">"))
             else:
                 xml_socket.send(ET.tostring(xml, encoding = "utf-8", method = "xml"))
 
@@ -247,7 +225,7 @@ def generateXmlRoot():
     printLog("==> Done.", end = "\n\n")
 
 def generateXmlChannel():
-    printLog("==> Generate XML Channel")
+    printLog("==> Generate XML Channels")
 
     progress = 0;
     progressLog(0, len(channel_list))
@@ -391,7 +369,7 @@ def generateXmlProgrammeUplus():
     generate_source = "http://www.uplus.co.kr/"
     base_url = "http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channel_code}&evntCmpYmd={date_ymd}"
 
-    printLog("===> Generate Programme (Uplus)")
+    printLog("===> Generate Programmes (Uplus)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -472,7 +450,7 @@ def generateXmlProgrammeNaver():
     generate_source = "http://www.naver.co.kr/"
     base_url = "http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcast_type}&channelGroup={channel_group}&date={date_ymd}"
 
-    printLog("===> Generate Programme(Naver)")
+    printLog("===> Generate Programmes (Naver)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -547,7 +525,7 @@ def generateXmlProgrammeEpg():
     base_url = "http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date_y-m-d}&{checkchannel}"
     base_url_epg_checkchannel = "checkchannel%5B{channel_code}%5D={channel_id}"
 
-    printLog("===> Generate Programme(EPG)")
+    printLog("===> Generate Programmes (EPG)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -706,28 +684,29 @@ def postProc():
         else:
             call([post_proc, post_proc_args])
 
-argumentParser = argparse.ArgumentParser()
-argumentParser.add_argument("-v", "--v", action="store_true", help="verbose")
-args = argumentParser.parse_args()
+if __name__ == '__main__':
+    argumentParser = argparse.ArgumentParser()
+    argumentParser.add_argument("-v", "--v", action="store_true", help="verbose")
+    argumentParser.add_argument("-b", "--b", action="store_true", help="pretty_print")
+    args = argumentParser.parse_args()
 
-readConfig()
+    readConfig()
 
-generateXmlRoot()
+    generateXmlRoot()
 
-generateXmlChannel()
+    generateXmlChannel()
 
-generateXmlProgrammeUplus()
+    generateXmlProgrammeUplus()
 
-generateXmlProgrammeNaver()
+    generateXmlProgrammeNaver()
 
-generateXmlProgrammeEpg()
+    generateXmlProgrammeEpg()
 
-writeXml()
+    writeXml()
+    postProc()
 
-if args.v:
-    printXml()
+    if args.v:
+        printXml()
 
-postProc()
-
-printLog("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
+    printLog("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
 
