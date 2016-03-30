@@ -53,6 +53,9 @@ def progressLog(progress, totalCount):
     if progress >= totalCount:
         printLog("")
 
+def progressCount(progress):
+    printLog(" => Count : %d" % progress, end = "\r", flush = True)
+
 def printLog(log, end = "\n", flush = False, error = False, file = None):
     if file is None:
         out = None
@@ -695,6 +698,7 @@ def postProc():
 
 def generateChannelListUplus(o):
     printLog("===> Generate Channel List (Uplus)")
+    total = 0
     printLog("##LG유플러스", file = o)
     printLog("#http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd=YYYYMMDD", file = o)
     printLog("#channelId,channelName", file = o)
@@ -720,11 +724,15 @@ def generateChannelListUplus(o):
                                 match2 = re.match(".*retrieveSchedule\('(.*)','.*'\).*", b['onclick'])
                                 if match2:
                                     printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+                                    total += 1
+                                    progressCount(total)
     printLog("", file = o)
+    printLog("")
     printLog("===> Done.", end = "\n\n")
                                     
 def generateChannelListNaver(o):
     printLog("===> Generate Channel List (Naver)")
+    total = 0
     printLog("##네이버", file = o)
     printLog("#http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcastType}&channelGroup={channelGroup}&date=YYYYMMDD", file = o)
     printLog("#broadcastType,channelGroup,channelId,channelName", file = o)
@@ -766,6 +774,8 @@ def generateChannelListNaver(o):
                                 js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                             for js_channel in js["channelList"]:
                                 printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                                total += 1
+                                progressCount(total)
 
                 #케이블/스카이라이프
                 cable_list = [k for k in soup2.select('ul[class]') if k['class'][0] == "cable_list"]
@@ -785,6 +795,8 @@ def generateChannelListNaver(o):
                                     js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                                 for js_channel in js["channelList"]:
                                     printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                                    total += 1
+                                    progressCount(total)
 
                 #케이블/스카이라이프 추가
                 s_more_wrap = [k for k in soup2.select('ul[id=s_more_lst_ul]')]
@@ -804,6 +816,8 @@ def generateChannelListNaver(o):
                                     js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                                 for js_channel in js["channelList"]:
                                     printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                                    total += 1
+                                    progressCount(total)
 
                 #종합편성/해외위성
                 if not layer_areaset and not cable_list and not s_more_wrap:
@@ -827,11 +841,15 @@ def generateChannelListNaver(o):
                             js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                         for js_channel in js["channelList"]:
                             printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                            total += 1
+                            progressCount(total)
     printLog("", file = o)
+    printLog("")
     printLog("===> Done.", end = "\n\n")
 
 def generateChannelListEpg(o):
     printLog("===> Generate Channel List (EPG)")
+    total = 0
     printLog("##EPG", file = o)
     printLog("#http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}", file = o)
     printLog("#top_channel_group,sub_channel_group,checkchannel,channel_name", file = o)
@@ -854,6 +872,8 @@ def generateChannelListEpg(o):
                 for b in soup.select('input[name^=checkchannel]'):
                     if b['type'] == "checkbox":
                         printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+                        total += 1
+                        progressCount(total)
             else:
                 with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
                     html2 = f2.read().decode("cp949", "ignore")
@@ -876,6 +896,8 @@ def generateChannelListEpg(o):
                             for c in soup2.select('input[name^=checkchannel]'):
                                 if c['type'] == "checkbox":
                                     printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                                    total += 1
+                                    progressCount(total)
                         else:
                             with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
                                 html3 = f3.read().decode("cp949", "ignore")
@@ -886,7 +908,10 @@ def generateChannelListEpg(o):
                                 for d in soup3.select('input[name^=checkchannel]'):
                                     if d['type'] == "checkbox":
                                         printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+                                        total += 1
+                                        progressCount(total)
     printLog("", file = o)
+    printLog("")
     printLog("===> Done.", end = "\n\n")
 
 def generateChannelList():
