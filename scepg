@@ -39,6 +39,7 @@ if not __USE_LXML:
 
 ###Global Constant
 CONFIG_FILE = "tvchannel.conf"
+LIST_FILE = "tvchannel.list"
 
 ___START_TIME = time.time()
 
@@ -52,15 +53,22 @@ def progressLog(progress, totalCount):
     if progress >= totalCount:
         printLog("")
 
-def printLog(log, end = "\n", flush = False, error = False):
-    out = []
-    if args.v or error:
-        out = sys.stderr
+def printLog(log, end = "\n", flush = False, error = False, file = None):
+    if file is None:
+        out = None
+        if args.v or error:
+            out = sys.stderr
+        else:
+            out = sys.stdout
+
+        out.write("%s%s" % (log, end))
+        if flush:
+            out.flush()
     else:
-        out = sys.stdout
-    out.write("%s%s" % (log, end))
-    if flush:
-        out.flush()
+        for out in file:
+            out.write("%s%s" % (log, end))
+            if flush:
+                out.flush()
 
 def readConfig():
     global channel_list
@@ -153,8 +161,8 @@ def writeXml():
                     f.writelines(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
         except PermissionError:
             printLog(" => Permission denied : %s" % xml_config, error = True)
-        except:
-            printLog(" => Unknown error : %s" % xml_config, error = True)
+        except Exception as e:
+            printLog(" => Unknown error : %s (%s)" % (xml_config, e.args[0]), error = True)
 
         if f is not None:
             f.close()
@@ -174,8 +182,8 @@ def writeXml():
                 printLog(" => Connection refuesed error : %s" % socket_config, error = True)
             except socket.gaierror:
                 printLog(" => Name or service not known : %s" % socket_config, error = True)
-            except:
-                printLog(" => Unknown error : %s" % socket_config, error = True)
+            except Exception as e:
+                printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
                 connect = True
         else:
@@ -186,8 +194,8 @@ def writeXml():
                 printLog(" => File not found error : %s" % socket_config, error = True)
             except PermissionError:
                 printLog(" => Permission denied : %s" % socket_config, error = True)
-            except:
-                printLog(" => Unknown error : %s" % socket_config, error = True)
+            except Exception as e:
+                printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
                 connect = True
 
@@ -406,7 +414,7 @@ def generateXmlProgrammeUplus():
                                 dic_programme["programme_start"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
                             elif row == 1:
                                 dic_programme["title"] = td.next_element.strip()
-                                match_episode_num = re.search("^(.*)[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
+                                match_episode_num = re.search("^(.*)[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", dic_programme["title"])
                                 if match_episode_num:
                                     dic_programme["episode_num"] = match_episode_num.group(2)
                                 match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", str(td.img), re.MULTILINE | re.DOTALL)
@@ -429,7 +437,7 @@ def generateXmlProgrammeUplus():
                             dic_programme["generate_source"] = generate_source
                             dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
                             dic_programme["title"] = match.group(3).rstrip()
-                            match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", match.group(3).rstrip())
+                            match_episode_num = re.search("^.*[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", match.group(3).rstrip())
                             if match_episode_num:
                                 dic_programme["episode_num"] = match_episode_num.group(1)
                             dic_programme["category"] = match.group(5)
@@ -470,11 +478,12 @@ def generateXmlProgrammeNaver():
             url = base_url.replace("{broadcast_type}", broadcast_type).replace("{channel_group}", channel_group).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             with urllib.request.urlopen(url) as f:
-                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", f.read().decode("utf-8"), re.MULTILINE)
+                html = f.read().decode("utf-8")
+                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html, re.MULTILINE)
                 if match:
                     js = json.loads(match.group(1))
                 else:
-                    js = json.loads(res.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                 for js_channel in js["channelList"]:
                     group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
                     if group_channel:
@@ -684,29 +693,244 @@ def postProc():
         else:
             call([post_proc, post_proc_args])
 
+def generateChannelListUplus(o):
+    printLog("===> Generate Channel List (Uplus)")
+    printLog("##LG유플러스", file = o)
+    printLog("#http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd=YYYYMMDD", file = o)
+    printLog("#channelId,channelName", file = o)
+    with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi") as f:
+        html = f.read().decode("cp949", "ignore")
+        if __USE_LXML:
+            soup = BeautifulSoup(html, "lxml")
+        else:
+            soup = BeautifulSoup(html, "html.parser")
+        for a in soup.select('a[href]'):
+            if a['href'] == '#CHANNEL':
+                printLog("#LG유플러스 %s" % a.text, file = o)
+                match = re.match(".*\('(.*)','(.*)','.*'\).*", a['onclick'])
+                if match:
+                    with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1))) as f2:
+                        html2 = f2.read().decode("cp949", "ignore")
+                        if __USE_LXML:
+                            soup2 = BeautifulSoup(html2, "lxml")
+                        else:
+                            soup2 = BeautifulSoup(html2, "html.parser")
+                        for b in soup2.select('a[href]'):
+                            if b['href'] == '#':
+                                match2 = re.match(".*retrieveSchedule\('(.*)','.*'\).*", b['onclick'])
+                                if match2:
+                                    printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+    printLog("", file = o)
+    printLog("===> Done.", end = "\n\n")
+                                    
+def generateChannelListNaver(o):
+    printLog("===> Generate Channel List (Naver)")
+    printLog("##네이버", file = o)
+    printLog("#http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcastType}&channelGroup={channelGroup}&date=YYYYMMDD", file = o)
+    printLog("#broadcastType,channelGroup,channelId,channelName", file = o)
+    with urllib.request.urlopen("http://tvguide.naver.com/program/multiChannel.nhn") as f:
+        html = f.read().decode("utf-8", "ignore")
+        if __USE_LXML:
+            soup = BeautifulSoup(html, "lxml")
+        else:
+            soup = BeautifulSoup(html, "html.parser")
+        i = 0
+        for a in soup.select('div[class=channel_area] a[href]'):
+            if a['href'] == "#":
+                continue
+            if 'myChannel' in a['href']:
+                continue
+            with urllib.request.urlopen("http://tvguide.naver.com" + a['href']) as f2:
+                html2 = f2.read().decode("utf-8", "ignore")
+                if __USE_LXML:
+                    soup2 = BeautifulSoup(html2, "lxml")
+                else:
+                    soup2 = BeautifulSoup(html2, "html.parser")
+
+                #지상파
+                layer_areaset = soup2.select('div[class=layer_areaset] a[href]')
+                for layer_area in layer_areaset:
+                    if layer_area['href'] == "#":
+                        continue
+                    printLog("#네이버 %s (%s)" % (a.text, layer_area.text), file = o)
+                    match_layer_area = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", layer_area['href'])
+                    if match_layer_area:
+                        broadcastType = match_layer_area.group(1)
+                        channelGroup = match_layer_area.group(2)
+                        with urllib.request.urlopen("http://tvguide.naver.com" + layer_area['href']) as f3:
+                            html3 = f3.read().decode('utf-8')
+                            match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                            if match:
+                                js = json.loads(match.group(1))
+                            else:
+                                js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                            for js_channel in js["channelList"]:
+                                printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+
+                #케이블/스카이라이프
+                cable_list = [k for k in soup2.select('ul[class]') if k['class'][0] == "cable_list"]
+                for c in cable_list:
+                    for d in c.select("a[href]"):
+                        printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                        match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
+                        if match_cable_list:
+                            broadcastType = match_cable_list.group(1)
+                            channelGroup = match_cable_list.group(2)
+                            with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
+                                html3 = f3.read().decode('utf-8')
+                                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                                if match:
+                                    js = json.loads(match.group(1))
+                                else:
+                                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                                for js_channel in js["channelList"]:
+                                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+
+                #케이블/스카이라이프 추가
+                s_more_wrap = [k for k in soup2.select('ul[id=s_more_lst_ul]')]
+                for c in s_more_wrap:
+                    for d in c.select("a[href]"):
+                        printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                        match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
+                        if match_cable_list:
+                            broadcastType = match_cable_list.group(1)
+                            channelGroup = match_cable_list.group(2)
+                            with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
+                                html3 = f3.read().decode('utf-8')
+                                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                                if match:
+                                    js = json.loads(match.group(1))
+                                else:
+                                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                                for js_channel in js["channelList"]:
+                                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+
+                #종합편성/해외위성
+                if not layer_areaset and not cable_list and not s_more_wrap:
+                    printLog("#네이버 %s" % a.text, file = o)
+                    match1 = re.match(".*broadcastType=(\d+)\&.*", a['href'])
+                    match2 = re.match(".*channelGroup=(\d+)\&.*", a['href'])
+                    if match1:
+                        broadcastType = match1.group(1)
+                    else:
+                        broadcastType = ""
+                    if match2:
+                        channelGroup = match2.group(1)
+                    else:
+                        channelGroup = ""
+
+                    if match1:
+                        match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html2, re.MULTILINE)
+                        if match:
+                            js = json.loads(match.group(1))
+                        else:
+                            js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                        for js_channel in js["channelList"]:
+                            printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+    printLog("", file = o)
+    printLog("===> Done.", end = "\n\n")
+
+def generateChannelListEpg(o):
+    printLog("===> Generate Channel List (EPG)")
+    printLog("##EPG", file = o)
+    printLog("#http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}", file = o)
+    printLog("#top_channel_group,sub_channel_group,checkchannel,channel_name", file = o)
+    with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php") as f:
+        html = f.read().decode("cp949", "ignore")
+        soup = BeautifulSoup(html, "lxml")
+        for a in soup.select('select[name=search_top_channel_group] option'):
+            if 'selected' in a.attrs:
+                top_channel_group = ""
+                sub_channel_group = ""
+                printLog("#EPG %s" % a.text, file = o)
+                for b in soup.select('input[name=search_top_channel_group]'):
+                    if 'value' in b.attrs:
+                        top_channel_group = b['value']
+                        break
+                for b in soup.select('input[name=search_sub_channel_group]'):
+                    if 'value' in b.attrs:
+                        sub_channel_group = b['value']
+                        break
+                for b in soup.select('input[name^=checkchannel]'):
+                    if b['type'] == "checkbox":
+                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+            else:
+                with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
+                    html2 = f2.read().decode("cp949", "ignore")
+                    soup2 = BeautifulSoup(html2, "lxml")
+                    for b in soup2.select('select[name=search_sub_channel_group] option'):
+                        if b['value'] == '':
+                            continue
+                        if 'selected' in b.attrs:
+                            top_channel_group = ""
+                            sub_channel_group = ""
+                            printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                            for c in soup2.select('input[name=search_top_channel_group]'):
+                                if 'value' in c.attrs:
+                                    top_channel_group = c['value']
+                                    break
+                            for c in soup2.select('input[name=search_sub_channel_group]'):
+                                if 'value' in c.attrs:
+                                    sub_channel_group = c['value']
+                                    break
+                            for c in soup2.select('input[name^=checkchannel]'):
+                                if c['type'] == "checkbox":
+                                    printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                        else:
+                            with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
+                                html3 = f3.read().decode("cp949", "ignore")
+                                soup3 = BeautifulSoup(html3, "lxml")
+                                top_channel_group = a['value']
+                                sub_channel_group = b['value']
+                                printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                                for d in soup3.select('input[name^=checkchannel]'):
+                                    if d['type'] == "checkbox":
+                                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+    printLog("", file = o)
+    printLog("===> Done.", end = "\n\n")
+
+def generateChannelList():
+    with open(LIST_FILE, "r+") as f:
+        o = []
+        o.append(f)
+        if args.v:
+            o.append(sys.stderr)
+
+        generateChannelListUplus(o)
+        generateChannelListNaver(o)
+        generateChannelListEpg(o)
+
 if __name__ == '__main__':
     argumentParser = argparse.ArgumentParser()
     argumentParser.add_argument("-v", "--v", action="store_true", help="verbose")
     argumentParser.add_argument("-b", "--b", action="store_true", help="pretty_print")
+    argumentParser.add_argument("-g", "--g", action="store_true", help="generate_list")
     args = argumentParser.parse_args()
 
-    readConfig()
+    if args.g:
+        if not __USE_BS:
+            printLog("채널 소스 생성은 BeautifulSoup4가 필요합니다.")
+            exit(1)
+        generateChannelList()
 
-    generateXmlRoot()
+    else:
+        readConfig()
 
-    generateXmlChannel()
+        generateXmlRoot()
 
-    generateXmlProgrammeUplus()
+        generateXmlChannel()
 
-    generateXmlProgrammeNaver()
+        generateXmlProgrammeUplus()
 
-    generateXmlProgrammeEpg()
+        generateXmlProgrammeNaver()
 
-    writeXml()
-    postProc()
+        generateXmlProgrammeEpg()
 
-    if args.v:
-        printXml()
+        writeXml()
+        postProc()
+
+        if args.v:
+            printXml()
 
     printLog("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
 
