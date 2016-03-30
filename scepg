@@ -925,11 +925,47 @@ def generateChannelList():
         generateChannelListNaver(o)
         generateChannelListEpg(o)
 
+def checkChannelList():
+    printLog("==> Generate XML Channels")
+
+    progress = 0;
+    progressLog(0, len(channel_list))
+
+    list_file = []
+    with open(LIST_FILE, "r") as f:
+        line = f.readline()
+        while line:
+            if not line == "" and not line == "\n" and not line.startswith("#"):
+                list_file.append(line.rstrip())
+            line = f.readline()
+
+        for channel_config in channel_list:
+            if not channel_config[1] in list_file:
+                match = re.match("(.*),[^,]*", channel_config[1])
+                if match:
+                    conf = match.group(1)
+                    conf_match = [k for k in list_file if k.startswith(conf)]
+                    if conf_match:
+                        printLog("")
+                        printLog(" -> Changed : [%s] to [%s]" % (channel_config[1], conf_match[0]))
+                    else:
+                        printLog("")
+                        printLog(" -> Unknown source : [%s]" % channel_config[1])
+                else:
+                    printLog("")
+                    printLog(" -> Invalid : [%s]" % channel_config[1])
+
+            progress += 1
+            progressLog(progress, len(channel_list))
+
+    printLog("==> Done.", end = "\n\n")
+
 if __name__ == '__main__':
     argumentParser = argparse.ArgumentParser()
     argumentParser.add_argument("-v", "--v", action="store_true", help="verbose")
     argumentParser.add_argument("-b", "--b", action="store_true", help="pretty_print")
     argumentParser.add_argument("-g", "--g", action="store_true", help="generate_list")
+    argumentParser.add_argument("-c", "--c", action="store_true", help="check_channel")
     args = argumentParser.parse_args()
 
     if args.g:
@@ -937,6 +973,11 @@ if __name__ == '__main__':
             printLog("채널 소스 생성은 BeautifulSoup4가 필요합니다.")
             exit(1)
         generateChannelList()
+
+    elif args.c:
+        readConfig()
+
+        checkChannelList()
 
     else:
         readConfig()
