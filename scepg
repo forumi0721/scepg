@@ -127,7 +127,7 @@ def readConfig():
     printLog("==> Done.", end = "\n\n")
 
 def printXml():
-    printLog("===> Print XML")
+    printLog("==> Print XML")
 
     if __USE_LXML:
         print(etree.tostring(xml, pretty_print = output_xml_pretty_print, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
@@ -137,7 +137,7 @@ def printXml():
         else:
             print(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
 
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def writeXml():
     xml_list = output_xml.split(" ")
@@ -145,14 +145,14 @@ def writeXml():
     if not xml_list and not socket_list:
         return
 
-    printLog("===> Write XML")
+    printLog("==> Write XML")
     progress = 0
     progressLog(progress, len(xml_list) + len(socket_list))
 
     for xml_config in xml_list:
         f = None
         try:
-            f = open(xml_config, "w")
+            f = open(xml_config, "w", encoding='utf8')
             if __USE_LXML:
                 f.writelines(etree.tostring(xml, pretty_print = output_xml_pretty_print, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
             else:
@@ -214,7 +214,7 @@ def writeXml():
         progress += 1
         progressLog(progress, len(xml_list) + len(socket_list))
 
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def generateXmlRoot():
     global xml
@@ -380,7 +380,7 @@ def generateXmlProgrammeUplus():
     generate_source = "http://www.uplus.co.kr/"
     base_url = "http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channel_code}&evntCmpYmd={date_ymd}"
 
-    printLog("===> Generate Programmes (Uplus)")
+    printLog("==> Generate Programmes (Uplus)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -396,13 +396,15 @@ def generateXmlProgrammeUplus():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             with urllib.request.urlopen(url) as f:
-                body = f.read().decode("cp949", "ignore").partition("<tbody>")[2].rpartition("</tbody>")[0]
+                html = f.read().decode("cp949", "ignore")
+                #UPLUS에서 제목을 제대로 안줌
+                html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;")
                 if __USE_BS:
                     if __USE_LXML:
-                        soup = BeautifulSoup(body, "lxml")
+                        soup = BeautifulSoup(html, "lxml")
                     else:
-                        soup = BeautifulSoup(body, "html.parser")
-                    for tr in soup.find_all("tr"):
+                        soup = BeautifulSoup(html, "html.parser")
+                    for tr in soup.select("tbody tr"):
                         row = 0
                         for td in tr.find_all("td"):
                             if row == 0:
@@ -424,9 +426,10 @@ def generateXmlProgrammeUplus():
                                 if match_rating:
                                     dic_programme["rating"] = match_rating.group(1)
                             elif row == 2:
-                                dic_programme["category"] = str(td.next_element).strip()
+                                dic_programme["category"] = td.next_element.strip()
                             row += 1
                 else:
+                    body = html.partition("<tbody>")[2].rpartition("</tbody>")[0]
                     for programme in body.split("<tr>"):
                         match = re.search(".*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
                         if match:
@@ -451,7 +454,7 @@ def generateXmlProgrammeUplus():
             progress += 1
             progressLog(progress, len(channel_config) * retrieve_days)
 
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgrammeNaver():
     channel_config = [[k, v] for k, v in channel_list if v[0] == "N"]
@@ -461,7 +464,7 @@ def generateXmlProgrammeNaver():
     generate_source = "http://www.naver.co.kr/"
     base_url = "http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcast_type}&channelGroup={channel_group}&date={date_ymd}"
 
-    printLog("===> Generate Programmes (Naver)")
+    printLog("==> Generate Programmes (Naver)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -482,11 +485,11 @@ def generateXmlProgrammeNaver():
 
             with urllib.request.urlopen(url) as f:
                 html = f.read().decode("utf-8")
-                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html, re.MULTILINE)
+                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html, re.MULTILINE | re.DOTALL)
                 if match:
                     js = json.loads(match.group(1))
                 else:
-                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                    js = json.loads(html.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                 for js_channel in js["channelList"]:
                     group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
                     if group_channel:
@@ -526,7 +529,7 @@ def generateXmlProgrammeNaver():
 
                         progress += 1
                         progressLog(progress, len(channel_config) * retrieve_days)
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgrammeEpg():
     channel_config = [[k, v] for k, v in channel_list if v[0] == "E"]
@@ -537,7 +540,7 @@ def generateXmlProgrammeEpg():
     base_url = "http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group={top_channel_group}&old_top_channel_group={top_channel_group}&search_sub_channel_group={sub_channel_group}&old_sub_channel_group={sub_channel_group}&ymd={date_y-m-d}&{checkchannel}"
     base_url_epg_checkchannel = "checkchannel%5B{channel_code}%5D={channel_id}"
 
-    printLog("===> Generate Programmes (EPG)")
+    printLog("==> Generate Programmes (EPG)")
     progress = 0
     progressLog(0, len(channel_config) * retrieve_days)
 
@@ -601,7 +604,7 @@ def generateXmlProgrammeEpg():
 
                 checkchannel = ""
                 checkchannel_count = 0
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def getCategory(category):
     if category == "드라마":
@@ -697,7 +700,7 @@ def postProc():
             call([post_proc, post_proc_args])
 
 def generateChannelListUplus(o):
-    printLog("===> Generate Channel List (Uplus)")
+    printLog("==> Generate Channel List (Uplus)")
     total = 0
     printLog("##LG유플러스", file = o)
     printLog("#http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd=YYYYMMDD", file = o)
@@ -728,10 +731,10 @@ def generateChannelListUplus(o):
                                     progressCount(total)
     printLog("", file = o)
     printLog("")
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
                                     
 def generateChannelListNaver(o):
-    printLog("===> Generate Channel List (Naver)")
+    printLog("==> Generate Channel List (Naver)")
     total = 0
     printLog("##네이버", file = o)
     printLog("#http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcastType}&channelGroup={channelGroup}&date=YYYYMMDD", file = o)
@@ -767,11 +770,11 @@ def generateChannelListNaver(o):
                         channelGroup = match_layer_area.group(2)
                         with urllib.request.urlopen("http://tvguide.naver.com" + layer_area['href']) as f3:
                             html3 = f3.read().decode('utf-8')
-                            match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                            match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
                             if match:
                                 js = json.loads(match.group(1))
                             else:
-                                js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                                js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                             for js_channel in js["channelList"]:
                                 printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
                                 total += 1
@@ -788,11 +791,11 @@ def generateChannelListNaver(o):
                             channelGroup = match_cable_list.group(2)
                             with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
                                 html3 = f3.read().decode('utf-8')
-                                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
                                 if match:
                                     js = json.loads(match.group(1))
                                 else:
-                                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                                    js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                                 for js_channel in js["channelList"]:
                                     printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
                                     total += 1
@@ -809,11 +812,11 @@ def generateChannelListNaver(o):
                             channelGroup = match_cable_list.group(2)
                             with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
                                 html3 = f3.read().decode('utf-8')
-                                match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html3, re.MULTILINE)
+                                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
                                 if match:
                                     js = json.loads(match.group(1))
                                 else:
-                                    js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                                    js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                                 for js_channel in js["channelList"]:
                                     printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
                                     total += 1
@@ -834,21 +837,21 @@ def generateChannelListNaver(o):
                         channelGroup = ""
 
                     if match1:
-                        match = re.search("var PROGRAM_SCHEDULES=([^;]+});", html2, re.MULTILINE)
+                        match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html2, re.MULTILINE | re.DOTALL)
                         if match:
                             js = json.loads(match.group(1))
                         else:
-                            js = json.loads(html.text.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                            js = json.loads(html2.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
                         for js_channel in js["channelList"]:
                             printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
                             total += 1
                             progressCount(total)
     printLog("", file = o)
     printLog("")
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def generateChannelListEpg(o):
-    printLog("===> Generate Channel List (EPG)")
+    printLog("==> Generate Channel List (EPG)")
     total = 0
     printLog("##EPG", file = o)
     printLog("#http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}", file = o)
@@ -912,10 +915,10 @@ def generateChannelListEpg(o):
                                         progressCount(total)
     printLog("", file = o)
     printLog("")
-    printLog("===> Done.", end = "\n\n")
+    printLog("==> Done.", end = "\n\n")
 
 def generateChannelList():
-    with open(LIST_FILE, "r+") as f:
+    with open(LIST_FILE, "w", encoding='utf8') as f:
         o = []
         o.append(f)
         if args.v:
@@ -998,5 +1001,5 @@ if __name__ == '__main__':
         if args.v:
             printXml()
 
-    printLog("===> Execution time : %.2fs" % (time.time() - ___START_TIME))
+    printLog("==> Execution time : %.2fs" % (time.time() - ___START_TIME))
 
