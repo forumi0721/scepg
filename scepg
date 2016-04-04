@@ -82,15 +82,29 @@ def readConfig():
     global post_proc
     global post_proc_args
 
+    configFilePath = None
+
     printLog("==> Read config file")
-    progressLog(0, 4)
+
+    if os.path.isfile(CONFIG_FILE):
+        configFilePath = CONFIG_FILE
+    elif os.path.isfile("/etc/" + CONFIG_FILE):
+        configFilePath = "/etc/" + CONFIG_FILE
+    elif os.path.isfile("/var/lib/scepg/" + CONFIG_FILE):
+        configFilePath = "/var/lib/scepg/" + CONFIG_FILE
+    else:
+        printLog(" => Cannot found config file")
+        exit(1)
 
     config = configparser.RawConfigParser()
     config.optionxform = str
-    config.read(CONFIG_FILE)
+    config.read(configFilePath)
+        
+    printLog(" => Config File : " + configFilePath)
 
+    progressLog(0, 4)
     if not config.has_section("channel_list"):
-        sys.stdout.write("\n")
+        printLog("")
         printLog(" => Config file not contains channel_list section")
         exit(1)
 
@@ -99,7 +113,7 @@ def readConfig():
     try:
         channel_list = config.items("channel_list")
     except configparser.Error:
-        sys.stdout.write("\n")
+        printLog("")
         printLog(" => Config file not contains channel_list section")
         exit(1)
 
