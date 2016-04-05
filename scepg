@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#print function
+from __future__ import print_function
+
 ###Library Config
 __USE_BS = True
 __USE_LXML = True
@@ -10,15 +13,30 @@ __DEBUG = True
 import sys
 import os
 import argparse
-import configparser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 import socket
 import time
 import datetime
-import urllib.request
+try:
+    import urllib.request as request
+except ImportError:
+    import urllib2 as request
 import re
 import json
-import html
 from subprocess import call
+#for python2
+if sys.version_info[0] < 3:
+    from io import open
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+    __USE_LXML = False
+    import HTMLParser
+    htmlparser = HTMLParser.HTMLParser()
+else:
+    import html as htmlparser
 ###Import(dynamic)
 #Check BeautifulSoup
 if __USE_BS:
@@ -69,7 +87,10 @@ def printLog(log, end = "\n", flush = False, error = False, file = None):
             out.flush()
     else:
         for out in file:
-            out.write("%s%s" % (log, end))
+            if sys.version_info[0] < 3:
+                out.write(unicode("%s%s" % (log, end)))
+            else:
+                out.write("%s%s" % (log, end))
             if flush:
                 out.flush()
 
@@ -100,7 +121,16 @@ def readConfig():
     config.optionxform = str
     config.read(configFilePath)
         
-    printLog(" => Config File : " + configFilePath)
+    printLog(" => Config file : " + configFilePath)
+    printLog(" => python major version : " + str(sys.version_info[0]))
+    if __USE_BS:
+        printLog(" => BeautifulSoup : Yes")
+    else:
+        printLog(" => BeautifulSoup : No")
+    if __USE_LXML:
+        printLog(" => LXML : Yes")
+    else:
+        printLog(" => LXML : No")
 
     progressLog(0, 4)
     if not config.has_section("channel_list"):
@@ -119,12 +149,36 @@ def readConfig():
 
     progressLog(2, 4)
 
-    retrieve_days = config.getint("defaults", "retrieve_days", fallback=1)
-    output_xml = config.get("defaults", "output_xml", fallback="")
-    output_xml_pretty_print = config.getboolean("defaults", "output_xml_pretty_print", fallback=False)
-    output_socket = config.get("defaults", "output_socket", fallback="")
-    post_proc = config.get("defaults", "post_proc", fallback="")
-    post_proc_args = config.get("defaults", "post_proc_args", fallback="")
+    #retrieve_days = config.getint("defaults", "retrieve_days", fallback=1)
+    try:
+        retrieve_days = config.getint("defaults", "retrieve_days")
+    except configparser.NoOptionError:
+        retrieve_days = 1
+    #output_xml = config.get("defaults", "output_xml", fallback="")
+    try:
+        output_xml = config.get("defaults", "output_xml")
+    except configparser.NoOptionError:
+        output_xml = ""
+    #output_xml_pretty_print = config.getboolean("defaults", "output_xml_pretty_print", fallback=False)
+    try:
+        output_xml_pretty_print = config.getboolean("defaults", "output_xml_pretty_print")
+    except configparser.NoOptionError:
+        output_xml_pretty_print = False
+    #output_socket = config.get("defaults", "output_socket", fallback="")
+    try:
+        output_socket = config.get("defaults", "output_socket")
+    except configparser.NoOptionError:
+        output_socket = ""
+    #post_proc = config.get("defaults", "post_proc", fallback="")
+    try:
+        post_proc = config.get("defaults", "post_proc")
+    except configparser.NoOptionError:
+        post_proc = ""
+    #post_proc_args = config.get("defaults", "post_proc_args", fallback="")
+    try:
+        post_proc_args = config.get("defaults", "post_proc_args")
+    except configparser.NoOptionError:
+        post_proc_args = ""
 
     progressLog(3, 4)
 
@@ -171,14 +225,14 @@ def writeXml():
                 f.writelines(etree.tostring(xml, pretty_print = output_xml_pretty_print, xml_declaration = True, encoding = "UTF-8", doctype = "<!DOCTYPE tv SYSTEM \"xmltv.dtd\">").decode("utf-8"))
             else:
                 if output_xml_pretty_print:
-                    print(1, output_xml_pretty_print)
                     f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
                 else:
-                    print(2, output_xml_pretty_print)
                     f.writelines(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
-        except PermissionError:
-            printLog(" => Permission denied : %s" % xml_config, error = True)
+        except IOError as e:
+            printLog("")
+            printLog(" => IO Error denied : %s (%s)" % (xml_config, e.args[0]), error = True)
         except Exception as e:
+            printLog("")
             printLog(" => Unknown error : %s (%s)" % (xml_config, e.args[0]), error = True)
 
         if f is not None:
@@ -267,6 +321,7 @@ def generateXmlChannel():
             
             xml_display_name1 = etree.Element("display-name")
             xml_display_name1.text = "%s %s" % (channel_id, channel_name)
+
             xml_channel.append(xml_display_name1)
             
             xml_display_name2 = etree.Element("display-name")
@@ -280,13 +335,13 @@ def generateXmlChannel():
             se_channel = ET.SubElement(xml, "channel", {"id":"I%s.forumi0721.ddns.net" % channel_id})
 
             se_channel_1 = ET.SubElement(se_channel, "display-name")
-            se_channel_1.text = "%s %s" % (channel_id, channel_name)
+            se_channel_1.text = str("%s %s" % (channel_id, channel_name))
 
             se_channel_2 = ET.SubElement(se_channel, "display-name")
-            se_channel_2.text = channel_id
+            se_channel_2.text = str(channel_id)
 
             se_channel_3 = ET.SubElement(se_channel, "display-name")
-            se_channel_3.text = channel_name
+            se_channel_3.text = str(channel_name)
 
         progress += 1
         progressLog(progress, len(channel_list))
@@ -346,7 +401,7 @@ def generateXmlProgramme(dic_programme):
         xml_generate_source = etree.Element("generate-source", name = dic_programme["generate_source"])
         xml_programme.append(xml_generate_source)
     else:
-        se_programme = ET.SubElement(xml, "programme", {"start":"%s +0900" % dic_programme["programme_start"], "stop":"%s +0900" % dic_programme["programme_stop"], "channel":"I%s.forumi0721.ddns.net" % dic_programme["channel_id"], "channel_no":dic_programme["channel_id"], "channel_name":dic_programme["channel_name"]})
+        se_programme = ET.SubElement(xml, "programme", {"start":"%s +0900" % dic_programme["programme_start"], "stop":"%s +0900" % dic_programme["programme_stop"], "channel":"I%s.forumi0721.ddns.net" % dic_programme["channel_id"], "channel_no":str(dic_programme["channel_id"]), "channel_name":str(dic_programme["channel_name"])})
 
         se_title = ET.SubElement(se_programme, "title", {"lang":"ko"})
         se_title.text = dic_programme["title"]
@@ -409,62 +464,64 @@ def generateXmlProgrammeUplus():
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
-            with urllib.request.urlopen(url) as f:
-                html = f.read().decode("cp949", "ignore")
-                #UPLUS에서 제목을 제대로 안줌
-                html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;")
-                if __USE_BS:
-                    if __USE_LXML:
-                        soup = BeautifulSoup(html, "lxml")
-                    else:
-                        soup = BeautifulSoup(html, "html.parser")
-                    for tr in soup.select("tbody tr"):
-                        row = 0
-                        for td in tr.find_all("td"):
-                            if row == 0:
-                                if dic_programme:
-                                    dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
-                                    generateXmlProgramme(dic_programme)
-
-                                dic_programme.clear()
-                                dic_programme["channel_id"] = channel_id
-                                dic_programme["channel_name"] = channel_name
-                                dic_programme["generate_source"] = generate_source
-                                dic_programme["programme_start"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
-                            elif row == 1:
-                                dic_programme["title"] = td.next_element.strip()
-                                match_episode_num = re.search("^(.*)[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", dic_programme["title"])
-                                if match_episode_num:
-                                    dic_programme["episode_num"] = match_episode_num.group(2)
-                                match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", str(td.img), re.MULTILINE | re.DOTALL)
-                                if match_rating:
-                                    dic_programme["rating"] = match_rating.group(1)
-                            elif row == 2:
-                                dic_programme["category"] = td.next_element.strip()
-                            row += 1
+            #with request.urlopen(url) as f:
+            f = request.urlopen(url)
+            html = f.read().decode("cp949", "ignore")
+            #UPLUS에서 제목을 제대로 안줌
+            html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;")
+            if __USE_BS:
+                if __USE_LXML:
+                    soup = BeautifulSoup(html, "lxml")
                 else:
-                    body = html.partition("<tbody>")[2].rpartition("</tbody>")[0]
-                    for programme in body.split("<tr>"):
-                        match = re.search(".*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
-                        if match:
+                    soup = BeautifulSoup(html, "html.parser")
+                for tr in soup.select("tbody tr"):
+                    row = 0
+                    for td in tr.find_all("td"):
+                        if row == 0:
                             if dic_programme:
-                                dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
+                                dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
                                 generateXmlProgramme(dic_programme)
 
                             dic_programme.clear()
                             dic_programme["channel_id"] = channel_id
                             dic_programme["channel_name"] = channel_name
                             dic_programme["generate_source"] = generate_source
-                            dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
-                            dic_programme["title"] = match.group(3).rstrip()
-                            match_episode_num = re.search("^.*[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", match.group(3).rstrip())
+                            dic_programme["programme_start"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
+                        elif row == 1:
+                            dic_programme["title"] = td.next_element.strip()
+                            match_episode_num = re.search("^(.*)[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", dic_programme["title"])
                             if match_episode_num:
-                                dic_programme["episode_num"] = match_episode_num.group(1)
-                            dic_programme["category"] = match.group(5)
-                            match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", match.group(4), re.MULTILINE | re.DOTALL)
+                                dic_programme["episode_num"] = match_episode_num.group(2)
+                            match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", str(td.img), re.MULTILINE | re.DOTALL)
                             if match_rating:
                                 dic_programme["rating"] = match_rating.group(1)
+                        elif row == 2:
+                            dic_programme["category"] = td.next_element.strip()
+                        row += 1
+            else:
+                body = html.partition("<tbody>")[2].rpartition("</tbody>")[0]
+                for programme in body.split("<tr>"):
+                    match = re.search(".*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
+                    if match:
+                        if dic_programme:
+                            dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
+                            generateXmlProgramme(dic_programme)
 
+                        dic_programme.clear()
+                        dic_programme["channel_id"] = channel_id
+                        dic_programme["channel_name"] = channel_name
+                        dic_programme["generate_source"] = generate_source
+                        dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
+                        dic_programme["title"] = match.group(3).rstrip()
+                        match_episode_num = re.search("^.*[\(|\[\|<](\d+[회|강])[\)|\]\|>]$", match.group(3).rstrip())
+                        if match_episode_num:
+                            dic_programme["episode_num"] = match_episode_num.group(1)
+                        dic_programme["category"] = match.group(5)
+                        match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", match.group(4), re.MULTILINE | re.DOTALL)
+                        if match_rating:
+                            dic_programme["rating"] = match_rating.group(1)
+
+            f.close()
             progress += 1
             progressLog(progress, len(channel_config) * retrieve_days)
 
@@ -497,52 +554,54 @@ def generateXmlProgrammeNaver():
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
             url = base_url.replace("{broadcast_type}", broadcast_type).replace("{channel_group}", channel_group).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
-            with urllib.request.urlopen(url) as f:
-                html = f.read().decode("utf-8")
-                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html, re.MULTILINE | re.DOTALL)
-                if match:
-                    js = json.loads(match.group(1))
-                else:
-                    js = json.loads(html.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
-                for js_channel in js["channelList"]:
-                    group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
-                    if group_channel:
-                        for programme_channel in group_channel:
-                            channel_id = programme_channel[0]
-                            channel_name = programme_channel[1]
+            #with urllib.request.urlopen(url) as f:
+            f = request.urlopen(url)
+            html = f.read().decode("utf-8")
+            match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html, re.MULTILINE | re.DOTALL)
+            if match:
+                js = json.loads(match.group(1))
+            else:
+                js = json.loads(html.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+            for js_channel in js["channelList"]:
+                group_channel = [[k[0], k[1]] for k in download_channel_list if k[2] == str(js_channel["channelId"])]
+                if group_channel:
+                    for programme_channel in group_channel:
+                        channel_id = programme_channel[0]
+                        channel_name = programme_channel[1]
 
-                            for js_program in js_channel["programList"]:
-                                dic_programme = {}
-                                dic_programme["channel_id"] = channel_id
-                                dic_programme["channel_name"] = channel_name
-                                dic_programme["generate_source"] = generate_source
-                                dic_programme["programme_start"] = js_program["beginDate"].replace("-","") + js_program["beginTime"].replace(":", "")
-                                if int(js_program["beginTime"].replace(":", "")) > int(js_program["endTime"].replace(":", "")):
-                                    dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], "%Y-%m-%d") + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
+                        for js_program in js_channel["programList"]:
+                            dic_programme = {}
+                            dic_programme["channel_id"] = channel_id
+                            dic_programme["channel_name"] = channel_name
+                            dic_programme["generate_source"] = generate_source
+                            dic_programme["programme_start"] = js_program["beginDate"].replace("-","") + js_program["beginTime"].replace(":", "")
+                            if int(js_program["beginTime"].replace(":", "")) > int(js_program["endTime"].replace(":", "")):
+                                dic_programme["programme_stop"] = (datetime.datetime.strptime(js_program["beginDate"], "%Y-%m-%d") + datetime.timedelta(days = 1)).strftime("%Y%m%d") + js_program["endTime"].replace(":", "")
+                            else:
+                                dic_programme["programme_stop"] = js_program["beginDate"].replace("-","") + js_program["endTime"].replace(":", "")
+                            if js_program["subtitle"] != "":
+                                if js_program["episodeNo"] != "":
+                                    dic_programme["title"] = "%s <%s> (%s)" % (js_program["scheduleName"], js_program["subtitle"], js_program["episodeNo"])
+                                    dic_programme["episode_num"] = js_program["episodeNo"]
                                 else:
-                                    dic_programme["programme_stop"] = js_program["beginDate"].replace("-","") + js_program["endTime"].replace(":", "")
-                                if js_program["subtitle"] != "":
-                                    if js_program["episodeNo"] != "":
-                                        dic_programme["title"] = "%s <%s> (%s)" % (js_program["scheduleName"], js_program["subtitle"], js_program["episodeNo"])
-                                        dic_programme["episode_num"] = js_program["episodeNo"]
-                                    else:
-                                        dic_programme["title"] = "%s <%s>" % (js_program["scheduleName"], js_program["subtitle"])
+                                    dic_programme["title"] = "%s <%s>" % (js_program["scheduleName"], js_program["subtitle"])
+                            else:
+                                if js_program["episodeNo"] != "":
+                                    dic_programme["title"] = "%s (%s)" % (js_program["scheduleName"], js_program["episodeNo"])
+                                    dic_programme["episode_num"] = js_program["episodeNo"]
                                 else:
-                                    if js_program["episodeNo"] != "":
-                                        dic_programme["title"] = "%s (%s)" % (js_program["scheduleName"], js_program["episodeNo"])
-                                        dic_programme["episode_num"] = js_program["episodeNo"]
-                                    else:
-                                        dic_programme["title"] = js_program["scheduleName"]
-                                dic_programme["sub_title"] = dic_programme["title"]
-                                dic_programme["desc"] = dic_programme["title"]
-                                dic_programme["category"] = js_program["largeGenreId"]
-                                if js_program["ageRating"] != 0:
-                                    dic_programme["rating"] = str(js_program["ageRating"])
+                                    dic_programme["title"] = js_program["scheduleName"]
+                            dic_programme["sub_title"] = dic_programme["title"]
+                            dic_programme["desc"] = dic_programme["title"]
+                            dic_programme["category"] = js_program["largeGenreId"]
+                            if js_program["ageRating"] != 0:
+                                dic_programme["rating"] = str(js_program["ageRating"])
 
-                                generateXmlProgramme(dic_programme)
+                            generateXmlProgramme(dic_programme)
 
-                        progress += 1
-                        progressLog(progress, len(channel_config) * retrieve_days)
+                    progress += 1
+                    progressLog(progress, len(channel_config) * retrieve_days)
+            f.close()
     printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgrammeEpg():
@@ -582,39 +641,42 @@ def generateXmlProgrammeEpg():
                     download_date = (datetime.date.today() + datetime.timedelta(days = day))
                     url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
 
-                    with urllib.request.urlopen(url) as f:
-                        match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
-                        for preview in match_preview:
-                            match_program = re.match(r".*Preview\('[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
-                            if match_program:
-                                programme_channel_list = [k for k, v in group_channel if k.split(",")[0] == match_program.group(2)]
-                                for programme_channel in programme_channel_list:
-                                    dic_programme = {}
-                                    dic_programme["channel_id"] = programme_channel.split(",")[0]
-                                    dic_programme["channel_name"] = programme_channel.split(",")[1]
-                                    dic_programme["generate_source"] = generate_source
-                                    dic_programme["title"] = html.unescape(match_program.group(1))
-                                    match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
-                                    if match_episode_num:
-                                        dic_programme["episode_num"] = match_episode_num.group(1)
-                                    match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
-                                    if match_rating:
-                                        dic_programme["rating"] = match_rating.group(1)
-                                    start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), "%Y %m/%d %p %I:%M")
-                                    if download_date.month == 12 and start_date.month == 1:
-                                        start_date = start_date + datetime.timedelta(year = 1)
-                                    dic_programme["programme_start"] = start_date.strftime("%Y%m%d%H%M")
-                                    end_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(4)), "%Y %m/%d %p %I:%M")
-                                    if download_date.month == 12 and end_date.month == 1:
-                                        end_date = end_date + datetime.timedelta(year = 1)
-                                    dic_programme["programme_stop"] = end_date.strftime("%Y%m%d%H%M")
-                                    end = match_program.group(4)
-                                    dic_programme["category"] = match_program.group(5).split("-")[0]
+                    #with urllib.request.urlopen(url) as f:
+                    f = request.urlopen(url)
+                    match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
+                    for preview in match_preview:
+                        match_program = re.match(r".*Preview\('[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
+                        if match_program:
+                            programme_channel_list = [k for k, v in group_channel if k.split(",")[0] == match_program.group(2)]
+                            for programme_channel in programme_channel_list:
+                                dic_programme = {}
+                                dic_programme["channel_id"] = programme_channel.split(",")[0]
+                                dic_programme["channel_name"] = programme_channel.split(",")[1]
+                                dic_programme["generate_source"] = generate_source
+                                dic_programme["title"] = htmlparser.unescape(match_program.group(1))
+                                match_episode_num = re.search("^.*[\(|\[](\d+[회|강])[\)|\]]$", dic_programme["title"])
+                                if match_episode_num:
+                                    dic_programme["episode_num"] = match_episode_num.group(1)
+                                match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
+                                if match_rating:
+                                    dic_programme["rating"] = match_rating.group(1)
+                                start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), "%Y %m/%d %p %I:%M")
+                                if download_date.month == 12 and start_date.month == 1:
+                                    start_date = start_date + datetime.timedelta(year = 1)
+                                dic_programme["programme_start"] = start_date.strftime("%Y%m%d%H%M")
+                                end_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(4)), "%Y %m/%d %p %I:%M")
+                                if download_date.month == 12 and end_date.month == 1:
+                                    end_date = end_date + datetime.timedelta(year = 1)
+                                dic_programme["programme_stop"] = end_date.strftime("%Y%m%d%H%M")
+                                end = match_program.group(4)
+                                dic_programme["category"] = match_program.group(5).split("-")[0]
 
-                                    generateXmlProgramme(dic_programme)
+                                generateXmlProgramme(dic_programme)
 
-                        progress += checkchannel_count
-                        progressLog(progress, len(channel_config) * retrieve_days)
+                    f.close()
+
+                    progress += checkchannel_count
+                    progressLog(progress, len(channel_config) * retrieve_days)
 
                 checkchannel = ""
                 checkchannel_count = 0
@@ -719,30 +781,45 @@ def generateChannelListUplus(o):
     printLog("##LG유플러스", file = o)
     printLog("#http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd=YYYYMMDD", file = o)
     printLog("#channelId,channelName", file = o)
-    with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi") as f:
-        html = f.read().decode("cp949", "ignore")
-        if __USE_LXML:
-            soup = BeautifulSoup(html, "lxml")
-        else:
-            soup = BeautifulSoup(html, "html.parser")
-        for a in soup.select('a[href]'):
-            if a['href'] == '#CHANNEL':
-                printLog("#LG유플러스 %s" % a.text, file = o)
-                match = re.match(".*\('(.*)','(.*)','.*'\).*", a['onclick'])
-                if match:
-                    with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1))) as f2:
-                        html2 = f2.read().decode("cp949", "ignore")
-                        if __USE_LXML:
-                            soup2 = BeautifulSoup(html2, "lxml")
-                        else:
-                            soup2 = BeautifulSoup(html2, "html.parser")
-                        for b in soup2.select('a[href]'):
-                            if b['href'] == '#':
-                                match2 = re.match(".*retrieveSchedule\('(.*)','.*'\).*", b['onclick'])
-                                if match2:
-                                    printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
-                                    total += 1
-                                    progressCount(total)
+    #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi") as f:
+    f = None
+    try:
+        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=3)
+    except socket.timeout as e:
+        printLog(" => socket.timeout : %s" % e.args[0], error = True)
+    except urllib.error.URLError:
+        printLog(" => URLerror : %s" % e.args[0], error = True)
+        
+    if f is None:
+        printLog("")
+        return
+
+    html = f.read().decode("cp949", "ignore")
+    if __USE_LXML:
+        soup = BeautifulSoup(html, "lxml")
+    else:
+        soup = BeautifulSoup(html, "html.parser")
+    for a in soup.select('a[href]'):
+        if a['href'] == '#CHANNEL':
+            printLog("#LG유플러스 %s" % a.text, file = o)
+            match = re.match(".*\('(.*)','(.*)','.*'\).*", a['onclick'])
+            if match:
+                #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1))) as f2:
+                f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)))
+                html2 = f2.read().decode("cp949", "ignore")
+                if __USE_LXML:
+                    soup2 = BeautifulSoup(html2, "lxml")
+                else:
+                    soup2 = BeautifulSoup(html2, "html.parser")
+                for b in soup2.select('a[href]'):
+                    if b['href'] == '#':
+                        match2 = re.match(".*retrieveSchedule\('(.*)','.*'\).*", b['onclick'])
+                        if match2:
+                            printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+                            total += 1
+                            progressCount(total)
+                f2.close()
+    f.close()
     printLog("", file = o)
     printLog("")
     printLog("==> Done.", end = "\n\n")
@@ -753,113 +830,123 @@ def generateChannelListNaver(o):
     printLog("##네이버", file = o)
     printLog("#http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcastType}&channelGroup={channelGroup}&date=YYYYMMDD", file = o)
     printLog("#broadcastType,channelGroup,channelId,channelName", file = o)
-    with urllib.request.urlopen("http://tvguide.naver.com/program/multiChannel.nhn") as f:
-        html = f.read().decode("utf-8", "ignore")
+    #with urllib.request.urlopen("http://tvguide.naver.com/program/multiChannel.nhn") as f:
+    f = request.urlopen("http://tvguide.naver.com/program/multiChannel.nhn")
+    html = f.read().decode("utf-8", "ignore")
+    if __USE_LXML:
+        soup = BeautifulSoup(html, "lxml")
+    else:
+        soup = BeautifulSoup(html, "html.parser")
+    i = 0
+    for a in soup.select('div[class=channel_area] a[href]'):
+        if a['href'] == "#":
+            continue
+        if 'myChannel' in a['href']:
+            continue
+        #with urllib.request.urlopen("http://tvguide.naver.com" + a['href']) as f2:
+        f2 = request.urlopen("http://tvguide.naver.com" + a['href'])
+        html2 = f2.read().decode("utf-8", "ignore")
         if __USE_LXML:
-            soup = BeautifulSoup(html, "lxml")
+            soup2 = BeautifulSoup(html2, "lxml")
         else:
-            soup = BeautifulSoup(html, "html.parser")
-        i = 0
-        for a in soup.select('div[class=channel_area] a[href]'):
-            if a['href'] == "#":
+            soup2 = BeautifulSoup(html2, "html.parser")
+
+        #지상파
+        layer_areaset = soup2.select('div[class=layer_areaset] a[href]')
+        for layer_area in layer_areaset:
+            if layer_area['href'] == "#":
                 continue
-            if 'myChannel' in a['href']:
-                continue
-            with urllib.request.urlopen("http://tvguide.naver.com" + a['href']) as f2:
-                html2 = f2.read().decode("utf-8", "ignore")
-                if __USE_LXML:
-                    soup2 = BeautifulSoup(html2, "lxml")
+            printLog("#네이버 %s (%s)" % (a.text, layer_area.text), file = o)
+            match_layer_area = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", layer_area['href'])
+            if match_layer_area:
+                broadcastType = match_layer_area.group(1)
+                channelGroup = match_layer_area.group(2)
+                #with urllib.request.urlopen("http://tvguide.naver.com" + layer_area['href']) as f3:
+                f3 = request.urlopen("http://tvguide.naver.com" + layer_area['href'])
+                html3 = f3.read().decode('utf-8')
+                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
+                if match:
+                    js = json.loads(match.group(1))
                 else:
-                    soup2 = BeautifulSoup(html2, "html.parser")
+                    js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                for js_channel in js["channelList"]:
+                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                    total += 1
+                    progressCount(total)
+                f3.close()
 
-                #지상파
-                layer_areaset = soup2.select('div[class=layer_areaset] a[href]')
-                for layer_area in layer_areaset:
-                    if layer_area['href'] == "#":
-                        continue
-                    printLog("#네이버 %s (%s)" % (a.text, layer_area.text), file = o)
-                    match_layer_area = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", layer_area['href'])
-                    if match_layer_area:
-                        broadcastType = match_layer_area.group(1)
-                        channelGroup = match_layer_area.group(2)
-                        with urllib.request.urlopen("http://tvguide.naver.com" + layer_area['href']) as f3:
-                            html3 = f3.read().decode('utf-8')
-                            match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
-                            if match:
-                                js = json.loads(match.group(1))
-                            else:
-                                js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
-                            for js_channel in js["channelList"]:
-                                printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
-                                total += 1
-                                progressCount(total)
-
-                #케이블/스카이라이프
-                cable_list = [k for k in soup2.select('ul[class]') if k['class'][0] == "cable_list"]
-                for c in cable_list:
-                    for d in c.select("a[href]"):
-                        printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
-                        match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
-                        if match_cable_list:
-                            broadcastType = match_cable_list.group(1)
-                            channelGroup = match_cable_list.group(2)
-                            with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
-                                html3 = f3.read().decode('utf-8')
-                                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
-                                if match:
-                                    js = json.loads(match.group(1))
-                                else:
-                                    js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
-                                for js_channel in js["channelList"]:
-                                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
-                                    total += 1
-                                    progressCount(total)
-
-                #케이블/스카이라이프 추가
-                s_more_wrap = [k for k in soup2.select('ul[id=s_more_lst_ul]')]
-                for c in s_more_wrap:
-                    for d in c.select("a[href]"):
-                        printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
-                        match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
-                        if match_cable_list:
-                            broadcastType = match_cable_list.group(1)
-                            channelGroup = match_cable_list.group(2)
-                            with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
-                                html3 = f3.read().decode('utf-8')
-                                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
-                                if match:
-                                    js = json.loads(match.group(1))
-                                else:
-                                    js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
-                                for js_channel in js["channelList"]:
-                                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
-                                    total += 1
-                                    progressCount(total)
-
-                #종합편성/해외위성
-                if not layer_areaset and not cable_list and not s_more_wrap:
-                    printLog("#네이버 %s" % a.text, file = o)
-                    match1 = re.match(".*broadcastType=(\d+)\&.*", a['href'])
-                    match2 = re.match(".*channelGroup=(\d+)\&.*", a['href'])
-                    if match1:
-                        broadcastType = match1.group(1)
+        #케이블/스카이라이프
+        cable_list = [k for k in soup2.select('ul[class]') if k['class'][0] == "cable_list"]
+        for c in cable_list:
+            for d in c.select("a[href]"):
+                printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
+                if match_cable_list:
+                    broadcastType = match_cable_list.group(1)
+                    channelGroup = match_cable_list.group(2)
+                    #with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
+                    f3 = request.urlopen("http://tvguide.naver.com" + d['href'])
+                    html3 = f3.read().decode('utf-8')
+                    match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
+                    if match:
+                        js = json.loads(match.group(1))
                     else:
-                        broadcastType = ""
-                    if match2:
-                        channelGroup = match2.group(1)
-                    else:
-                        channelGroup = ""
+                        js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                    for js_channel in js["channelList"]:
+                        printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                        total += 1
+                        progressCount(total)
+                    f3.close()
 
-                    if match1:
-                        match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html2, re.MULTILINE | re.DOTALL)
-                        if match:
-                            js = json.loads(match.group(1))
-                        else:
-                            js = json.loads(html2.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
-                        for js_channel in js["channelList"]:
-                            printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
-                            total += 1
-                            progressCount(total)
+        #케이블/스카이라이프 추가
+        s_more_wrap = [k for k in soup2.select('ul[id=s_more_lst_ul]')]
+        for c in s_more_wrap:
+            for d in c.select("a[href]"):
+                printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
+                if match_cable_list:
+                    broadcastType = match_cable_list.group(1)
+                    channelGroup = match_cable_list.group(2)
+                    #with urllib.request.urlopen("http://tvguide.naver.com" + d['href']) as f3:
+                    f3 = request.urlopen("http://tvguide.naver.com" + d['href'])
+                    html3 = f3.read().decode('utf-8')
+                    match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html3, re.MULTILINE | re.DOTALL)
+                    if match:
+                        js = json.loads(match.group(1))
+                    else:
+                        js = json.loads(html3.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                    for js_channel in js["channelList"]:
+                        printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                        total += 1
+                        progressCount(total)
+                    f3.close()
+
+        #종합편성/해외위성
+        if not layer_areaset and not cable_list and not s_more_wrap:
+            printLog("#네이버 %s" % a.text, file = o)
+            match1 = re.match(".*broadcastType=(\d+)\&.*", a['href'])
+            match2 = re.match(".*channelGroup=(\d+)\&.*", a['href'])
+            if match1:
+                broadcastType = match1.group(1)
+            else:
+                broadcastType = ""
+            if match2:
+                channelGroup = match2.group(1)
+            else:
+                channelGroup = ""
+
+            if match1:
+                match = re.search("var PROGRAM_SCHEDULES=(.*\n});\n\n\n", html2, re.MULTILINE | re.DOTALL)
+                if match:
+                    js = json.loads(match.group(1))
+                else:
+                    js = json.loads(html2.partition("PROGRAM_SCHEDULES=")[2].rpartition("};")[0]+"}")
+                for js_channel in js["channelList"]:
+                    printLog("N,%s,%s,%s,%s" % (broadcastType, channelGroup, js_channel["channelId"], js_channel["channelName"]), file = o)
+                    total += 1
+                    progressCount(total)
+        f2.close()
+    f.close()
     printLog("", file = o)
     printLog("")
     printLog("==> Done.", end = "\n\n")
@@ -870,63 +957,70 @@ def generateChannelListEpg(o):
     printLog("##EPG", file = o)
     printLog("#http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}", file = o)
     printLog("#top_channel_group,sub_channel_group,checkchannel,channel_name", file = o)
-    with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php") as f:
-        html = f.read().decode("cp949", "ignore")
-        soup = BeautifulSoup(html, "lxml")
-        for a in soup.select('select[name=search_top_channel_group] option'):
-            if 'selected' in a.attrs:
-                top_channel_group = ""
-                sub_channel_group = ""
-                printLog("#EPG %s" % a.text, file = o)
-                for b in soup.select('input[name=search_top_channel_group]'):
-                    if 'value' in b.attrs:
-                        top_channel_group = b['value']
-                        break
-                for b in soup.select('input[name=search_sub_channel_group]'):
-                    if 'value' in b.attrs:
-                        sub_channel_group = b['value']
-                        break
-                for b in soup.select('input[name^=checkchannel]'):
-                    if b['type'] == "checkbox":
-                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
-                        total += 1
-                        progressCount(total)
-            else:
-                with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
-                    html2 = f2.read().decode("cp949", "ignore")
-                    soup2 = BeautifulSoup(html2, "lxml")
-                    for b in soup2.select('select[name=search_sub_channel_group] option'):
-                        if b['value'] == '':
-                            continue
-                        if 'selected' in b.attrs:
-                            top_channel_group = ""
-                            sub_channel_group = ""
-                            printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
-                            for c in soup2.select('input[name=search_top_channel_group]'):
-                                if 'value' in c.attrs:
-                                    top_channel_group = c['value']
-                                    break
-                            for c in soup2.select('input[name=search_sub_channel_group]'):
-                                if 'value' in c.attrs:
-                                    sub_channel_group = c['value']
-                                    break
-                            for c in soup2.select('input[name^=checkchannel]'):
-                                if c['type'] == "checkbox":
-                                    printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
-                                    total += 1
-                                    progressCount(total)
-                        else:
-                            with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
-                                html3 = f3.read().decode("cp949", "ignore")
-                                soup3 = BeautifulSoup(html3, "lxml")
-                                top_channel_group = a['value']
-                                sub_channel_group = b['value']
-                                printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
-                                for d in soup3.select('input[name^=checkchannel]'):
-                                    if d['type'] == "checkbox":
-                                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
-                                        total += 1
-                                        progressCount(total)
+    #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php") as f:
+    f = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php")
+    html = f.read().decode("cp949", "ignore")
+    soup = BeautifulSoup(html, "lxml")
+    for a in soup.select('select[name=search_top_channel_group] option'):
+        if 'selected' in a.attrs:
+            top_channel_group = ""
+            sub_channel_group = ""
+            printLog("#EPG %s" % a.text, file = o)
+            for b in soup.select('input[name=search_top_channel_group]'):
+                if 'value' in b.attrs:
+                    top_channel_group = b['value']
+                    break
+            for b in soup.select('input[name=search_sub_channel_group]'):
+                if 'value' in b.attrs:
+                    sub_channel_group = b['value']
+                    break
+            for b in soup.select('input[name^=checkchannel]'):
+                if b['type'] == "checkbox":
+                    printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+                    total += 1
+                    progressCount(total)
+        else:
+            #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
+            f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'])
+            html2 = f2.read().decode("cp949", "ignore")
+            soup2 = BeautifulSoup(html2, "lxml")
+            for b in soup2.select('select[name=search_sub_channel_group] option'):
+                if b['value'] == '':
+                    continue
+                if 'selected' in b.attrs:
+                    top_channel_group = ""
+                    sub_channel_group = ""
+                    printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                    for c in soup2.select('input[name=search_top_channel_group]'):
+                        if 'value' in c.attrs:
+                            top_channel_group = c['value']
+                            break
+                    for c in soup2.select('input[name=search_sub_channel_group]'):
+                        if 'value' in c.attrs:
+                            sub_channel_group = c['value']
+                            break
+                    for c in soup2.select('input[name^=checkchannel]'):
+                        if c['type'] == "checkbox":
+                            printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                            total += 1
+                            progressCount(total)
+                else:
+                    #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
+                    f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']))
+                    html3 = f3.read().decode("cp949", "ignore")
+                    soup3 = BeautifulSoup(html3, "lxml")
+                    top_channel_group = a['value']
+                    sub_channel_group = b['value']
+                    printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                    for d in soup3.select('input[name^=checkchannel]'):
+                        if d['type'] == "checkbox":
+                            printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+                            total += 1
+                            progressCount(total)
+                    f3.close()
+            f2.close()
+    f.close()
+
     printLog("", file = o)
     printLog("")
     printLog("==> Done.", end = "\n\n")
