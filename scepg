@@ -228,9 +228,6 @@ def writeXml():
                     f.writelines(minidom.parseString(ET.tostring(xml, encoding = "utf-8", method = "xml")).toprettyxml(indent = " "))
                 else:
                     f.writelines(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
-        except IOError as e:
-            printLog("")
-            printLog(" => IO Error denied : %s (%s)" % (xml_config, e.args[0]), error = True)
         except Exception as e:
             printLog("")
             printLog(" => Unknown error : %s (%s)" % (xml_config, e.args[0]), error = True)
@@ -249,10 +246,6 @@ def writeXml():
             xml_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
-            except ConnectionRefusedError:
-                printLog(" => Connection refuesed error : %s" % socket_config, error = True)
-            except socket.gaierror:
-                printLog(" => Name or service not known : %s" % socket_config, error = True)
             except Exception as e:
                 printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
@@ -261,10 +254,6 @@ def writeXml():
             xml_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             try:
                 xml_socket.connect(socket_config)
-            except FileNotFoundError:
-                printLog(" => File not found error : %s" % socket_config, error = True)
-            except PermissionError:
-                printLog(" => Permission denied : %s" % socket_config, error = True)
             except Exception as e:
                 printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
