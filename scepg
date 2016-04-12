@@ -66,13 +66,13 @@ def progressLog(progress, totalCount):
     totalLength = 10
     progressLength = int((progress / totalCount) * totalLength)
 
-    printLog(" => Progress : [%s%s] (%d/%d)" % ("#" * progressLength, "-" * (totalLength - progressLength), progress, totalCount), end = "\r", flush = True)
+    printLog(" -> Progress : [%s%s] (%d/%d)" % ("#" * progressLength, "-" * (totalLength - progressLength), progress, totalCount), end = "\r", flush = True)
 
     if progress >= totalCount:
         printLog("")
 
 def progressCount(progress):
-    printLog(" => Count : %d" % progress, end = "\r", flush = True)
+    printLog(" -> Count : %d" % progress, end = "\r", flush = True)
 
 def printLog(log, end = "\n", flush = False, error = False, file = None):
     if file is None:
@@ -114,28 +114,28 @@ def readConfig():
     elif os.path.isfile("/var/lib/scepg/" + CONFIG_FILE):
         configFilePath = "/var/lib/scepg/" + CONFIG_FILE
     else:
-        printLog(" => Cannot found config file")
+        printLog(" -> Cannot found config file")
         exit(1)
 
     config = configparser.RawConfigParser()
     config.optionxform = str
     config.read(configFilePath)
         
-    printLog(" => Config file : " + configFilePath)
-    printLog(" => python major version : " + str(sys.version_info[0]))
+    printLog(" -> Config file : " + configFilePath)
+    printLog(" -> python major version : " + str(sys.version_info[0]))
     if __USE_BS:
-        printLog(" => BeautifulSoup : Yes")
+        printLog(" -> BeautifulSoup : Yes")
     else:
-        printLog(" => BeautifulSoup : No")
+        printLog(" -> BeautifulSoup : No")
     if __USE_LXML:
-        printLog(" => LXML : Yes")
+        printLog(" -> LXML : Yes")
     else:
-        printLog(" => LXML : No")
+        printLog(" -> LXML : No")
 
     progressLog(0, 4)
     if not config.has_section("channel_list"):
         printLog("")
-        printLog(" => Config file not contains channel_list section")
+        printLog(" -> Config file not contains channel_list section")
         exit(1)
 
     progressLog(1, 4)
@@ -144,7 +144,7 @@ def readConfig():
         channel_list = config.items("channel_list")
     except configparser.Error:
         printLog("")
-        printLog(" => Config file not contains channel_list section")
+        printLog(" -> Config file not contains channel_list section")
         exit(1)
 
     progressLog(2, 4)
@@ -230,7 +230,7 @@ def writeXml():
                     f.writelines(ET.tostring(xml, encoding = "utf-8", method = "xml").decode("utf-8"))
         except Exception as e:
             printLog("")
-            printLog(" => Unknown error : %s (%s)" % (xml_config, e.args[0]), error = True)
+            printLog(" -> Unknown error : %s (%s)" % (xml_config, e.args[0]), error = True)
 
         if f is not None:
             f.close()
@@ -247,7 +247,7 @@ def writeXml():
             try:
                 xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
             except Exception as e:
-                printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
+                printLog(" -> Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
                 connect = True
         else:
@@ -255,7 +255,7 @@ def writeXml():
             try:
                 xml_socket.connect(socket_config)
             except Exception as e:
-                printLog(" => Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
+                printLog(" -> Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
             else:
                 connect = True
 
@@ -775,9 +775,9 @@ def generateChannelListUplus(o):
     try:
         f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=3)
     except socket.timeout as e:
-        printLog(" => socket.timeout : %s" % e.args[0], error = True)
+        printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
-        printLog(" => URLerror : %s" % e.args[0], error = True)
+        printLog(" -> URLerror : %s" % e.args[0], error = True)
         
     if f is None:
         printLog("")
@@ -804,7 +804,11 @@ def generateChannelListUplus(o):
                     if b['href'] == '#':
                         match2 = re.match(".*retrieveSchedule\('(.*)','.*'\).*", b['onclick'])
                         if match2:
-                            printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+                            match_b_text = re.match("^(.*)\(Ch\.\d+\)$", b.text)
+                            if match_b_text:
+                                printLog("U,%s,%s" % (match2.group(1), match_b_text.group(1)), file = o)
+                            else:
+                                printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
                             total += 1
                             progressCount(total)
                 f2.close()
@@ -845,7 +849,7 @@ def generateChannelListNaver(o):
         for layer_area in layer_areaset:
             if layer_area['href'] == "#":
                 continue
-            printLog("#네이버 %s (%s)" % (a.text, layer_area.text), file = o)
+            printLog("#네이버 %s %s" % (a.text, layer_area.text), file = o)
             match_layer_area = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", layer_area['href'])
             if match_layer_area:
                 broadcastType = match_layer_area.group(1)
@@ -868,7 +872,7 @@ def generateChannelListNaver(o):
         cable_list = [k for k in soup2.select('ul[class]') if k['class'][0] == "cable_list"]
         for c in cable_list:
             for d in c.select("a[href]"):
-                printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                printLog("#네이버 %s %s" % (a.text, d.text), file = o)
                 match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
                 if match_cable_list:
                     broadcastType = match_cable_list.group(1)
@@ -891,7 +895,7 @@ def generateChannelListNaver(o):
         s_more_wrap = [k for k in soup2.select('ul[id=s_more_lst_ul]')]
         for c in s_more_wrap:
             for d in c.select("a[href]"):
-                printLog("#네이버 %s (%s)" % (a.text, d.text), file = o)
+                printLog("#네이버 %s %s" % (a.text, d.text), file = o)
                 match_cable_list = re.match(".*broadcastType=(\d+)\&channelGroup=(\d+)\&.*", d['href'])
                 if match_cable_list:
                     broadcastType = match_cable_list.group(1)
@@ -965,7 +969,11 @@ def generateChannelListEpg(o):
                     break
             for b in soup.select('input[name^=checkchannel]'):
                 if b['type'] == "checkbox":
-                    printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+                    match_b_value = re.match("^(.*)\(\d+\)$", b['value'])
+                    if match_b_value:
+                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), match_b_value.group(1)), file = o)
+                    else:
+                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
                     total += 1
                     progressCount(total)
         else:
@@ -979,7 +987,7 @@ def generateChannelListEpg(o):
                 if 'selected' in b.attrs:
                     top_channel_group = ""
                     sub_channel_group = ""
-                    printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                    printLog("#EPG %s %s" % (a.text, b.text), file = o)
                     for c in soup2.select('input[name=search_top_channel_group]'):
                         if 'value' in c.attrs:
                             top_channel_group = c['value']
@@ -990,7 +998,11 @@ def generateChannelListEpg(o):
                             break
                     for c in soup2.select('input[name^=checkchannel]'):
                         if c['type'] == "checkbox":
-                            printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                            match_c_value = re.match("^(.*)\(\d+\)$", c['value'])
+                            if match_c_value:
+                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), match_c_value.group(1)), file = o)
+                            else:
+                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
                             total += 1
                             progressCount(total)
                 else:
@@ -1000,10 +1012,14 @@ def generateChannelListEpg(o):
                     soup3 = BeautifulSoup(html3, "lxml")
                     top_channel_group = a['value']
                     sub_channel_group = b['value']
-                    printLog("#EPG %s(%s)" % (a.text, b.text), file = o)
+                    printLog("#EPG %s %s" % (a.text, b.text), file = o)
                     for d in soup3.select('input[name^=checkchannel]'):
                         if d['type'] == "checkbox":
-                            printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+                            match_d_value = re.match("^(.*)\(\d+\)$", d['value'])
+                            if match_d_value:
+                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), match_d_value.group(1)), file = o)
+                            else:
+                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
                             total += 1
                             progressCount(total)
                     f3.close()
