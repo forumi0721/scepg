@@ -773,7 +773,7 @@ def generateChannelListUplus(o):
     #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi") as f:
     f = None
     try:
-        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=3)
+        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=10)
     except socket.timeout as e:
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
