@@ -2,740 +2,719 @@
 #http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvSchedule.hpi?chnlCd={channelId}&evntCmpYmd=YYYYMMDD
 #channelId,channelName
 #LG유플러스 지상파
-U,504,SBS
-U,561,TJB
-U,562,CJB
-U,566,TBC
-U,571,KBC
-U,572,JTV
-U,573,JIBS
-U,576,KNN
-U,577,UBC
-U,581,G1
-U,502,KBS2
-U,501,KBS1
-U,508,경인 KBS1
-U,511,대전 KBS1
-U,512,청주 KBS1
-U,513,충주 KBS1
-U,516,대구 KBS1
-U,517,안동 KBS1
-U,518,포항 KBS1
-U,521,광주 KBS1
-U,522,순천 KBS1
-U,523,목포 KBS1
-U,524,전주 KBS1
-U,525,제주 KBS1
-U,526,부산 KBS1
-U,527,울산 KBS1
-U,528,창원 KBS1
-U,529,진주 KBS1
-U,531,원주 KBS1
-U,532,춘천 KBS1
-U,533,강릉 KBS1
-U,503,MBC
-U,536,대전 MBC
-U,537,청주 MBC
-U,538,충주 MBC
-U,541,대구 MBC
-U,542,안동 MBC
-U,543,포항 MBC
-U,546,광주 MBC
-U,547,여수 MBC
-U,548,목포 MBC
-U,549,전주 MBC
-U,550,제주 MBC
-U,551,부산 MBC
-U,552,울산 MBC
-U,553,마산 MBC
-U,554,진주 MBC
-U,556,원주 MBC
-U,557,춘천 MBC
-U,558,강릉 MBC
-U,559,삼척 MBC
-U,505,EBS
-U,747,JTBC
-U,750,MBN
-U,749,채널A
-U,746,TV조선
-U,596,OBS
-U,506,EBS2-Full HD
+U,504,SBS(Ch.5)
+U,561,TJB(Ch.5)
+U,562,CJB(Ch.5)
+U,566,TBC(Ch.5)
+U,571,KBC(Ch.5)
+U,572,JTV(Ch.5)
+U,573,JIBS(Ch.5)
+U,576,KNN(Ch.5)
+U,577,UBC(Ch.5)
+U,581,G1(Ch.5)
+U,502,KBS2(Ch.7)
+U,501,KBS1(Ch.9)
+U,508,경인 KBS1(Ch.9)
+U,511,대전 KBS1(Ch.9)
+U,512,청주 KBS1(Ch.9)
+U,513,충주 KBS1(Ch.9)
+U,516,대구 KBS1(Ch.9)
+U,517,안동 KBS1(Ch.9)
+U,518,포항 KBS1(Ch.9)
+U,521,광주 KBS1(Ch.9)
+U,522,순천 KBS1(Ch.9)
+U,523,목포 KBS1(Ch.9)
+U,524,전주 KBS1(Ch.9)
+U,525,제주 KBS1(Ch.9)
+U,526,부산 KBS1(Ch.9)
+U,527,울산 KBS1(Ch.9)
+U,528,창원 KBS1(Ch.9)
+U,529,진주 KBS1(Ch.9)
+U,531,원주 KBS1(Ch.9)
+U,532,춘천 KBS1(Ch.9)
+U,533,강릉 KBS1(Ch.9)
+U,503,MBC(Ch.11)
+U,536,대전 MBC(Ch.11)
+U,537,청주 MBC(Ch.11)
+U,538,충주 MBC(Ch.11)
+U,541,대구 MBC(Ch.11)
+U,542,안동 MBC(Ch.11)
+U,543,포항 MBC(Ch.11)
+U,546,광주 MBC(Ch.11)
+U,547,여수 MBC(Ch.11)
+U,548,목포 MBC(Ch.11)
+U,549,전주 MBC(Ch.11)
+U,550,제주 MBC(Ch.11)
+U,551,부산 MBC(Ch.11)
+U,552,울산 MBC(Ch.11)
+U,553,마산 MBC(Ch.11)
+U,554,진주 MBC(Ch.11)
+U,556,원주 MBC(Ch.11)
+U,557,춘천 MBC(Ch.11)
+U,558,강릉 MBC(Ch.11)
+U,559,삼척 MBC(Ch.11)
+U,505,EBS(Ch.14)
+U,747,JTBC(Ch.15)
+U,750,MBN(Ch.16)
+U,749,채널A(Ch.18)
+U,746,TV조선(Ch.19)
+U,596,OBS(Ch.26)
+U,506,EBS2-Full HD(Ch.95)
 #LG유플러스 스포츠/취미
-U,613,SBS ESPN
-U,622,MBC스포츠플러스
-U,618,KBSN SPORTS
-U,614,SBS GOLF
-U,602,JTBC Golf
-U,647,The Golf Ch
-U,667,SPOTV
-U,638,SPOTV2
-U,637,IB SPORTS
-U,650,SPOTV Plus-Full HD
-U,668,빌리어즈TV
-U,665,FTV
-U,625,FSTV
-U,670,스카이트래블
-U,726,폴라리스TV
-U,713,EDGE TV
-U,710,아웃도어
-U,681,온게임넷
-U,683,바둑TV
-U,707,브레인TV-Full HD
-U,727,스포게임즈
-U,802,SPOTV GAMES
+U,613,SBS ESPN(Ch.50)
+U,622,MBC스포츠플러스(Ch.51)
+U,618,KBSN SPORTS(Ch.52)
+U,614,SBS GOLF(Ch.53)
+U,602,JTBC Golf(Ch.54)
+U,647,The Golf Ch(Ch.55)
+U,667,SPOTV(Ch.56)
+U,638,SPOTV2(Ch.57)
+U,637,IB SPORTS(Ch.58)
+U,650,SPOTV Plus-Full HD(Ch.59)
+U,668,빌리어즈TV(Ch.62)
+U,665,FTV(Ch.63)
+U,625,FSTV(Ch.64)
+U,670,스카이트래블(Ch.65)
+U,726,폴라리스TV(Ch.66)
+U,713,EDGE TV(Ch.67)
+U,710,아웃도어(Ch.68)
+U,681,온게임넷(Ch.96)
+U,683,바둑TV(Ch.97)
+U,707,브레인TV-Full HD(Ch.98)
+U,727,스포게임즈(Ch.109)
+U,802,SPOTV GAMES(Ch.109)
 #LG유플러스 영화
-U,679,U+Movie
-U,684,OCN
-U,686,CH CGV
-U,690,OCN시리즈
-U,685,Super Action
-U,652,SCREEN
-U,653,cineF
-U,659,선댄스
-U,654,FOX채널
-U,744,AXN
-U,756,Mplex
-U,724,THE MOVIE-Full HD
-U,605,캐치온
-U,777,캐치온Plus-Full HD
-U,694,스카이드라마
-U,609,CNTV
-U,658,AsiaN
-U,725,중화TV
-U,723,히어로액션-Full HD
-U,695,애니박스
-U,699,애니플러스
+U,679,U+Movie(Ch.36)
+U,684,OCN(Ch.37)
+U,686,CH CGV(Ch.38)
+U,690,OCN시리즈(Ch.39)
+U,685,Super Action(Ch.40)
+U,652,SCREEN(Ch.41)
+U,653,cineF(Ch.42)
+U,659,선댄스(Ch.43)
+U,654,FOX채널(Ch.44)
+U,744,AXN(Ch.45)
+U,756,Mplex(Ch.46)
+U,724,THE MOVIE-Full HD(Ch.47)
+U,605,캐치온(Ch.48)
+U,777,캐치온Plus-Full HD(Ch.49)
+U,694,스카이드라마(Ch.79)
+U,609,CNTV(Ch.85)
+U,658,AsiaN(Ch.86)
+U,725,중화TV(Ch.87)
+U,723,히어로액션-Full HD(Ch.88)
+U,695,애니박스(Ch.148)
+U,699,애니플러스(Ch.149)
 #LG유플러스 뉴스/경제
-U,734,뉴스Y
-U,698,YTN
-U,616,SBS CNBC
-U,775,C`TIME
-U,771,토마토TV
-U,627,매일경제TV
-U,742,아시아경제
-U,730,부동산TV
-U,729,CNN
-U,735,CNBC
-U,764,CCTV4
-U,604,한국경제TV
-U,630,MTN
-U,631,이데일리TV
-U,752,서울경제-Full HD
-U,655,YTN웨더
-U,709,BBC World
-U,722,tbs TV
+U,734,뉴스Y(Ch.23)
+U,698,YTN(Ch.24)
+U,616,SBS CNBC(Ch.27)
+U,775,C`TIME(Ch.110)
+U,771,토마토TV(Ch.111)
+U,627,매일경제TV(Ch.112)
+U,742,아시아경제(Ch.114)
+U,730,부동산TV(Ch.115)
+U,729,CNN(Ch.117)
+U,735,CNBC(Ch.118)
+U,764,CCTV4(Ch.120)
+U,604,한국경제TV(Ch.121)
+U,630,MTN(Ch.122)
+U,631,이데일리TV(Ch.123)
+U,752,서울경제-Full HD(Ch.124)
+U,655,YTN웨더(Ch.125)
+U,709,BBC World(Ch.126)
+U,722,tbs TV(Ch.176)
 #LG유플러스 교양/다큐
-U,755,사이언스TV
-U,739,CCTV NEWS
-U,773,BBC earth-Full HD
-U,697,내셔널지오그래픽
-U,664,히스토리HD
-U,610,Discovery HD
-U,718,NatGeoWild-Full HD
-U,648,OBS W
-U,753,헬스메디tv
-U,691,예술TVArte
-U,736,MBCNET
-U,601,아리랑TV
-U,669,NHK World TV
-U,731,NHK World
-U,770,쿠키건강TV
-U,656,채널J
-U,708,Classica
-U,741,소비자TV
-U,680,U+Choice
+U,755,사이언스TV(Ch.25)
+U,739,CCTV NEWS(Ch.119)
+U,773,BBC earth-Full HD(Ch.130)
+U,697,내셔널지오그래픽(Ch.131)
+U,664,히스토리HD(Ch.132)
+U,610,Discovery HD(Ch.133)
+U,718,NatGeoWild-Full HD(Ch.134)
+U,648,OBS W(Ch.137)
+U,753,헬스메디tv(Ch.138)
+U,691,예술TVArte(Ch.139)
+U,736,MBCNET(Ch.140)
+U,601,아리랑TV(Ch.141)
+U,669,NHK World TV(Ch.142)
+U,731,NHK World(Ch.143)
+U,770,쿠키건강TV(Ch.144)
+U,656,채널J(Ch.145)
+U,708,Classica(Ch.146)
+U,741,소비자TV(Ch.177)
+U,680,U+Choice(Ch.900)
 #LG유플러스 여성/오락
-U,677,U+Today
-U,619,KBS JOY
-U,682,tvN
-U,687,M.net
-U,626,MBCevery1
-U,617,KBS DRAMA
-U,612,SBS 플러스
-U,621,MBC드라마넷
-U,692,스카이스포츠
-U,597,U+투데이
-U,689,O tvN
-U,778,OnStyle
-U,615,SBS funE
-U,623,MBC QueeN
-U,620,KBS W
-U,644,채널 차이나
-U,700,텔레노벨라
-U,696,O`live
-U,603,푸드TV
-U,660,동아TV-Full HD
-U,666,디원
-U,701,하이라이트
-U,767,NOLL TV-Full HD
-U,671,XTM
-U,606,QTV
-U,624,MBC뮤직
-U,634,SBS MTV-Full HD
-U,688,GMTV
-U,765,가요TV
-U,651,이벤트TV-Full HD
-U,712,E channel
-U,662,K STAR
-U,657,아이넷TV
-U,663,K-바둑
-U,661,i-Concerts
-U,301,노래방
-U,302,바둑
-U,303,만화
-U,304,인터넷
-U,305,미니게임
-U,306,놀이동화
-U,307,TV속마트
-U,308,동영상/사진공유
-U,309,홈채널
-U,321,U+BOX
-U,322,C-games
+U,677,U+Today(Ch.1)
+U,619,KBS JOY(Ch.3)
+U,682,tvN(Ch.17)
+U,687,M.net(Ch.22)
+U,626,MBCevery1(Ch.29)
+U,617,KBS DRAMA(Ch.31)
+U,612,SBS 플러스(Ch.33)
+U,621,MBC드라마넷(Ch.35)
+U,692,스카이스포츠(Ch.61)
+U,597,U+투데이(Ch.70)
+U,689,O tvN(Ch.71)
+U,778,OnStyle(Ch.72)
+U,615,SBS funE(Ch.75)
+U,623,MBC QueeN(Ch.77)
+U,620,KBS W(Ch.78)
+U,644,채널 차이나(Ch.80)
+U,700,텔레노벨라(Ch.81)
+U,696,O`live(Ch.82)
+U,603,푸드TV(Ch.83)
+U,660,동아TV-Full HD(Ch.84)
+U,666,디원(Ch.90)
+U,701,하이라이트(Ch.91)
+U,767,NOLL TV-Full HD(Ch.92)
+U,671,XTM(Ch.93)
+U,606,QTV(Ch.94)
+U,624,MBC뮤직(Ch.99)
+U,634,SBS MTV-Full HD(Ch.100)
+U,688,GMTV(Ch.101)
+U,765,가요TV(Ch.102)
+U,651,이벤트TV-Full HD(Ch.103)
+U,712,E channel(Ch.104)
+U,662,K STAR(Ch.105)
+U,657,아이넷TV(Ch.106)
+U,663,K-바둑(Ch.107)
+U,661,i-Concerts(Ch.108)
+U,301,노래방(Ch.301)
+U,302,바둑(Ch.302)
+U,303,만화(Ch.303)
+U,304,인터넷(Ch.304)
+U,305,미니게임(Ch.305)
+U,306,놀이동화(Ch.306)
+U,307,TV속마트(Ch.307)
+U,308,동영상/사진공유(Ch.308)
+U,309,홈채널(Ch.309)
+U,321,U+BOX(Ch.333)
+U,322,C-games(Ch.369)
 #LG유플러스 어린이/교육
-U,645,디즈니채널
-U,646,디즈니주니어
-U,693,투니버스-Full HD
-U,636,애니원
-U,635,니켈로디언
-U,716,CARTOON-Full HD
-U,761,어린이TV
-U,728,키즈원
-U,805,키즈톡톡
-U,776,JEI재능TV-Full HD
-U,800,JEI EnglishTV
-U,772,정철영어TV
-U,801,EBS English
-U,714,EBS+ 1
-U,715,EBS+ 2
-U,810,스마트교육방송
-U,703,ANIMAX
-U,607,EBS u
-U,608,KBS kids
+U,645,디즈니채널(Ch.150)
+U,646,디즈니주니어(Ch.151)
+U,693,투니버스-Full HD(Ch.152)
+U,636,애니원(Ch.153)
+U,635,니켈로디언(Ch.154)
+U,716,CARTOON-Full HD(Ch.155)
+U,761,어린이TV(Ch.156)
+U,728,키즈원(Ch.157)
+U,805,키즈톡톡(Ch.158)
+U,776,JEI재능TV-Full HD(Ch.159)
+U,800,JEI EnglishTV(Ch.160)
+U,772,정철영어TV(Ch.161)
+U,801,EBS English(Ch.162)
+U,714,EBS+ 1(Ch.163)
+U,715,EBS+ 2(Ch.164)
+U,810,스마트교육방송(Ch.165)
+U,703,ANIMAX(Ch.167)
+U,607,EBS u(Ch.168)
+U,608,KBS kids(Ch.169)
 #LG유플러스 홈쇼핑
-U,649,홈&쇼핑
-U,676,GSSHOP
-U,672,CJ오쇼핑
-U,675,현대홈쇼핑
-U,674,롯데홈쇼핑
-U,673,NS홈쇼핑
-U,737,아임쇼핑
-U,783,롯데 OneTV-Full HD
-U,738,B 쇼핑-Full HD
+U,649,홈&쇼핑(Ch.4)
+U,676,GSSHOP(Ch.6)
+U,672,CJ오쇼핑(Ch.8)
+U,675,현대홈쇼핑(Ch.10)
+U,674,롯데홈쇼핑(Ch.12)
+U,673,NS홈쇼핑(Ch.13)
+U,737,아임쇼핑(Ch.20)
+U,783,롯데 OneTV-Full HD(Ch.21)
+U,738,B 쇼핑-Full HD(Ch.28)
 #LG유플러스 공공/종교
-U,641,마운틴TV
-U,705,OUN
-U,733,KTV
-U,717,국회방송-Full HD
-U,732,복지TV
-U,642,KFN_국방TV
-U,766,소상공인TV
-U,769,CTS-Full HD
-U,711,CBS-Full HD
-U,745,C channel-Full HD
-U,754,CGNTV
-U,758,평화방송
-U,702,BTN불교-Full HD
-U,719,BBS불교방송
-U,779,STB상생방송
-U,785,원음방송
+U,641,마운틴TV(Ch.69)
+U,705,OUN(Ch.170)
+U,733,KTV(Ch.171)
+U,717,국회방송-Full HD(Ch.172)
+U,732,복지TV(Ch.173)
+U,642,KFN_국방TV(Ch.174)
+U,766,소상공인TV(Ch.175)
+U,769,CTS-Full HD(Ch.180)
+U,711,CBS-Full HD(Ch.181)
+U,745,C channel-Full HD(Ch.182)
+U,754,CGNTV(Ch.183)
+U,758,평화방송(Ch.184)
+U,702,BTN불교-Full HD(Ch.185)
+U,719,BBS불교방송(Ch.186)
+U,779,STB상생방송(Ch.187)
+U,785,원음방송(Ch.188)
 
 ##네이버
-#http://tvguide.naver.com/program/multiChannel.nhn?broadcastType={broadcastType}&channelGroup={channelGroup}&date=YYYYMMDD
-#broadcastType,channelGroup,channelId,channelName
-#네이버 지상파 서울/인천/경기
-N,100,1,9,KBS1
-N,100,1,7,KBS2
-N,100,1,11,MBC
-N,100,1,6,SBS
-N,100,1,13,EBS1
-N,100,1,816,OBS 경인TV
-N,100,1,281,경인 KBS1
-N,100,1,546,EBS2
-#네이버 지상파 강원
-N,100,2,603,강릉 KBS1
-N,100,2,601,춘천 KBS1
-N,100,2,7,KBS2
-N,100,2,474,강릉 MBC
-N,100,2,481,삼척 MBC
-N,100,2,480,원주 MBC
-N,100,2,471,춘천 MBC
-N,100,2,269,G1 강원민방
-N,100,2,13,EBS1
-N,100,2,546,EBS2
-#네이버 지상파 경남/부산
-N,100,3,608,부산 KBS1
-N,100,3,609,창원 KBS1
-N,100,3,7,KBS2
-N,100,3,466,부산 MBC
-N,100,3,475,진주MBC
-N,100,3,470,MBC경남
-N,100,3,264,KNN 부산경남방송
-N,100,3,13,EBS1
-N,100,3,546,EBS2
-#네이버 지상파 경북/대구
-N,100,4,610,대구 KBS1
-N,100,4,7,KBS2
-N,100,4,467,대구 MBC
-N,100,4,478,안동 MBC
-N,100,4,479,포항 MBC
-N,100,4,265,TBC 대구방송
-N,100,4,13,EBS1
-N,100,4,546,EBS2
-#네이버 지상파 전남/광주
-N,100,5,606,광주 KBS1
-N,100,5,7,KBS2
-N,100,5,468,광주 MBC
-N,100,5,476,목포 MBC
-N,100,5,477,여수 MBC
-N,100,5,266,KBC 광주방송
-N,100,5,13,EBS1
-N,100,5,546,EBS2
-#네이버 지상파 전북/전주
-N,100,6,607,전주 KBS1
-N,100,6,7,KBS2
-N,100,6,469,전주 MBC
-N,100,6,271,JTV 전주방송
-N,100,6,13,EBS1
-N,100,6,546,EBS2
-#네이버 지상파 충남/대전
-N,100,7,604,대전 KBS1
-N,100,7,7,KBS2
-N,100,7,461,대전 MBC
-N,100,7,267,TJB 대전방송
-N,100,7,13,EBS1
-N,100,7,546,EBS2
-#네이버 지상파 충북
-N,100,8,605,청주 KBS1
-N,100,8,7,KBS2
-N,100,8,464,청주 MBC
-N,100,8,465,충주 MBC
-N,100,8,270,CJB 청주방송
-N,100,8,13,EBS1
-N,100,8,546,EBS2
-#네이버 지상파 울산
-N,100,9,602,울산 KBS1
-N,100,9,7,KBS2
-N,100,9,473,울산 MBC
-N,100,9,268,UBC 울산방송
-N,100,9,13,EBS1
-N,100,9,546,EBS2
-#네이버 지상파 제주
-N,100,10,611,제주 KBS1
-N,100,10,7,KBS2
-N,100,10,472,제주 MBC
-N,100,10,376,JIBS 제주방송
-N,100,10,13,EBS1
-N,100,10,546,EBS2
+#https://search.naver.com/search.naver?query={channelCode}
+#channelCode,channelName
+#네이버 지상파
+N,kbs1편성표,KBS1
+N,kbs2 편성표,KBS2
+N,mbc편성표,MBC
+N,sbs편성표,SBS
+N,ebs편성표,EBS1
+N,EBS2 편성표,EBS2
+N,cjb청주방송편성표,CJB 청주방송
+N,g1 강원민방편성표,G1 강원민방
+N,jibs제주방송편성표,JIBS 제주방송
+N,jtv전주방송편성표,JTV 전주방송
+N,kbc광주방송편성표,KBC 광주방송
+N,knn부산경남방송편성표,KNN 부산경남방송
+N,mbc경남편성표,MBC 경남
+N,obs경인tv편성표,OBS 경인TV
+N,tbc대구방송편성표,TBC 대구방송
+N,tjb대전방송편성표,TJB 대전방송
+N,ubc울산방송편성표,UBC 울산방송
+N,강릉kbs1편성표,강릉 KBS1
+N,강릉mbc편성표,강릉 MBC
+N,경인kbs1편성표,경인 KBS1
+N,광주kbs1편성표,광주 KBS1
+N,광주mbc편성표,광주 MBC
+N,대구kbs1편성표,대구 KBS1
+N,대구mbc편성표,대구 MBC
+N,대전kbs1편성표,대전 KBS1
+N,대전mbc편성표,대전 MBC
+N,목포mbc편성표,목포 MBC
+N,부산kbs1편성표,부산 KBS1
+N,부산mbc편성표,부산 MBC
+N,삼척mbc편성표,삼척 MBC
+N,안동mbc편성표,안동 MBC
+N,여수mbc편성표,여수 MBC
+N,울산kbs1편성표,울산 KBS1
+N,울산mbc편성표,울산 MBC
+N,원주mbc편성표,원주 MBC
+N,전주kbs1편성표,전주 KBS1
+N,전주mbc편성표,전주 MBC
+N,제주kbs1편성표,제주 KBS1
+N,제주mbc편성표,제주 MBC
+N,진주mbc편성표,진주 MBC
+N,창원kbs1편성표,창원 KBS1
+N,청주kbs1편성표,청주 KBS1
+N,청주mbc편성표,청주 MBC
+N,춘천kbs1편성표,춘천 KBS1
+N,춘천mbc편성표,춘천 MBC
+N,충주mbc편성표,충주 MBC
+N,포항mbc편성표,포항 MBC
 #네이버 종합편성
-N,500,46,570,JTBC
-N,500,46,20,MBN
-N,500,46,569,TV 조선
-N,500,46,571,채널A
+N,jtbc편성표,JTBC
+N,mbn편성표,MBN
+N,tv조선편성표,TV조선
+N,채널a편성표,채널A
 #네이버 케이블 드라마
-N,200,12,148,KBS 드라마
-N,200,12,253,MBC 드라마넷
-N,200,12,54,SBS플러스
-N,200,12,285,드라맥스
-N,200,12,706,FOX채널
-N,200,12,817,FOXlife
-N,200,12,912,OCN series
-N,200,12,664,중화TV
-N,200,12,780,CHING
-N,200,12,287,DramaH
-N,200,12,693,디원TV
-N,200,12,925,텔레노벨라
-N,200,12,332,Asia N
-N,200,12,783,Sky Drama
-N,200,12,915,Hero Action
-N,200,12,781,TVA
-N,200,12,499,DRAMAcube
-N,200,12,679,AXN
-N,200,12,598,큐브TV
-N,200,12,379,하이라이트TV
-N,200,12,906,채널차이나
+N,asian편성표,Asia N
+N,axn편성표,AXN
+N,ching편성표,CHING
+N,dramacube편성표,DRAMAcube
+N,DramaH편성표,DramaH
+N,foxlife편성표,FOXlife
+N,fox채널편성표,FOX채널
+N,herotv편성표,Hero Action
+N,kbs드라마편성표,KBS 드라마
+N,mbc드라마넷편성표,MBC 드라마넷
+N,ocnseries편성표,OCN series
+N,sbs플러스편성표,SBS플러스
+N,sky drama 편성표,Sky Drama
+N,TVA편성표,TVA
+N,드라맥스편성표,드라맥스
+N,디원tv편성표,디원TV
+N,중화tv편성표,중화TV
+N,채널차이나 편성표,채널차이나
+N,텔레노벨라편성표,텔레노벨라
+N,하이라이트TV 편성표,하이라이트TV
 #네이버 케이블 영화
-N,200,11,22,OCN
-N,200,11,129,SUPER ACTION
-N,200,11,19,채널CGV
-N,200,11,388,XTM
-N,200,11,916,스크린
-N,200,11,355,CNTV
-N,200,11,31,캐치온1
-N,200,11,161,캐치온2
-N,200,11,105,인디필름
-N,200,11,167,Mplex
-N,200,11,103,씨네프
-N,200,11,679,AXN
+N,cntv편성표,CNTV
+N,mplex편성표,Mplex
+N,ocn편성표,OCN
+N,superaction편성표,SUPER ACTION
+N,스크린편성표,스크린
+N,씨네프편성표,씨네프
+N,인디필름편성표,인디필름
+N,채널cgv편성표,채널CGV
+N,캐치온편성표,캐치온
+N,캐치온플러스편성표,캐치온플러스
 #네이버 케이블 연예/오락
-N,200,13,743,tvN
-N,200,13,27,Mnet
-N,200,13,388,XTM
-N,200,13,25,JTBC2
-N,200,13,335,MBC every1
-N,200,13,108,E채널
-N,200,13,126,MBC Music
-N,200,13,559,KBS WORLD
-N,200,13,37,K STAR
-N,200,13,130,SBS MTV
-N,200,13,684,SBS funE
-N,200,13,818,FX
-N,200,13,100,코미디TV
-N,200,13,754,KBS Joy
-N,200,13,118,I.NET
-N,200,13,102,이벤트TV
-N,200,13,419,CMC 가족오락TV
-N,200,13,899,Sky ENT
-N,200,13,43,GMTV
-N,200,13,775,가요TV
-N,200,13,101,etn 연예채널
-N,200,13,518,CH W
-N,200,13,598,큐브TV
-N,200,13,142,Smile TV
-N,200,13,662,HQ+
+N,CHW편성표,CH W
+N,cmc가족오락tv편성표,CMC 가족오락TV
+N,etn연예채널편성표,etn 연예채널
+N,e채널편성표,E채널
+N,fx편성표,FX
+N,GMTV편성표,GMTV
+N,HQ+편성표,HQ+
+N,i.net편성표,I.NET
+N,JTBC2편성표,JTBC2
+N,kbsjoy편성표,KBS Joy
+N,kbsworld편성표,KBS WORLD
+N,K STAR 편성표,K STAR
+N,mbcevery1편성표,MBC every1
+N,mbcmusic편성표,MBC Music
+N,mnet편성표,Mnet
+N,sbsfune편성표,SBS funE
+N,sbsmtv편성표,SBS MTV
+N,SmileTV편성표,SmileTV
+N,tvn편성표,tvN
+N,xtm편성표,XTM
+N,가요tv편성표,가요TV
+N,이벤트tv편성표,이벤트TV
+N,코미디tv편성표,코미디TV
+N,큐브TV 편성표,큐브TV
 #네이버 케이블 스포츠/게임
-N,200,14,55,OGN
-N,200,14,126,MBC Music
-N,200,14,147,KBS N 스포츠
-N,200,14,124,MBC스포츠 플러스
-N,200,14,30,SBS스포츠
-N,200,14,44,SBS골프
-N,200,14,487,JTBC GOLF
-N,200,14,615,Billiards TV
-N,200,14,713,SPOTV+
-N,200,14,407,JTBC3
-N,200,14,109,SPOTV
-N,200,14,176,MBC SPORTS+2
+N,Billiards TV 편성표,Billiards TV
+N,jtbc3 Fox Sports 편성표,JTBC3
+N,jtbcgolf편성표,JTBC Golf
+N,kbsn스포츠편성표,KBS N 스포츠
+N,MBC SPORTS+2 편성표,MBC SPORTS+2
+N,mbc스포츠플러스편성표,MBC스포츠 플러스
+N,OGN편성표,OGN
+N,SBS Sports 편성표,SBS Sports
+N,sbs골프편성표,SBS골프
+N,SPOTV 편성표,SPOTV
+N,spotv+편성표,SPOTV+
 #네이버 케이블 어린이
-N,200,19,38,투니버스
-N,200,19,358,카툰네트워크
-N,200,19,666,챔프
-N,200,19,91,애니플러스
-N,200,19,685,Nickelodeon
-N,200,19,725,애니맥스
-N,200,19,17,대교어린이TV
-N,200,19,905,키즈원
-N,200,19,740,AniBox
-N,200,19,23,JEI 재능TV
-N,200,19,160,AniOne
-N,200,19,110,CBeebies
-N,200,19,363,KIDS-TV
-N,200,19,172,디즈니채널
-N,200,19,430,디즈니주니어
-N,200,19,596,KBS KIDS
-N,200,19,723,EBS U
+N,anibox편성표,AniBox
+N,anione편성표,AniOne
+N,cbeebies편성표,Cbeebies
+N,ebsu편성표,EBS U
+N,jei재능tv편성표,JEI 재능TV
+N,kbskids편성표,KBS KIDS
+N,kids-tv편성표,KIDS-TV
+N,Nickelodeon 편성표,Nickelodeon
+N,대교어린이tv편성표,대교어린이TV
+N,디즈니 주니어 채널 편성표,디즈니주니어
+N,디즈니 채널 편성표,디즈니채널
+N,애니맥스편성표,애니맥스
+N,애니플러스편성표,애니플러스
+N,챔프편성표,챔프
+N,카툰네트워크편성표,카툰네트워크
+N,키즈원편성표,키즈원
+N,투니버스편성표,투니버스
 #네이버 케이블 쇼핑
-N,200,23,138,롯데홈쇼핑
-N,200,23,140,현대홈쇼핑
-N,200,23,250,CJ오쇼핑
-N,200,23,45,GS SHOP
-N,200,23,133,NS홈쇼핑
-N,200,23,567,홈&amp;쇼핑
+N,cj오쇼핑편성표,CJ오쇼핑
+N,gsshop편성표,GS SHOP
+N,NS홈쇼핑 편성표,NS홈쇼핑
+N,롯데홈쇼핑편성표,롯데홈쇼핑
+N,현대홈쇼핑편성표,현대홈쇼핑
+N,홈앤쇼핑 편성표,홈&쇼핑
 #네이버 케이블 뉴스/경제
-N,200,16,24,YTN
-N,200,16,622,SBS CNBC
-N,200,16,106,한국경제TV
-N,200,16,132,MTN
-N,200,16,359,토마토TV
-N,200,16,380,이데일리TV
-N,200,16,157,서울경제TV
-N,200,16,78,아시아경제TV
-N,200,16,573,연합뉴스 TV
-N,200,16,735,쿠키건강TV
-N,200,16,397,Euronews
-N,200,16,125,RTN 부동산경제TV
-N,200,16,256,DWTV
-N,200,16,771,C TIME
-N,200,16,81,Channel News Asia
-N,200,16,579,yestv
+N,channelnewsasia편성표,Channel News Asia
+N,CTIME편성표,C TIME
+N,euronews편성표,Euronews
+N,mtn편성표,MTN
+N,rtn부동산tv편성표,RTN 부동산경제TV
+N,sbscnbc편성표,SBS CNBC
+N,yestv편성표,yestv
+N,ytn편성표,YTN
+N,서울경제tv편성표,서울경제TV
+N,아시아경제tv편성표,아시아경제TV
+N,연합뉴스tv편성표,연합뉴스TV
+N,이데일리tv편성표,이데일리TV
+N,쿠키건강tv편성표,쿠키건강TV
+N,토마토tv편성표,토마토TV
+N,한국경제tv편성표,한국경제TV
 #네이버 케이블 레저
-N,200,15,262,FTV
-N,200,15,28,리빙TV
-N,200,15,46,한국기원 바둑TV
-N,200,15,488,브레인TV
-N,200,15,683,폴라리스TV
-N,200,15,151,생활체육 TV
-N,200,15,162,한국바둑방송
-N,200,15,254,FISHING TV
-N,200,15,613,마운틴TV
-N,200,15,107,한국승마TV
-N,200,15,94,Sky Travel
-N,200,15,575,티비즈
-N,200,15,584,onbooktv
-N,200,15,402,ONT
+N,FISHINGTV편성표,FISHING TV
+N,ftv편성표,FTV
+N,booktv편성표,onbooktv
+N,ont편성표,ONT
+N,Sky Travel 편성표,Sky Travel
+N,리빙tv편성표,리빙TV
+N,마운틴TV 편성표,마운틴TV
+N,브레인tv편성표,브레인TV
+N,생활체육 TV 편성표,생활체육 TV
+N,티비즈편성표,티비즈
+N,폴라리스tv편성표,폴라리스TV
+N,한국기원바둑tv편성표,한국기원 바둑TV
+N,한국바둑방송편성표,한국바둑방송
+N,한국승마tv편성표,한국승마TV
 #네이버 케이블 여성/패션
-N,200,20,414,On Style
-N,200,20,705,O tvN
-N,200,20,15,올'리브
-N,200,20,917,FashionN
-N,200,20,813,TRENDY
-N,200,20,35,GTV
-N,200,20,252,육아방송
-N,200,20,247,동아TV
-N,200,20,753,FOODTV
-N,200,20,104,EDGE TV
-N,200,20,906,채널차이나
-N,200,20,509,KBS W
-N,200,20,70,EXF
+N,edgetv편성표,EDGE TV
+N,EXF편성표,EXF
+N,fashionn편성표,FashionN
+N,foodtv편성표,FOODTV
+N,gtv편성표,GTV
+N,kbsw편성표,KBS W
+N,onstyle편성표,On Style
+N,otvn편성표,O tvN
+N,TRENDY편성표,TRENDY
+N,동아TV 편성표,동아TV
+N,올'리브편성표,올'리브
+N,육아방송편성표,육아방송
 #네이버 케이블 해외
-N,200,43,141,CNBC
-N,200,43,122,STAR Sports
-N,200,43,260,BBC World
-N,200,43,159,CCTV4
-N,200,43,703,Bloomberg TV
-N,200,43,901,Fox News
-N,200,43,852,CNN Headline News
-N,200,43,166,NHK WORLD Premium
-N,200,43,673,CCTV News
-N,200,43,904,BBC Earth
-N,200,43,310,Euro Sports News
-N,200,43,426,Australia Plus
-N,200,43,492,STC
-N,200,43,612,TV5
-N,200,43,741,LAC
-N,200,43,920,Nat Geo Wild
-N,200,43,900,History channel HD
-N,200,43,365,HD Classica
-N,200,43,117,CNN Int’l
-N,200,43,527,CNN US HD
+N,케이블 australia plus 편성표,Australia Plus
+N,케이블bbcearth편성표,BBC Earth
+N,케이블bbcworld편성표,BBC World
+N,케이블bloombergtv편성표,Bloomberg TV
+N,케이블cctv4편성표,CCTV4
+N,케이블cctvnews편성표,CCTV News
+N,케이블cnbc편성표,CNBC
+N,케이블cnnheadlinenews편성표,CNN Headline News
+N,케이블cnnint'l편성표,CNN Int’l
+N,케이블CNNUSHD편성표,CNN US HD
+N,케이블dwtv편성표,DWTV
+N,케이블eurosportsnews편성표,Euro Sports News
+N,케이블foxnews편성표,Fox News
+N,케이블france24편성표,France 24
+N,케이블historychannelhd편성표,History channel HD
+N,케이블lac편성표,LAC
+N,케이블natgeowild편성표,Nat Geo Wild
+N,케이블nhkworldpremium편성표,NHK WORLD Premium
+N,케이블starsports편성표,STAR Sports
+N,케이블stc편성표,STC
+N,케이블tv5편성표,TV5
 #네이버 케이블 종교
-N,200,24,52,BTN불교TV
-N,200,24,33,평화방송
-N,200,24,903,BBS불교방송
-N,200,24,688,CGN
-N,200,24,293,GOODTV
-N,200,24,42,CTS 기독교TV
-N,200,24,779,상생방송
-N,200,24,156,CBS TV
-N,200,24,907,C channel
-N,200,24,629,CMTV
+N,bbs불교 편성표,BBS불교방송
+N,btn불교tv 편성표,BTN불교TV
+N,cbs tv 편성표,CBS TV
+N,C channel 편성표,C channel
+N,cgn편성표,CGN
+N,CMTV 편성표,CMTV
+N,CTS 기독교TV 편성표,CTS 기독교TV
+N,goodtv편성표,GOODTV
+N,상생방송편성표,상생방송
+N,평화방송편성표,평화방송
 #네이버 케이블 공공
-N,200,22,427,국회방송
-N,200,22,698,국방TV
-N,200,22,707,복지TV
-N,200,22,736,실버TV
-N,200,22,50,arirang
-N,200,22,812,법률방송
-N,200,22,184,KTV 국민방송
-N,200,22,180,한국소비자TV
-N,200,22,178,한국청소년방송
+N,3d시험방송편성표,3D 시험방송
+N,arirang편성표,arirang
+N,ktv국민방송편성표,KTV 국민방송
+N,국방TV편성표,국방TV
+N,국회방송편성표,국회방송
+N,법률방송편성표,법률방송
+N,복지tv편성표,복지TV
+N,실버tv편성표,실버TV
+N,한국청소년방송편성표,한국청소년방송
 #네이버 케이블 교육
-N,200,18,113,EBS플러스1
-N,200,18,114,EBS플러스2
-N,200,18,777,EBS English
-N,200,18,289,JEI English TV
-N,200,18,561,정철영어 TV
-N,200,18,811,일자리방송
-N,200,18,47,OUN
-N,200,18,79,한국직업방송
-N,200,18,508,EduKids TV
+N,ebsenglish편성표,EBS English
+N,ebs플러스1편성표,EBS플러스1
+N,ebs플러스2편성표,EBS플러스2
+N,edukidstv편성표,EduKids TV
+N,jeienglishtv편성표,JEI English TV
+N,oun편성표,OUN
+N,일자리방송편성표,일자리방송
+N,정철영어tv편성표,정철영어 TV
+N,한국직업방송편성표,한국직업방송
 #네이버 케이블 다큐
-N,200,17,918,채널 뷰
-N,200,17,168,KBS N Life
-N,200,17,142,Smile TV
-N,200,17,669,리얼TV
-N,200,17,792,사이언스TV
-N,200,17,119,내셔널지오그래픽채널
-N,200,17,290,channel J
-N,200,17,175,RTV
-N,200,17,29,환경TV
-N,200,17,560,Nat Geo People
-N,200,17,407,JTBC3
-N,200,17,90,다큐스토리
+N,channelj편성표,channel J
+N,kbsnlife편성표,KBS N Life
+N,Nat Geo People 편성표,Nat Geo People
+N,rtv편성표,RTV
+N,내셔널지오그래픽채널편성표,내셔널지오그래픽채널
+N,다큐스토리 편성표,다큐스토리
+N,리얼tv편성표,리얼TV
+N,사이언스tv편성표,사이언스TV
+N,채널뷰편성표,채널 뷰
+N,환경tv편성표,환경TV
 #네이버 케이블 교양/정보
-N,200,21,379,하이라이트TV
-N,200,21,26,부메랑
-N,200,21,764,MBCNET
-N,200,21,333,예술TV Arte
-N,200,21,89,K.NET
-N,200,21,99,9colors
-N,200,21,185,메디컬TV
-N,200,21,90,다큐스토리
-N,200,21,378,실버아이TV
-N,200,21,402,ONT
-N,200,21,416,SAFE TV
-N,200,21,415,헬스메디tv
-N,200,21,495,tbsTV
-N,200,21,500,Sky UHD2
-N,200,21,568,Sky ICT
-N,200,21,76,DOGTV
-N,200,21,134,한국여론방송 HD
-N,200,21,136,채널 해피독
-N,200,21,313,채널i
-N,200,21,639,마이펫TV
-N,200,21,49,지방자치TV
+N,babytv편성표,BabyTV
+N,cbn편성표,CBN
+N,DOGTV 편성표,DOGTV
+N,k.net편성표,K.NET
+N,mbcnet편성표,MBCNET
+N,safetv편성표,SAFE TV
+N,Sky ICT 편성표,Sky ICT
+N,tbs tv편성표,tbsTV
+N,마이펫TV 편성표,마이펫TV
+N,메디컬tv편성표,메디컬TV
+N,산업방송 채널i 편성표,산업방송 채널i
+N,생활건강tv편성표,생활건강TV
+N,실버아이편성표,실버아이
+N,예술tvarte편성표,예술TV Arte
+N,지방자치TV편성표,지방자치TV
+N,채널해피독편성표,채널 해피독
+N,한국여론방송 편성표,한국여론방송 HD
+N,헬스메디tv편성표,헬스메디tv
 #네이버 스카이라이프 지상파
-N,300,25,9,KBS1
-N,300,25,7,KBS2
-N,300,25,11,MBC
-N,300,25,6,SBS
-N,300,25,13,EBS1
-N,300,25,546,EBS2
+N,스카이라이프ebs1편성표,EBS1
+N,스카이라이프ebs2편성표,EBS2
+N,스카이라이프kbs1편성표,KBS1
+N,스카이라이프kbs2편성표,KBS2
+N,스카이라이프mbc편성표,MBC
+N,스카이라이프sbs편성표,SBS
 #네이버 스카이라이프 종합편성
-N,300,47,570,JTBC
-N,300,47,20,MBN
-N,300,47,569,TV 조선
-N,300,47,571,채널A
+N,스카이라이프jtbc편성표,JTBC
+N,스카이라이프mbn편성표,MBN
+N,스카이라이프tv조선편성표,TV조선
+N,스카이라이프채널a편성표,채널A
 #네이버 스카이라이프 드라마
-N,300,27,148,KBS 드라마
-N,300,27,253,MBC 드라마넷
-N,300,27,54,SBS플러스
-N,300,27,912,OCN series
-N,300,27,664,중화TV
-N,300,27,332,Asia N
-N,300,27,694,BBC entertainment
+N,스카이라이프asian편성표,Asia N
+N,스카이라이프bbcentertainment편성표,BBC entertainment
+N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
+N,hd텔레노벨라편성표,HD 텔레노벨라
+N,스카이라이프kbs드라마편성표,KBS 드라마
+N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
+N,스카이라이프ocnseries편성표,OCN series
+N,스카이라이프sbs플러스편성표,SBS플러스
+N,스카이라이프 sky drama 편성표,Sky Drama
+N,스카이라이프중화tv편성표,중화TV
 #네이버 스카이라이프 영화
-N,300,26,22,OCN
-N,300,26,129,SUPER ACTION
-N,300,26,19,채널CGV
-N,300,26,388,XTM
-N,300,26,355,CNTV
-N,300,26,165,THE MOVIE
-N,300,26,31,캐치온1
-N,300,26,161,캐치온2
-N,300,26,679,AXN
-N,300,26,447,Sky Sports
-N,300,26,167,Mplex
-N,300,26,624,CJ UXN
+N,스카이라이프axn편성표,AXN
+N,스카이라이프 CJ UXN 편성표,CJ UXN
+N,스카이라이프cntv편성표,CNTV
+N,스카이라이프mplex편성표,Mplex
+N,스카이라이프ocn편성표,OCN
+N,스카이라이프superaction편성표,SUPER ACTION
+N,스카이라이프 the movie 편성표,THE MOVIE
+N,스카이라이프채널cgv편성표,채널CGV
+N,스카이라이프캐치온편성표,캐치온
+N,스카이라이프캐치온플러스편성표,캐치온플러스
 #네이버 스카이라이프 연예/오락
-N,300,28,743,tvN
-N,300,28,27,Mnet
-N,300,28,388,XTM
-N,300,28,25,JTBC2
-N,300,28,335,MBC every1
-N,300,28,126,MBC Music
-N,300,28,37,K STAR
-N,300,28,899,Sky ENT
-N,300,28,684,SBS funE
-N,300,28,100,코미디TV
-N,300,28,754,KBS Joy
-N,300,28,118,I.NET
-N,300,28,101,etn 연예채널
+N,스카이라이프etn연예채널편성표,etn 연예채널
+N,스카이라이프i.net편성표,I.NET
+N,스카이라이프jtbc2편성표,JTBC2
+N,스카이라이프kbsjoy편성표,KBS Joy
+N,스카이라이프kstar편성표,K STAR
+N,스카이라이프mbcevery1편성표,MBC every1
+N,스카이라이프mbcmusic편성표,MBC Music
+N,스카이라이프mnet편성표,Mnet
+N,스카이라이프sbsfune편성표,SBS funE
+N,Sky ENT 편성표,Sky ENT
+N,스카이라이프tvn편성표,tvN
+N,스카이라이프xtm편성표,XTM
+N,스카이라이프코미디tv편성표,코미디TV
 #네이버 스카이라이프 스포츠/게임
-N,300,29,55,OGN
-N,300,29,126,MBC Music
-N,300,29,147,KBS N 스포츠
-N,300,29,124,MBC스포츠 플러스
-N,300,29,30,SBS스포츠
-N,300,29,44,SBS골프
-N,300,29,487,JTBC GOLF
-N,300,29,713,SPOTV+
-N,300,29,80,SPOTV GAMES
-N,300,29,447,Sky Sports
-N,300,29,578,EUROSPORT
-N,300,29,515,IB sports
-N,300,29,109,SPOTV
-N,300,29,176,MBC SPORTS+2
+N,(S)IB sports 편성표,(S)IB sports
+N,스카이라이프 EUROSPORT 편성표,EUROSPORT
+N,스카이라이프jtbcgolf편성표,JTBC Golf
+N,스카이라이프kbsn스포츠편성표,KBS N 스포츠
+N,스카이라이프MBC SPORTS+2편성표,MBC SPORTS+2
+N,스카이라이프mbc스포츠플러스편성표,MBC스포츠 플러스
+N,스카이라이프ogn편성표,OGN
+N,스카이라이프sbs골프편성표,SBS골프
+N,스카이라이프sbs스포츠편성표,SBS 스포츠
+N,스카이라이프 Sky Sports 편성표,Sky Sports
+N,스카이라이프 SPOTV 편성표,SPOTV
+N,스카이라이프spotv+편성표,SPOTV+
+N,spotv games 편성표,SPOTV GAMES
 #네이버 스카이라이프 어린이
-N,300,34,38,투니버스
-N,300,34,358,카툰네트워크
-N,300,34,725,애니맥스
-N,300,34,17,대교어린이TV
-N,300,34,740,AniBox
-N,300,34,23,JEI 재능TV
-N,300,34,160,AniOne
-N,300,34,360,Kids TalkTalk 플러스
-N,300,34,172,디즈니채널
-N,300,34,430,디즈니주니어
+N,스카이라이프anibox편성표,AniBox
+N,스카이라이프anione편성표,AniOne
+N,스카이라이프jei재능tv편성표,JEI 재능TV
+N,스카이라이프 kidstalktalk플러스 편성표,Kids TalkTalk 플러스
+N,스카이라이프대교어린이tv편성표,대교어린이TV
+N,스카이라이프 디즈니 주니어 채널 편성표,디즈니주니어
+N,스카이라이프 디즈니 채널 편성표,디즈니채널
+N,스카이라이프애니맥스편성표,애니맥스
+N,스카이라이프카툰네트워크편성표,카툰네트워크
+N,스카이라이프투니버스편성표,투니버스
 #네이버 스카이라이프 쇼핑
-N,300,38,138,롯데홈쇼핑
-N,300,38,140,현대홈쇼핑
-N,300,38,250,CJ오쇼핑
-N,300,38,45,GS SHOP
-N,300,38,133,NS홈쇼핑
+N,스카이라이프cj오쇼핑편성표,CJ오쇼핑
+N,스카이라이프gsshop편성표,GS SHOP
+N,스카이라이프 NS홈쇼핑 편성표,NS홈쇼핑
+N,스카이라이프롯데홈쇼핑편성표,롯데홈쇼핑
+N,스카이라이프현대홈쇼핑편성표,현대홈쇼핑
+N,스카이라이프홈&amp;쇼핑편성표,홈&쇼핑
 #네이버 스카이라이프 뉴스/경제
-N,300,31,24,YTN
-N,300,31,106,한국경제TV
-N,300,31,132,MTN
-N,300,31,359,토마토TV
-N,300,31,380,이데일리TV
-N,300,31,622,SBS CNBC
-N,300,31,157,서울경제TV
-N,300,31,125,RTN 부동산경제TV
-N,300,31,573,연합뉴스 TV
-N,300,31,482,HD 아시아경제TV
+N,HD 아시아경제TV 편성표,HD 아시아경제TV
+N,스카이라이프mtn편성표,MTN
+N,스카이라이프rtn부동산tv편성표,RTN 부동산경제TV
+N,스카이라이프sbscnbc편성표,SBS CNBC
+N,스카이라이프ytn편성표,YTN
+N,스카이라이프서울경제tv편성표,서울경제TV
+N,스카이라이프연합뉴스tv편성표,연합뉴스TV
+N,스카이라이프이데일리tv편성표,이데일리TV
+N,스카이라이프토마토tv편성표,토마토TV
+N,스카이라이프한국경제tv편성표,한국경제TV
 #네이버 스카이라이프 레저
-N,300,30,262,FTV
-N,300,30,28,리빙TV
-N,300,30,488,브레인TV
-N,300,30,151,생활체육 TV
-N,300,30,162,한국바둑방송
-N,300,30,94,Sky Travel
+N,스카이라이프ftv편성표,FTV
+N,스카이라이프 Sky Travel 편성표,Sky Travel
+N,스카이라이프리빙tv편성표,리빙TV
+N,스카이라이프브레인tv편성표,브레인TV
+N,스카이라이프 생활체육 TV 편성표,생활체육 TV
+N,스카이라이프 티비즈 편성표,티비즈
+N,스카이라이프한국바둑방송편성표,한국바둑방송
 #네이버 스카이라이프 여성/패션
-N,300,36,414,On Style
-N,300,36,705,O tvN
-N,300,36,15,올'리브
-N,300,36,509,KBS W
+N,스카이라이프kbsw편성표,KBS W
+N,스카이라이프onstyle편성표,On Style
+N,스카이라이프otvn편성표,O tvN
+N,스카이라이프올'리브편성표,올'리브
 #네이버 스카이라이프 해외
-N,300,35,117,CNN Int’l
-N,300,35,122,STAR Sports
-N,300,35,260,BBC World
-N,300,35,159,CCTV4
-N,300,35,365,HD Classica
-N,300,35,673,CCTV News
-N,300,35,166,NHK WORLD Premium
-N,300,35,182,Animal Planet
-N,300,35,900,History channel HD
-N,300,35,750,HD SundanceTV
-N,300,35,527,CNN US HD
+N,스카이라이프animalplanet편성표,Animal Planet
+N,스카이라이프bbcworld편성표,BBC World
+N,스카이라이프cctv4편성표,CCTV4
+N,스카이라이프cctvnews편성표,CCTV News
+N,스카이라이프cnnint’l편성표,CNN Int’l
+N,스카이라이프CNNUSHD편성표,CNN US HD
+N,스카이라이프hdclassica편성표,HD Classica
+N,스카이라이프hdsundancetv편성표,HD SundanceTV
+N,스카이라이프historychannelhd편성표,History channel HD
+N,스카이라이프nhkworldpremium편성표,NHK WORLD Premium
+N,스카이라이프starsports편성표,STAR Sports
 #네이버 스카이라이프 종교
-N,300,39,52,BTN불교TV
-N,300,39,33,평화방송
-N,300,39,42,CTS 기독교TV
-N,300,39,156,CBS TV
+N,스카이라이프bbs불교방송편성표,BBS불교방송
+N,스카이라이프 btn불교tv 편성표,BTN불교TV
+N,스카이라이프cbstv편성표,CBS TV
+N,스카이라이프 cts 기독교 tv 편성표,CTS 기독교TV
+N,스카이라이프평화방송편성표,평화방송
 #네이버 스카이라이프 공공/정보
-N,300,37,427,국회방송
-N,300,37,698,국방TV
-N,300,37,707,복지TV
-N,300,37,736,실버TV
-N,300,37,168,KBS N Life
-N,300,37,50,arirang
-N,300,37,175,RTV
-N,300,37,764,MBCNET
-N,300,37,184,KTV 국민방송
-N,300,37,333,예술TV Arte
-N,300,37,89,K.NET
-N,300,37,128,HD OBS W
-N,300,37,180,한국소비자TV
-N,300,37,568,Sky ICT
+N,스카이라이프arirang편성표,arirang
+N,스카이라이프hdobsw편성표,HD OBS W
+N,스카이라이프k.net편성표,K.NET
+N,스카이라이프kbsnlife편성표,KBS N Life
+N,스카이라이프ktv국민방송편성표,KTV 국민방송
+N,스카이라이프mbcnet편성표,MBCNET
+N,스카이라이프rtv편성표,RTV
+N,스카이라이프 Sky ICT 편성표,Sky ICT
+N,스카이라이프국방TV편성표,국방TV
+N,스카이라이프국회방송편성표,국회방송
+N,스카이라이프복지tv편성표,복지TV
+N,스카이라이프실버tv편성표,실버TV
+N,스카이라이프예술tvarte편성표,예술TV Arte
+N,한국소비자tv편성표,한국소비자TV
 #네이버 스카이라이프 교육
-N,300,33,113,EBS플러스1
-N,300,33,114,EBS플러스2
-N,300,33,777,EBS English
-N,300,33,289,JEI English TV
-N,300,33,811,일자리방송
-N,300,33,47,OUN
-N,300,33,79,한국직업방송
+N,스카이라이프ebsenglish편성표,EBS English
+N,스카이라이프ebs플러스1편성표,EBS플러스1
+N,스카이라이프ebs플러스2편성표,EBS플러스2
+N,스카이라이프jeienglishtv편성표,JEI English TV
+N,스카이라이프oun편성표,OUN
+N,스카이라이프일자리방송편성표,일자리방송
+N,스카이라이프한국직업방송편성표,한국직업방송
 #네이버 스카이라이프 다큐
-N,300,32,142,Smile TV
-N,300,32,792,사이언스TV
-N,300,32,119,내셔널지오그래픽채널
-N,300,32,929,HD Discovery
-N,300,32,365,HD Classica
-N,300,32,514,SkyA&amp;C
+N,스카이라이프디스커버리편성표,Discovery
+N,스카이라이프hddiscovery편성표,HD Discovery
+N,SkyA&C편성표,SkyA&C
+N,스카이라이프내셔널지오그래픽채널편성표,내셔널지오그래픽채널
+N,스카이라이프사이언스tv편성표,사이언스TV
 #네이버 해외위성
-N,9000,,141,CNBC
-N,9000,,122,STAR Sports
-N,9000,,260,BBC World
-N,9000,,159,CCTV4
-N,9000,,703,Bloomberg TV
-N,9000,,901,Fox News
-N,9000,,852,CNN Headline News
-N,9000,,166,NHK WORLD Premium
-N,9000,,673,CCTV News
-N,9000,,904,BBC Earth
-N,9000,,310,Euro Sports News
-N,9000,,426,Australia Plus
-N,9000,,492,STC
-N,9000,,612,TV5
-N,9000,,741,LAC
-N,9000,,920,Nat Geo Wild
-N,9000,,182,Animal Planet
-N,9000,,900,History channel HD
-N,9000,,750,HD SundanceTV
-N,9000,,406,iConcerts
-N,9000,,256,DWTV
-N,9000,,117,CNN Int’l
-N,9000,,527,CNN US HD
+N,animalplanet편성표,Animal Planet
+N,Australia Plus 편성표,Australia Plus
+N,bbcearth편성표,BBC Earth
+N,bbcworld편성표,BBC World
+N,bloombergtv편성표,Bloomberg TV
+N,cctv4편성표,CCTV4
+N,cctvnews편성표,CCTV News
+N,cnbc편성표,CNBC
+N,cnnheadlinenews편성표,CNN Headline News
+N,cnnint’l편성표,CNN Int’l
+N,CNNUSHD편성표,CNN US HD
+N,dwtv편성표,DWTV
+N,eurosportsnews편성표,Euro Sports News
+N,foxnews편성표,Fox News
+N,france24편성표,France 24
+N,HD Classica 편성표,HD Classica
+N,hdsundancetv편성표,HD SundanceTV
+N,historychannelhd편성표,History channel HD
+N,lac편성표,LAC
+N,natgeowild편성표,Nat Geo Wild
+N,nhkworldpremium편성표,NHK WORLD Premium
+N,starsports편성표,STAR Sports
+N,stc편성표,STC
+N,tv5편성표,TV5
+#네이버 라디오
+N,bbs불교라디오방송편성표,BBS불교방송
+N,cbs음악fm편성표,CBS음악FM
+N,cbs표준fm편성표,CBS표준FM
+N,ebs교육방송라디오편성표,EBS교육방송
+N,kbs 1fm 편성표,KBS1FM
+N,kbs1r편성표,KBS1R
+N,kbs2fm편성표,KBS2FM
+N,kbs2r편성표,KBS2R
+N,kbs3r편성표,KBS3R
+N,kbsworldradio편성표,KBSWorldRadio
+N,kbs한민족편성표,KBS한민족
+N,KFM 경기방송 편성표,KFM 경기방송
+N,mbcfm4u편성표,MBCFM4U
+N,mbc표준fm편성표,MBC표준FM
+N,PBC 평화방송 편성표,PBC 평화방송
+N,sbs러브fm편성표,SBS러브FM
+N,sbs파워fm편성표,SBS파워FM
+N,tbs교통방송편성표,TBS교통방송
+N,YTN NEWS FM 편성표,YTN NEWS FM
+N,경인방송편성표,경인방송
+N,국악방송편성표,국악방송
+N,극동방송 편성표,극동방송
 
 ##EPG
 #http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}
@@ -1468,7 +1447,6 @@ E,4,170,128,HD OBS W
 E,4,170,509,KBS W
 E,4,170,708,K쇼핑
 E,4,170,625,K쇼핑_OTV1
-E,4,170,626,K쇼핑_OTV2
 E,4,170,548,LOTTE OneTV
 E,4,170,646,NS Shop+
 E,4,170,133,NS홈쇼핑
