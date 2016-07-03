@@ -672,7 +672,7 @@ def generateXmlProgrammeEpg():
                                 match_episode_num = re.search("^(.*)[\(|\[|>| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", htmlparser.unescape(match_program.group(1)))
                                 if match_episode_num:
                                     dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
-                                    dic_programme["episode_num"] = match_episode_num.group(1).strip()
+                                    dic_programme["episode_num"] = match_episode_num.group(2).strip()
                                 else:
                                     dic_programme["title"] = htmlparser.unescape(match_program.group(1))
                                 dic_programme["sub_title"] = dic_programme["title"]
