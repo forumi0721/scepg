@@ -485,7 +485,7 @@ def generateXmlProgrammeUplus():
                             dic_programme["generate_source"] = generate_source
                             dic_programme["programme_start"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
                         elif row == 1:
-                            match_episode_num = re.search("^(.*)[\(|\[|<| ](\d+[회|강|부])[\)|\]|>| ]?$", td.next_element.strip())
+                            match_episode_num = re.search("^(.*)[\(|\[|<| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", td.next_element.strip())
                             if match_episode_num:
                                 dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
                                 dic_programme["episode_num"] = match_episode_num.group(2).strip()
@@ -513,7 +513,7 @@ def generateXmlProgrammeUplus():
                         dic_programme["channel_name"] = channel_name
                         dic_programme["generate_source"] = generate_source
                         dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
-                        match_episode_num = re.search("^(.*)[\(|\[|<| ](\d+[회|강|부])[\)|\]|>| ]?$", match.group(3).strip())
+                        match_episode_num = re.search("^(.*)[\(|\[|<| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", match.group(3).strip())
                         if match_episode_num:
                             dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
                             dic_programme["episode_num"] = match_episode_num.group(2).strip()
@@ -592,7 +592,7 @@ def generateXmlProgrammeNaver():
                             dic_programme["title"] = "%s (%s)" % (js_schedule["title"], js_schedule["episode"])
                             dic_programme["episode_num"] = js_schedule["episode"]
                         else:
-                            match_episode_num = re.search("^(.*)[\(|\[|<| ](\d+[회|강|부])[\)|\]|>| ]?$", js_schedule["title"])
+                            match_episode_num = re.search("^(.*)[\(|\[|<| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", js_schedule["title"])
                             if match_episode_num:
                                 dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
                                 dic_programme["episode_num"] = match_episode_num.group(2).strip()
@@ -669,7 +669,7 @@ def generateXmlProgrammeEpg():
                                 dic_programme["channel_id"] = programme_channel.split(",")[0]
                                 dic_programme["channel_name"] = programme_channel.split(",")[1]
                                 dic_programme["generate_source"] = generate_source
-                                match_episode_num = re.search("^(.*)[\(|\[|>| ](\d+[회|강|부])[\)|\]|>| ]?$", htmlparser.unescape(match_program.group(1)))
+                                match_episode_num = re.search("^(.*)[\(|\[|>| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", htmlparser.unescape(match_program.group(1)))
                                 if match_episode_num:
                                     dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
                                     dic_programme["episode_num"] = match_episode_num.group(1).strip()
