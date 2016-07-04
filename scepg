@@ -352,19 +352,19 @@ def generateXmlProgramme(dic_programme):
         xml_title.text = dic_programme["title"]
         xml_programme.append(xml_title)
 
-        xml_sub_title = etree.Element("sub-title", lang = "ko" )
-        if "sub_title" in dic_programme:
-            xml_sub_title.text = dic_programme["sub_title"]
-        else:
-            xml_sub_title.text = dic_programme["title"]
-        xml_programme.append(xml_sub_title)
+        #xml_sub_title = etree.Element("sub-title", lang = "ko" )
+        #if "sub_title" in dic_programme:
+        #    xml_sub_title.text = dic_programme["sub_title"]
+        #else:
+        #    xml_sub_title.text = dic_programme["title"]
+        #xml_programme.append(xml_sub_title)
 
-        xml_desc = etree.Element("desc", lang = "ko" )
-        if "desc" in dic_programme:
-            xml_desc.text = dic_programme["desc"]
-        else:
-            xml_desc.text = dic_programme["title"]
-        xml_programme.append(xml_desc)
+        #xml_desc = etree.Element("desc", lang = "ko" )
+        #if "desc" in dic_programme:
+        #    xml_desc.text = dic_programme["desc"]
+        #else:
+        #    xml_desc.text = dic_programme["title"]
+        #xml_programme.append(xml_desc)
 
         if "episode_num" in dic_programme:
             xml_episode_num = etree.Element("episode-num", system = "onscreen" )
@@ -402,17 +402,17 @@ def generateXmlProgramme(dic_programme):
         se_title = ET.SubElement(se_programme, "title", {"lang":"ko"})
         se_title.text = dic_programme["title"]
 
-        se_sub_title = ET.SubElement(se_programme, "sub-title", {"lang":"ko"})
-        if "sub_title" in dic_programme:
-            se_sub_title.text = dic_programme["sub_title"]
-        else:
-            se_sub_title.text = dic_programme["title"]
+        #se_sub_title = ET.SubElement(se_programme, "sub-title", {"lang":"ko"})
+        #if "sub_title" in dic_programme:
+        #    se_sub_title.text = dic_programme["sub_title"]
+        #else:
+        #    se_sub_title.text = dic_programme["title"]
 
-        se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
-        if "desc" in dic_programme:
-            se_desc.text = dic_programme["desc"]
-        else:
-            se_desc.text = dic_programme["title"]
+        #se_desc = ET.SubElement(se_programme, "desc", {"lang":"ko"})
+        #if "desc" in dic_programme:
+        #    se_desc.text = dic_programme["desc"]
+        #else:
+        #    se_desc.text = dic_programme["title"]
 
         if "episode_num" in dic_programme:
             se_episode_num = ET.SubElement(se_programme, "episode-num", {"system":"onscreen"})
@@ -491,8 +491,8 @@ def generateXmlProgrammeUplus():
                                 dic_programme["episode_num"] = match_episode_num.group(2).strip()
                             else:
                                 dic_programme["title"] = td.next_element.strip()
-                            dic_programme["sub_title"] = dic_programme["title"]
-                            dic_programme["desc"] = dic_programme["title"]
+                            #dic_programme["sub_title"] = dic_programme["title"]
+                            #dic_programme["desc"] = dic_programme["title"]
                             match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", str(td.img), re.MULTILINE | re.DOTALL)
                             if match_rating:
                                 dic_programme["rating"] = match_rating.group(1)
@@ -519,8 +519,8 @@ def generateXmlProgrammeUplus():
                             dic_programme["episode_num"] = match_episode_num.group(2).strip()
                         else:
                             dic_programme["title"] = match.group(3).strip()
-                        dic_programme["sub_title"] = dic_programme["title"]
-                        dic_programme["desc"] = dic_programme["title"]
+                        #dic_programme["sub_title"] = dic_programme["title"]
+                        #dic_programme["desc"] = dic_programme["title"]
                         dic_programme["category"] = match.group(5)
                         match_rating = re.search(".*txtcon_grade_pg(\d+)\.gif.*", match.group(4), re.MULTILINE | re.DOTALL)
                         if match_rating:
@@ -598,8 +598,8 @@ def generateXmlProgrammeNaver():
                                 dic_programme["episode_num"] = match_episode_num.group(2).strip()
                             else:
                                 dic_programme["title"] = js_schedule["title"]
-                        dic_programme["sub_title"] = dic_programme["title"]
-                        dic_programme["desc"] = dic_programme["title"]
+                        #dic_programme["sub_title"] = dic_programme["title"]
+                        #dic_programme["desc"] = dic_programme["title"]
                         #dic_programme["category"] = 
                         if js_schedule["grade"] != 0:
                             dic_programme["rating"] = str(js_schedule["grade"])
@@ -675,8 +675,8 @@ def generateXmlProgrammeEpg():
                                     dic_programme["episode_num"] = match_episode_num.group(2).strip()
                                 else:
                                     dic_programme["title"] = htmlparser.unescape(match_program.group(1))
-                                dic_programme["sub_title"] = dic_programme["title"]
-                                dic_programme["desc"] = dic_programme["title"]
+                                #dic_programme["sub_title"] = dic_programme["title"]
+                                #dic_programme["desc"] = dic_programme["title"]
                                 match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
                                 if match_rating:
                                     dic_programme["rating"] = match_rating.group(1)
