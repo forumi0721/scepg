@@ -111,10 +111,10 @@ def readConfig():
 
     printLog("==> Read config file")
 
-    if os.path.isfile("/etc/" + CONFIG_FILE):
-        configFilePath = "/etc/" + CONFIG_FILE
-    elif os.path.isfile(CONFIG_FILE):
+    if os.path.isfile(CONFIG_FILE):
         configFilePath = CONFIG_FILE
+    elif os.path.isfile("/etc/" + CONFIG_FILE):
+        configFilePath = "/etc/" + CONFIG_FILE
     elif os.path.isfile("/var/lib/scepg/" + CONFIG_FILE):
         configFilePath = "/var/lib/scepg/" + CONFIG_FILE
     else:
@@ -661,7 +661,7 @@ def generateXmlProgrammeEpg():
                     f = request.urlopen(url)
                     match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                     for preview in match_preview:
-                        match_program = re.match(r".*Preview\('[^']*','([^']*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
+                        match_program = re.match(r".*Preview\('[^']*','(.*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
                         if match_program:
                             programme_channel_list = [k for k, v in group_channel if k.split(",")[0] == match_program.group(2)]
                             for programme_channel in programme_channel_list:
@@ -671,10 +671,10 @@ def generateXmlProgrammeEpg():
                                 dic_programme["generate_source"] = generate_source
                                 match_episode_num = re.search("^(.*)[\(|\[|>| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", htmlparser.unescape(match_program.group(1)))
                                 if match_episode_num:
-                                    dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
+                                    dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip().replace("\\'", "'"), match_episode_num.group(2).strip())
                                     dic_programme["episode_num"] = match_episode_num.group(2).strip()
                                 else:
-                                    dic_programme["title"] = htmlparser.unescape(match_program.group(1))
+                                    dic_programme["title"] = htmlparser.unescape(match_program.group(1)).strip().replace("\\'", "'")
                                 #dic_programme["sub_title"] = dic_programme["title"]
                                 #dic_programme["desc"] = dic_programme["title"]
                                 match_rating = re.search(".*schedule_(\d+)\.gif.*", preview)
