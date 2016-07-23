@@ -419,7 +419,7 @@ fn_generate_xml_header() {
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE tv SYSTEM "xmltv.dtd">
 
-<tv source-info-name="forumi0721.ddns.net" generator-info-name="forumi0721" generator-info-url="mailto:forumi0721@gmail.com">
+<tv source-info-name="stonecold.kr" generator-info-name="forumi0721" generator-info-url="mailto:forumi0721@gmail.com">
 EOF
 	fn_file_write "${OUTPUT_FILE}" "${result}"
 
@@ -447,7 +447,7 @@ fn_generate_xml_channel() {
 
 		local result=
 		read -r -d "" result << EOF
-<channel id="I${channel_no}.forumi0721.ddns.net">
+<channel id="I${channel_no}.stonecold.kr">
 	<display-name>${channel_no} ${channel_name}</display-name>
 	<display-name>${channel_no}</display-name>
 	<display-name>${channel_name}</display-name>
@@ -591,7 +591,7 @@ fn_generate_xml_programme_uplus_thread() {
 
 			local result=
 			read -r -d "" result << EOF
-<programme start="${start} +0900" stop="${end} +0900" channel="I${ch}.forumi0721.ddns.net">
+<programme start="${start} +0900" stop="${end} +0900" channel="I${ch}.stonecold.kr">
 	<title lang="ko">${desc}</title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
@@ -747,7 +747,7 @@ fn_generate_xml_programme_naver_thread() {
 	
 		local result=
 		read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${channel}.forumi0721.ddns.net">
+<programme start="${start}" stop="${end}" channel="I${channel}.stonecold.kr">
 	<title lang="ko">${desc}</title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>
@@ -893,7 +893,7 @@ fn_generate_xml_programme_epg_thread() {
 
 	local result=
 	read -r -d "" result << EOF
-<programme start="${start}" stop="${end}" channel="I${channel_no}.forumi0721.ddns.net">
+<programme start="${start}" stop="${end}" channel="I${channel_no}.stonecold.kr">
 	<title lang="ko">${desc}</title>
 	<desc lang="ko">${desc}</desc>
 	<episode-num system="onscreen">${episode}</episode-num>

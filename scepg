@@ -288,11 +288,11 @@ def generateXmlRoot():
 
     if __USE_LXML:
         xml = lxml.builder.ElementMaker().tv()
-        xml.set("source-info-name", "forumi0721.ddns.net")
+        xml.set("source-info-name", "stonecold.kr")
         xml.set("generator-info-name", "forumi0721")
         xml.set("generator-info-url", "mailto:forumi0721@gmail.com")
     else:
-        xml = ET.Element("tv", {"source-info-name":"forumi0721.ddns.net", "generator-info-name":"forumi0721", "generator-info-url":"mailto:forumi0721@gmail.com"})
+        xml = ET.Element("tv", {"source-info-name":"stonecold.kr", "generator-info-name":"forumi0721", "generator-info-url":"mailto:forumi0721@gmail.com"})
 
     progressLog(1, 1)
 
@@ -311,7 +311,7 @@ def generateXmlChannel():
         channel_name = channel[1]
 
         if __USE_LXML:
-            xml_channel = etree.Element("channel", id = "I%s.forumi0721.ddns.net" % channel_id)
+            xml_channel = etree.Element("channel", id = "I%s.stonecold.kr" % channel_id)
             xml.append(xml_channel)
             
             xml_display_name1 = etree.Element("display-name")
@@ -327,7 +327,7 @@ def generateXmlChannel():
             xml_display_name2.text = channel_name
             xml_channel.append(xml_display_name2)
         else:
-            se_channel = ET.SubElement(xml, "channel", {"id":"I%s.forumi0721.ddns.net" % channel_id})
+            se_channel = ET.SubElement(xml, "channel", {"id":"I%s.stonecold.kr" % channel_id})
 
             se_channel_1 = ET.SubElement(se_channel, "display-name")
             se_channel_1.text = str("%s %s" % (channel_id, channel_name))
@@ -345,7 +345,7 @@ def generateXmlChannel():
 
 def generateXmlProgramme(dic_programme):
     if __USE_LXML:
-        xml_programme = etree.Element("programme", channel = "I%s.forumi0721.ddns.net" % dic_programme["channel_id"], channel_name = dic_programme["channel_name"], channel_no = dic_programme["channel_id"], start = "%s +0900" % dic_programme["programme_start"], stop = "%s +0900" % dic_programme["programme_stop"])
+        xml_programme = etree.Element("programme", channel = "I%s.stonecold.kr" % dic_programme["channel_id"], channel_name = dic_programme["channel_name"], channel_no = dic_programme["channel_id"], start = "%s +0900" % dic_programme["programme_start"], stop = "%s +0900" % dic_programme["programme_stop"])
         xml.append(xml_programme)
 
         xml_title = etree.Element("title", lang = "ko" )
@@ -397,7 +397,7 @@ def generateXmlProgramme(dic_programme):
         xml_generate_source = etree.Element("generate-source", name = dic_programme["generate_source"])
         xml_programme.append(xml_generate_source)
     else:
-        se_programme = ET.SubElement(xml, "programme", {"start":"%s +0900" % dic_programme["programme_start"], "stop":"%s +0900" % dic_programme["programme_stop"], "channel":"I%s.forumi0721.ddns.net" % dic_programme["channel_id"], "channel_no":str(dic_programme["channel_id"]), "channel_name":str(dic_programme["channel_name"])})
+        se_programme = ET.SubElement(xml, "programme", {"start":"%s +0900" % dic_programme["programme_start"], "stop":"%s +0900" % dic_programme["programme_stop"], "channel":"I%s.stonecold.kr" % dic_programme["channel_id"], "channel_no":str(dic_programme["channel_id"]), "channel_name":str(dic_programme["channel_name"])})
 
         se_title = ET.SubElement(se_programme, "title", {"lang":"ko"})
         se_title.text = dic_programme["title"]

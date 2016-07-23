@@ -8,7 +8,7 @@ output_xml=xmltv.xml
 output_xml_pretty_print=True
 #출력 소켓 경로를 지정 (구분자 : ' ', Unix-socket : 경로, tcp-socket : tcp:address:port)
 #socat을 이용한 relay : socat TCP-LISTEN:9983,reuseaddr,fork UNIX-CLIENT:/home/hts/.hts/tvheadend/epggrab/xmltv.sock
-output_socket=/home/hts/.hts/tvheadend/epggrab/xmltv.sock tcp:192.168.0.41:9983
+output_socket=/home/hts/.hts/tvheadend/epggrab/xmltv.sock tcp:192.168.0.31:9983
 #생성 후 실행할 스크립트를 지정
 post_proc=
 post_proc_args=
