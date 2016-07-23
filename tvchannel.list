@@ -330,6 +330,7 @@ N,캐치온플러스편성표,캐치온플러스
 #네이버 케이블 연예/오락
 N,CHW편성표,CH W
 N,cmc가족오락tv편성표,CMC 가족오락TV
+N,CTIME편성표,C TIME
 N,etn연예채널편성표,etn 연예채널
 N,e채널편성표,E채널
 N,fx편성표,FX
@@ -391,7 +392,6 @@ N,현대홈쇼핑편성표,현대홈쇼핑
 N,홈앤쇼핑 편성표,홈&쇼핑
 #네이버 케이블 뉴스/경제
 N,channelnewsasia편성표,Channel News Asia
-N,CTIME편성표,C TIME
 N,euronews편성표,Euronews
 N,mtn편성표,MTN
 N,rtn부동산tv편성표,RTN 부동산경제TV
@@ -1486,7 +1486,6 @@ E,4,180,55,OGN
 E,4,180,130,SBS MTV
 E,4,180,684,SBS funE
 E,4,180,899,Sky ENT
-E,4,180,142,Smile TV
 E,4,180,388,XTM
 E,4,180,647,high4K
 E,4,180,663,tag TV
