@@ -279,6 +279,52 @@ def writeXml():
 
     printLog("==> Done.", end = "\n\n")
 
+def writeSocket():
+    socket_list = output_socket.split(" ")
+    socket_list = [x for x in socket_list if x != '']
+    if not socket_list:
+        return
+
+    printLog("==> Write Socket")
+    progress = 0
+    progressLog(progress, len(socket_list))
+
+    f_xml = open("xmltv.xml", "r")
+
+    for socket_config in socket_list:
+        match_tcp = re.match("tcp:(.*):(.*)", socket_config)
+        xml_socket = None
+        connect = False
+        if match_tcp:
+            xml_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                xml_socket.connect((match_tcp.group(1), int(match_tcp.group(2))))
+            except Exception as e:
+                printLog(" -> Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
+            else:
+                connect = True
+        else:
+            xml_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                xml_socket.connect(socket_config)
+            except Exception as e:
+                printLog(" -> Unknown error : %s (%s)" % (socket_config, e.args[0]), error = True)
+            else:
+                connect = True
+
+        if connect:
+            xml_socket.send(str.encode(f_xml.read(), encoding="utf-8"))
+
+        if xml_socket is not None:
+            xml_socket.close()
+
+        progress += 1
+        progressLog(progress, len(socket_list))
+
+    f_xml.close()
+
+    printLog("==> Done.", end = "\n\n")
+
 def generateXmlRoot():
     global xml
 
@@ -1034,6 +1080,7 @@ if __name__ == '__main__':
     argumentParser.add_argument("-b", "--b", action="store_true", help="pretty_print")
     argumentParser.add_argument("-g", "--g", action="store_true", help="generate_list")
     argumentParser.add_argument("-c", "--c", action="store_true", help="check_channel")
+    argumentParser.add_argument("-s", "--s", action="store_true", help="socket_write")
     args = argumentParser.parse_args()
 
     if args.g:
@@ -1046,6 +1093,11 @@ if __name__ == '__main__':
         readConfig()
 
         checkChannelList()
+
+    elif args.s:
+        readConfig()
+
+        writeSocket()
 
     else:
         readConfig()
