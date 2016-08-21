@@ -71,6 +71,7 @@ U,667,SPOTV(Ch.56)
 U,638,SPOTV2(Ch.57)
 U,637,IB SPORTS(Ch.58)
 U,650,SPOTV Plus-Full HD(Ch.59)
+U,795,JTBC3 FOX(Ch.60)
 U,668,빌리어즈TV(Ch.62)
 U,665,FTV(Ch.63)
 U,625,FSTV(Ch.64)
@@ -143,7 +144,7 @@ U,770,쿠키건강TV(Ch.144)
 U,656,채널J(Ch.145)
 U,708,Classica(Ch.146)
 U,741,소비자TV(Ch.177)
-U,680,U+Choice(Ch.900)
+U,680,9 colors(Ch.178)
 #LG유플러스 여성/오락
 U,677,U+Today(Ch.1)
 U,619,KBS JOY(Ch.3)
@@ -180,6 +181,7 @@ U,662,K STAR(Ch.105)
 U,657,아이넷TV(Ch.106)
 U,663,K-바둑(Ch.107)
 U,661,i-Concerts(Ch.108)
+U,748,GTV(Ch.136)
 U,301,노래방(Ch.301)
 U,302,바둑(Ch.302)
 U,303,만화(Ch.303)
@@ -208,6 +210,7 @@ U,801,EBS English(Ch.162)
 U,714,EBS+ 1(Ch.163)
 U,715,EBS+ 2(Ch.164)
 U,810,스마트교육방송(Ch.165)
+U,757,부메랑(Ch.166)
 U,703,ANIMAX(Ch.167)
 U,607,EBS u(Ch.168)
 U,608,KBS kids(Ch.169)
@@ -321,6 +324,7 @@ N,cntv편성표,CNTV
 N,mplex편성표,Mplex
 N,ocn편성표,OCN
 N,superaction편성표,SUPER ACTION
+N,the movie 편성표,THE MOVIE
 N,스크린편성표,스크린
 N,씨네프편성표,씨네프
 N,인디필름편성표,인디필름
