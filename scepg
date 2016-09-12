@@ -113,10 +113,12 @@ def readConfig():
 
     if os.path.isfile(CONFIG_FILE):
         configFilePath = CONFIG_FILE
-    elif os.path.isfile("/etc/" + CONFIG_FILE):
-        configFilePath = "/etc/" + CONFIG_FILE
+    elif os.path.isfile("/usr/local/etc/" + CONFIG_FILE):
+        configFilePath = "/usr/local/etc/" + CONFIG_FILE
     elif os.path.isfile("/var/lib/scepg/" + CONFIG_FILE):
         configFilePath = "/var/lib/scepg/" + CONFIG_FILE
+    elif os.path.isfile("/etc/" + CONFIG_FILE):
+        configFilePath = "/etc/" + CONFIG_FILE
     else:
         printLog(" -> Cannot found config file")
         exit(1)
