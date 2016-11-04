@@ -111,7 +111,12 @@ def readConfig():
 
     printLog("==> Read config file")
 
-    if os.path.isfile(CONFIG_FILE):
+    if args.f:
+        if not os.path.isfile(args.f):
+            printLog(" -> Cannot found config file")
+            exit(1)
+        configFilePath = args.f
+    elif os.path.isfile(CONFIG_FILE):
         configFilePath = CONFIG_FILE
     elif os.path.isfile("/usr/local/etc/" + CONFIG_FILE):
         configFilePath = "/usr/local/etc/" + CONFIG_FILE
@@ -1083,6 +1088,7 @@ if __name__ == '__main__':
     argumentParser.add_argument("-g", "--g", action="store_true", help="generate_list")
     argumentParser.add_argument("-c", "--c", action="store_true", help="check_channel")
     argumentParser.add_argument("-s", "--s", action="store_true", help="socket_write")
+    argumentParser.add_argument("-f", "--f", help="config_file")
     args = argumentParser.parse_args()
 
     if args.g:
