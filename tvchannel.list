@@ -61,36 +61,37 @@ U,746,TV조선(Ch.19)
 U,596,OBS(Ch.26)
 U,506,EBS2-Full HD(Ch.95)
 #LG유플러스 스포츠/취미
-U,613,SBS ESPN(Ch.50)
-U,622,MBC스포츠플러스(Ch.51)
-U,618,KBSN SPORTS(Ch.52)
+U,795,JTBC3 FOX(Ch.50)
+U,795,JTBC3 FOX(Ch.50)
+U,650,SPOTV Plus-Full HD(Ch.51)
+U,638,SPOTV2(Ch.52)
 U,614,SBS GOLF(Ch.53)
 U,602,JTBC Golf(Ch.54)
 U,647,The Golf Ch(Ch.55)
 U,667,SPOTV(Ch.56)
-U,638,SPOTV2(Ch.57)
-U,637,IB SPORTS(Ch.58)
-U,650,SPOTV Plus-Full HD(Ch.59)
-U,795,JTBC3 FOX(Ch.60)
-U,692,스카이스포츠(Ch.61)
-U,668,빌리어즈TV(Ch.62)
-U,665,FTV(Ch.63)
-U,625,FSTV(Ch.64)
-U,670,스카이트래블(Ch.65)
-U,726,폴라리스TV(Ch.66)
-U,713,EDGE TV(Ch.67)
-U,710,아웃도어(Ch.68)
-U,623,MCS스포츠플러스2(Ch.77)
+U,692,스카이스포츠(Ch.57)
+U,613,SBS ESPN(Ch.58)
+U,618,KBSN SPORTS(Ch.59)
+U,622,MBC스포츠플러스(Ch.60)
+U,623,MCS스포츠플러스2(Ch.61)
+U,637,IB SPORTS(Ch.62)
+U,668,빌리어즈TV(Ch.63)
+U,665,FTV(Ch.64)
+U,625,FSTV(Ch.65)
+U,670,스카이트래블(Ch.66)
+U,726,폴라리스TV(Ch.67)
+U,713,EDGE TV(Ch.68)
+U,713,EDGE TV(Ch.68)
 U,681,온게임넷(Ch.96)
 U,683,바둑TV(Ch.97)
 U,707,브레인TV-Full HD(Ch.98)
 U,727,스포게임즈(Ch.109)
 U,802,SPOTV GAMES(Ch.109)
+U,710,아웃도어(Ch.135)
 #LG유플러스 영화
-U,679,U+Movie(Ch.36)
-U,684,OCN(Ch.37)
-U,686,CH CGV(Ch.38)
-U,690,OCN시리즈(Ch.39)
+U,679,U+Movie(Ch.37)
+U,684,OCN(Ch.38)
+U,686,CH CGV(Ch.39)
 U,685,Super Action(Ch.40)
 U,652,SCREEN(Ch.41)
 U,653,cineF(Ch.42)
@@ -103,20 +104,21 @@ U,605,캐치온(Ch.48)
 U,777,캐치온Plus-Full HD(Ch.49)
 U,694,스카이드라마(Ch.79)
 U,609,CNTV(Ch.85)
-U,658,AsiaN(Ch.86)
 U,725,중화TV(Ch.87)
-U,723,히어로액션-Full HD(Ch.88)
+U,658,AsiaN(Ch.88)
+U,690,DIA TV(Ch.93)
+U,723,히어로액션-Full HD(Ch.110)
 U,695,애니박스(Ch.148)
 U,699,애니플러스(Ch.149)
 #LG유플러스 뉴스/경제
 U,734,연합뉴스TV(Ch.23)
 U,698,YTN(Ch.24)
 U,616,SBS CNBC(Ch.27)
-U,775,C`TIME(Ch.110)
+U,775,C`TIME(Ch.86)
 U,771,토마토TV(Ch.111)
 U,627,매일경제TV(Ch.112)
-U,742,아시아경제(Ch.114)
-U,730,부동산TV(Ch.115)
+U,742,아시아경제(Ch.113)
+U,730,부동산TV(Ch.114)
 U,729,CNN(Ch.117)
 U,735,CNBC(Ch.118)
 U,764,CCTV4(Ch.120)
@@ -124,7 +126,7 @@ U,604,한국경제TV(Ch.121)
 U,630,MTN(Ch.122)
 U,631,이데일리TV(Ch.123)
 U,752,서울경제-Full HD(Ch.124)
-U,655,YTN웨더(Ch.125)
+U,655,YTN라이프(Ch.125)
 U,709,BBC World(Ch.126)
 U,722,tbs TV(Ch.176)
 #LG유플러스 교양/다큐
@@ -158,9 +160,10 @@ U,612,SBS 플러스(Ch.33)
 U,621,MBC드라마넷(Ch.35)
 U,597,U+투데이(Ch.70)
 U,689,O tvN(Ch.71)
-U,778,OnStyle(Ch.72)
+U,671,XTM(Ch.72)
+U,778,OnStyle(Ch.73)
 U,615,SBS funE(Ch.75)
-U,620,KBS W(Ch.78)
+U,620,KBS W(Ch.77)
 U,644,채널 차이나(Ch.80)
 U,700,텔레노벨라(Ch.81)
 U,696,O`live(Ch.82)
@@ -169,7 +172,6 @@ U,660,동아TV-Full HD(Ch.84)
 U,666,디원(Ch.90)
 U,701,하이라이트(Ch.91)
 U,767,NOLL TV-Full HD(Ch.92)
-U,671,XTM(Ch.93)
 U,606,QTV(Ch.94)
 U,624,MBC뮤직(Ch.99)
 U,634,SBS MTV-Full HD(Ch.100)
@@ -383,6 +385,7 @@ N,Nickelodeon 편성표,Nickelodeon
 N,대교어린이tv편성표,대교어린이TV
 N,디즈니 주니어 채널 편성표,디즈니주니어
 N,디즈니 채널 편성표,디즈니채널
+N,부메랑편성표,부메랑
 N,애니맥스편성표,애니맥스
 N,애니플러스편성표,애니플러스
 N,챔프편성표,챔프
@@ -515,7 +518,6 @@ N,tbs tv편성표,tbsTV
 N,마이펫TV 편성표,마이펫TV
 N,메디컬tv편성표,메디컬TV
 N,산업방송 채널i 편성표,산업방송 채널i
-N,생활건강tv편성표,생활건강TV
 N,실버아이편성표,실버아이
 N,예술tvarte편성표,예술TV Arte
 N,지방자치TV편성표,지방자치TV
@@ -538,8 +540,8 @@ N,스카이라이프채널a편성표,채널A
 N,스카이라이프asian편성표,Asia N
 N,스카이라이프 Asia UHD,Asia UHD
 N,스카이라이프bbcentertainment편성표,BBC entertainment
-N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
 N,hd텔레노벨라편성표,HD 텔레노벨라
+N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
 N,스카이라이프ocnseries편성표,OCN series
@@ -1484,6 +1486,7 @@ E,4,170,930,현대홈쇼핑+Shop
 E,4,170,567,홈&쇼핑
 #EPG IPTV 음악/오락
 E,4,180,680,(C)EXF
+E,4,180,983,(SKB)가상채널
 E,4,180,419,CMC 가족오락TV
 E,4,180,629,CMTV
 E,4,180,108,E채널

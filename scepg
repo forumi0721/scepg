@@ -735,11 +735,11 @@ def generateXmlProgrammeEpg():
                                     dic_programme["rating"] = match_rating.group(1)
                                 start_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(3)), "%Y %m/%d %p %I:%M")
                                 if download_date.month == 12 and start_date.month == 1:
-                                    start_date = start_date + datetime.timedelta(year = 1)
+                                    start_date = datetime.datetime.strptime("%d %s" % (download_date.year + 1, match_program.group(3)), "%Y %m/%d %p %I:%M")
                                 dic_programme["programme_start"] = start_date.strftime("%Y%m%d%H%M")
                                 end_date = datetime.datetime.strptime("%d %s" % (download_date.year, match_program.group(4)), "%Y %m/%d %p %I:%M")
                                 if download_date.month == 12 and end_date.month == 1:
-                                    end_date = end_date + datetime.timedelta(year = 1)
+                                    end_date = datetime.datetime.strptime("%d %s" % (download_date.year + 1, match_program.group(4)), "%Y %m/%d %p %I:%M")
                                 dic_programme["programme_stop"] = end_date.strftime("%Y%m%d%H%M")
                                 end = match_program.group(4)
                                 dic_programme["category"] = match_program.group(5).split("-")[0]
