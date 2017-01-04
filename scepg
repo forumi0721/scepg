@@ -59,6 +59,13 @@ if not __USE_LXML:
     import xml.etree.ElementTree as ET
     from xml.dom import minidom
 
+###SSL
+import ssl
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
 ###Global Constant
 CONFIG_FILE = "tvchannel.conf"
 LIST_FILE = "tvchannel.list"
@@ -515,7 +522,7 @@ def generateXmlProgrammeUplus():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             #with request.urlopen(url) as f:
-            f = request.urlopen(url)
+            f = request.urlopen(url, context=ctx)
             html = f.read().decode("cp949", "ignore")
             #UPLUS에서 제목을 제대로 안줌
             html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;")
@@ -605,7 +612,7 @@ def generateXmlProgrammeNaver():
 
         url = base_url.replace("{channelCode}", quote(channel_code))
 
-        f = request.urlopen(url)
+        f = request.urlopen(url, context=ctx)
         html = f.read().decode("utf-8")
 
         if not "var htInitDataForTvtimeSchedule = " in html:
@@ -711,7 +718,7 @@ def generateXmlProgrammeEpg():
                     url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
 
                     #with urllib.request.urlopen(url) as f:
-                    f = request.urlopen(url)
+                    f = request.urlopen(url, context=ctx)
                     match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                     for preview in match_preview:
                         match_program = re.match(r".*Preview\('[^']*','(.*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
@@ -857,7 +864,7 @@ def generateChannelListUplus(o):
     #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi") as f:
     f = None
     try:
-        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=10)
+        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=10, context=ctx)
     except socket.timeout as e:
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
@@ -878,7 +885,7 @@ def generateChannelListUplus(o):
             match = re.match(".*\('(.*)','(.*)','.*'\).*", a['onclick'])
             if match:
                 #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1))) as f2:
-                f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)))
+                f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)), context=ctx)
                 html2 = f2.read().decode("cp949", "ignore")
                 if __USE_LXML:
                     soup2 = BeautifulSoup(html2, "lxml")
@@ -909,7 +916,7 @@ def generateChannelListNaver(o):
     printLog("#https://search.naver.com/search.naver?query={channelCode}", file = o)
     printLog("#channelCode,channelName", file = o)
     #with urllib.request.urlopen("https://search.naver.com/search.naver?query=" + quote("편성표")) as f:
-    f = request.urlopen("https://search.naver.com/search.naver?query=" + quote("편성표"))
+    f = request.urlopen("https://search.naver.com/search.naver?query=" + quote("편성표"), context=ctx)
     html = f.read().decode("utf-8", "ignore")
 
     if __USE_LXML:
@@ -921,7 +928,7 @@ def generateChannelListNaver(o):
         if a.text != "케이블" and a.text != "스카이라이프":
             printLog("#네이버 %s" % (a.text), file = o)
 
-        f2 = request.urlopen("https://search.naver.com/search.naver?" + a['href'])
+        f2 = request.urlopen("https://search.naver.com/search.naver?" + a['href'], context=ctx)
         html2 = f2.read().decode("utf-8", "ignore")
 
         if __USE_LXML:
@@ -955,7 +962,7 @@ def generateChannelListEpg(o):
     printLog("#http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}", file = o)
     printLog("#top_channel_group,sub_channel_group,checkchannel,channel_name", file = o)
     #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php") as f:
-    f = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php")
+    f = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php", context=ctx)
     html = f.read().decode("cp949", "ignore")
     soup = BeautifulSoup(html, "lxml")
     for a in soup.select('select[name=search_top_channel_group] option'):
@@ -982,7 +989,7 @@ def generateChannelListEpg(o):
                     progressCount(total)
         else:
             #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
-            f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'])
+            f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'], context=ctx)
             html2 = f2.read().decode("cp949", "ignore")
             soup2 = BeautifulSoup(html2, "lxml")
             for b in soup2.select('select[name=search_sub_channel_group] option'):
@@ -1011,7 +1018,7 @@ def generateChannelListEpg(o):
                             progressCount(total)
                 else:
                     #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
-                    f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']))
+                    f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']), context=ctx)
                     html3 = f3.read().decode("cp949", "ignore")
                     soup3 = BeautifulSoup(html3, "lxml")
                     top_channel_group = a['value']
