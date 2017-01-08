@@ -382,6 +382,7 @@ N,jei재능tv편성표,JEI 재능TV
 N,kbskids편성표,KBS KIDS
 N,kids-tv편성표,KIDS-TV
 N,Nickelodeon 편성표,Nickelodeon
+N,대교 베이비TV편성표,대교 베이비TV
 N,대교어린이tv편성표,대교어린이TV
 N,디즈니 주니어 채널 편성표,디즈니주니어
 N,디즈니 채널 편성표,디즈니채널
@@ -826,7 +827,6 @@ E,2,110,767,HD SBS플러스
 E,2,110,915,Hero Action
 E,2,110,148,KBS 드라마
 E,2,110,253,MBC 드라마넷
-E,2,110,912,OCN series
 E,2,110,676,SBS Plus UHD
 E,2,110,54,SBS플러스
 E,2,110,783,Sky Drama
@@ -876,7 +876,6 @@ E,2,130,132,MTN
 E,2,130,704,R토마토
 E,2,130,622,SBS CNBC
 E,2,130,24,YTN
-E,2,130,502,YTN웨더&라이프
 E,2,130,594,매일경제TV
 E,2,130,125,부동산TV
 E,2,130,157,서울경제TV
@@ -940,6 +939,7 @@ E,2,160,416,SAFE TV
 E,2,160,568,Sky ICT
 E,2,160,94,Sky Travel
 E,2,160,514,SkyA&C
+E,2,160,502,YTN Life
 E,2,160,50,arirang
 E,2,160,290,channel J
 E,2,160,584,onbooktv
@@ -1005,6 +1005,7 @@ E,2,170,567,홈&쇼핑
 E,2,180,518,CH W
 E,2,180,419,CMC 가족오락TV
 E,2,180,629,CMTV
+E,2,180,912,DIA TV
 E,2,180,108,E채널
 E,2,180,818,FX
 E,2,180,43,GMTV
@@ -1038,9 +1039,9 @@ E,2,190,904,BBC Earth
 E,2,190,260,BBC World
 E,2,190,703,Bloomberg TV
 E,2,190,520,C music
-E,2,190,39,CCTV 9 documentary
-E,2,190,673,CCTV News
 E,2,190,159,CCTV4
+E,2,190,673,CGTN
+E,2,190,39,CGTN Documentary
 E,2,190,141,CNBC
 E,2,190,117,CNN Int’l
 E,2,190,463,Channel V
@@ -1094,7 +1095,6 @@ E,3,110,857,HD MBC 드라마
 E,3,110,767,HD SBS플러스
 E,3,110,61,HD 텔레노벨라
 E,3,110,915,Hero Action
-E,3,110,912,OCN series
 E,3,110,676,SBS Plus UHD
 E,3,110,783,Sky Drama
 E,3,110,285,드라맥스
@@ -1130,7 +1130,6 @@ E,3,130,566,HD 연합뉴스TV
 E,3,130,171,HD 한국경제TV
 E,3,130,132,MTN
 E,3,130,622,SBS CNBC
-E,3,130,502,YTN웨더&라이프
 E,3,130,594,매일경제TV
 E,3,130,125,부동산TV
 E,3,130,157,서울경제TV
@@ -1178,6 +1177,7 @@ E,3,160,507,RTV2
 E,3,160,40,Sky Healing
 E,3,160,568,Sky ICT
 E,3,160,514,SkyA&C
+E,3,160,502,YTN Life
 E,3,160,50,arirang
 E,3,160,500,skyUHD
 E,3,160,33,가톨릭 평화방송
@@ -1212,6 +1212,7 @@ E,3,170,632,아임쇼핑
 E,3,170,567,홈&쇼핑
 #EPG SkyLife 음악/오락
 E,3,180,518,CH W
+E,3,180,912,DIA TV
 E,3,180,108,E채널
 E,3,180,818,FX
 E,3,180,365,HD Classica
@@ -1233,8 +1234,8 @@ E,3,190,182,Animal Planet
 E,3,190,904,BBC Earth
 E,3,190,506,BBC World 2
 E,3,190,520,C music
-E,3,190,673,CCTV News
 E,3,190,159,CCTV4
+E,3,190,673,CGTN
 E,3,190,117,CNN Int’l
 E,3,190,578,EUROSPORT
 E,3,190,750,HD SundanceTV
@@ -1284,7 +1285,6 @@ E,4,110,706,FOX채널
 E,4,110,915,Hero Action
 E,4,110,148,KBS 드라마
 E,4,110,253,MBC 드라마넷
-E,4,110,912,OCN series
 E,4,110,54,SBS플러스
 E,4,110,783,Sky Drama
 E,4,110,285,드라맥스
@@ -1341,7 +1341,6 @@ E,4,130,132,MTN
 E,4,130,704,R토마토
 E,4,130,622,SBS CNBC
 E,4,130,24,YTN
-E,4,130,502,YTN웨더&라이프
 E,4,130,643,내외경제TV
 E,4,130,594,매일경제TV
 E,4,130,125,부동산TV
@@ -1411,6 +1410,7 @@ E,4,160,568,Sky ICT
 E,4,160,94,Sky Travel
 E,4,160,514,SkyA&C
 E,4,160,689,UHD Dream TV
+E,4,160,502,YTN Life
 E,4,160,50,arirang
 E,4,160,290,channel J
 E,4,160,584,onbooktv
@@ -1489,6 +1489,7 @@ E,4,180,680,(C)EXF
 E,4,180,983,(SKB)가상채널
 E,4,180,419,CMC 가족오락TV
 E,4,180,629,CMTV
+E,4,180,912,DIA TV
 E,4,180,108,E채널
 E,4,180,818,FX
 E,4,180,43,GMTV
@@ -1526,8 +1527,8 @@ E,4,190,260,BBC World
 E,4,190,386,BabyTV
 E,4,190,703,Bloomberg TV
 E,4,190,520,C music
-E,4,190,673,CCTV News
 E,4,190,159,CCTV4
+E,4,190,673,CGTN
 E,4,190,141,CNBC
 E,4,190,117,CNN Int’l
 E,4,190,463,Channel V
