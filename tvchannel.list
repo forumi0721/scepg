@@ -84,7 +84,7 @@ U,713,EDGE TV(Ch.68)
 U,713,EDGE TV(Ch.68)
 U,681,온게임넷(Ch.96)
 U,683,바둑TV(Ch.97)
-U,707,브레인TV-Full HD(Ch.98)
+U,707,브레인TV(Ch.98)
 U,727,스포게임즈(Ch.109)
 U,802,SPOTV GAMES(Ch.109)
 U,710,아웃도어(Ch.135)
@@ -110,6 +110,7 @@ U,690,DIA TV(Ch.93)
 U,723,히어로액션-Full HD(Ch.110)
 U,695,애니박스(Ch.148)
 U,699,애니플러스(Ch.149)
+U,818,UXN-UHD(Ch.201)
 #LG유플러스 뉴스/경제
 U,734,연합뉴스TV(Ch.23)
 U,698,YTN(Ch.24)
@@ -183,6 +184,8 @@ U,662,K STAR(Ch.105)
 U,657,아이넷TV(Ch.106)
 U,663,K-바둑(Ch.107)
 U,661,i-Concerts(Ch.108)
+U,784,채널A플러스(Ch.115)
+U,787,MBN플러스(Ch.116)
 U,748,GTV(Ch.136)
 U,301,노래방(Ch.301)
 U,302,바둑(Ch.302)
@@ -303,14 +306,14 @@ N,채널a편성표,채널A
 N,asian편성표,Asia N
 N,axn편성표,AXN
 N,ching편성표,CHING
+N,DIATV편성표,DIATV
 N,dramacube편성표,DRAMAcube
 N,DramaH편성표,DramaH
 N,foxlife편성표,FOXlife
 N,fox채널편성표,FOX채널
-N,herotv편성표,Hero Action
+N,Hero Action 편성표,Hero Action
 N,kbs드라마편성표,KBS 드라마
 N,mbc드라마넷편성표,MBC 드라마넷
-N,ocnseries편성표,OCN series
 N,sbs플러스편성표,SBS플러스
 N,sky drama 편성표,Sky Drama
 N,TVA편성표,TVA
@@ -331,7 +334,7 @@ N,씨네프편성표,씨네프
 N,인디필름편성표,인디필름
 N,채널cgv편성표,채널CGV
 N,캐치온편성표,캐치온
-N,캐치온플러스편성표,캐치온플러스
+N,캐치온2편성표,캐치온플러스
 #네이버 케이블 연예/오락
 N,CHW편성표,CH W
 N,cmc가족오락tv편성표,CMC 가족오락TV
@@ -373,6 +376,7 @@ N,sbs골프편성표,SBS골프
 N,SPOTV 편성표,SPOTV
 N,spotv+편성표,SPOTV+
 N,SPOTV2,SPOTV2
+N,헝그리앱TV편성표,헝그리앱TV
 #네이버 케이블 어린이
 N,anibox편성표,AniBox
 N,anione편성표,AniOne
@@ -406,9 +410,9 @@ N,euronews편성표,Euronews
 N,mtn편성표,MTN
 N,rtn부동산tv편성표,RTN 부동산경제TV
 N,sbscnbc편성표,SBS CNBC
-N,yestv편성표,yestv
 N,ytn편성표,YTN
 N,서울경제tv편성표,서울경제TV
+N,소상공인방송 편성표,소상공인방송
 N,아시아경제tv편성표,아시아경제TV
 N,연합뉴스tv편성표,연합뉴스TV
 N,이데일리tv편성표,이데일리TV
@@ -511,19 +515,17 @@ N,환경tv편성표,환경TV
 N,babytv편성표,BabyTV
 N,cbn편성표,CBN
 N,DOGTV 편성표,DOGTV
-N,k.net편성표,K.NET
+N,JJCTV편성표,JJCTV
 N,mbcnet편성표,MBCNET
 N,safetv편성표,SAFE TV
 N,Sky ICT 편성표,Sky ICT
 N,tbs tv편성표,tbsTV
 N,마이펫TV 편성표,마이펫TV
 N,메디컬tv편성표,메디컬TV
-N,산업방송 채널i 편성표,산업방송 채널i
 N,실버아이편성표,실버아이
 N,예술tvarte편성표,예술TV Arte
-N,지방자치TV편성표,지방자치TV
+N,채널i 편성표,채널i
 N,채널해피독편성표,채널 해피독
-N,한국여론방송 편성표,한국여론방송 HD
 N,헬스메디tv편성표,헬스메디tv
 #네이버 스카이라이프 지상파
 N,스카이라이프ebs1편성표,EBS1
@@ -539,13 +541,12 @@ N,스카이라이프tv조선편성표,TV조선
 N,스카이라이프채널a편성표,채널A
 #네이버 스카이라이프 드라마
 N,스카이라이프asian편성표,Asia N
-N,스카이라이프 Asia UHD,Asia UHD
-N,스카이라이프bbcentertainment편성표,BBC entertainment
-N,hd텔레노벨라편성표,HD 텔레노벨라
+N,스카이라이프 Asia UHD 편성표,Asia UHD
+N,스카이라이프DIATV편성표,DIATV
 N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
+N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
-N,스카이라이프ocnseries편성표,OCN series
 N,스카이라이프sbs플러스편성표,SBS플러스
 N,스카이라이프 sky drama 편성표,Sky Drama
 N,스카이라이프중화tv편성표,중화TV
@@ -570,7 +571,9 @@ N,스카이라이프mbcevery1편성표,MBC every1
 N,스카이라이프mbcmusic편성표,MBC Music
 N,스카이라이프mnet편성표,Mnet
 N,스카이라이프sbsfune편성표,SBS funE
+N,스카이라이프 SBS Plus UHD 편성표,SBS Plus UHD
 N,Sky ENT 편성표,Sky ENT
+N,스카이라이프 skyUHD 편성표,skyUHD
 N,스카이라이프tvn편성표,tvN
 N,스카이라이프xtm편성표,XTM
 N,스카이라이프코미디tv편성표,코미디TV
@@ -651,7 +654,6 @@ N,스카이라이프평화방송편성표,평화방송
 #네이버 스카이라이프 공공/정보
 N,스카이라이프arirang편성표,arirang
 N,스카이라이프hdobsw편성표,HD OBS W
-N,스카이라이프k.net편성표,K.NET
 N,스카이라이프kbsnlife편성표,KBS N Life
 N,스카이라이프ktv국민방송편성표,KTV 국민방송
 N,스카이라이프mbcnet편성표,MBCNET
@@ -929,6 +931,7 @@ E,2,160,293,GOODTV
 E,2,160,929,HD Discovery
 E,2,160,423,HD Nat Geo People
 E,2,160,928,HD 예술TV Arte
+E,2,160,49,JJC TV
 E,2,160,89,K.NET
 E,2,160,168,KBS N Life
 E,2,160,559,KBS WORLD
@@ -939,7 +942,7 @@ E,2,160,416,SAFE TV
 E,2,160,568,Sky ICT
 E,2,160,94,Sky Travel
 E,2,160,514,SkyA&C
-E,2,160,502,YTN Life
+E,2,160,502,YTN life
 E,2,160,50,arirang
 E,2,160,290,channel J
 E,2,160,584,onbooktv
@@ -964,7 +967,6 @@ E,2,160,736,실버TV
 E,2,160,378,실버아이TV
 E,2,160,644,원음방송
 E,2,160,539,정보채널
-E,2,160,49,지방자치TV
 E,2,160,918,채널 뷰
 E,2,160,136,채널 해피독
 E,2,160,313,채널i
@@ -1017,6 +1019,7 @@ E,2,180,754,KBS Joy
 E,2,180,126,MBC Music
 E,2,180,335,MBC every1
 E,2,180,658,MBN Plus
+E,2,180,984,Mezzo live
 E,2,180,27,Mnet
 E,2,180,55,OGN
 E,2,180,130,SBS MTV
@@ -1177,7 +1180,7 @@ E,3,160,507,RTV2
 E,3,160,40,Sky Healing
 E,3,160,568,Sky ICT
 E,3,160,514,SkyA&C
-E,3,160,502,YTN Life
+E,3,160,502,YTN life
 E,3,160,50,arirang
 E,3,160,500,skyUHD
 E,3,160,33,가톨릭 평화방송
@@ -1399,6 +1402,7 @@ E,4,160,933,FTN
 E,4,160,36,FUNTV
 E,4,160,652,GCN
 E,4,160,293,GOODTV
+E,4,160,49,JJC TV
 E,4,160,89,K.NET
 E,4,160,168,KBS N Life
 E,4,160,184,KTV 국민방송
@@ -1410,7 +1414,7 @@ E,4,160,568,Sky ICT
 E,4,160,94,Sky Travel
 E,4,160,514,SkyA&C
 E,4,160,689,UHD Dream TV
-E,4,160,502,YTN Life
+E,4,160,502,YTN life
 E,4,160,50,arirang
 E,4,160,290,channel J
 E,4,160,584,onbooktv
@@ -1428,6 +1432,7 @@ E,4,160,845,라이프TV
 E,4,160,28,리빙TV
 E,4,160,669,리얼TV
 E,4,160,639,마이펫TV
+E,4,160,185,메디컬TV
 E,4,160,812,법률방송
 E,4,160,707,복지TV
 E,4,160,616,비타민TV
@@ -1438,14 +1443,12 @@ E,4,160,378,실버아이TV
 E,4,160,846,온토마토
 E,4,160,644,원음방송
 E,4,160,48,유교방송
-E,4,160,49,지방자치TV
 E,4,160,918,채널 뷰
 E,4,160,136,채널 해피독
 E,4,160,313,채널i
 E,4,160,645,캠퍼스TV
 E,4,160,575,티비즈
 E,4,160,180,한국소비자TV
-E,4,160,134,한국여론방송 HD
 E,4,160,697,한방건강TV
 E,4,160,415,헬스메디tv
 E,4,160,29,환경TV
