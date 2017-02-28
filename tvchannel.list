@@ -461,7 +461,6 @@ N,케이블CNNUSHD편성표,CNN US HD
 N,케이블dwtv편성표,DWTV
 N,케이블eurosportsnews편성표,Euro Sports News
 N,케이블foxnews편성표,Fox News
-N,케이블france24편성표,France 24
 N,케이블historychannelhd편성표,History channel HD
 N,케이블lac편성표,LAC
 N,케이블natgeowild편성표,Nat Geo Wild
@@ -694,7 +693,7 @@ N,CNNUSHD편성표,CNN US HD
 N,dwtv편성표,DWTV
 N,eurosportsnews편성표,Euro Sports News
 N,foxnews편성표,Fox News
-N,france24편성표,France 24
+N,해외위성 France 24 편성표,France 24
 N,HD Classica 편성표,HD Classica
 N,hdsundancetv편성표,HD SundanceTV
 N,historychannelhd편성표,History channel HD
@@ -857,6 +856,8 @@ E,2,120,44,SBS골프
 E,2,120,30,SBS스포츠
 E,2,120,109,SPOTV
 E,2,120,80,SPOTV GAMES
+E,2,120,985,SPOTV ON
+E,2,120,986,SPOTV ON2
 E,2,120,713,SPOTV+
 E,2,120,922,SPOTV2
 E,2,120,628,STN
@@ -994,7 +995,7 @@ E,2,170,813,TRENDY
 E,2,170,640,W쇼핑1
 E,2,170,247,동아TV
 E,2,170,138,롯데홈쇼핑
-E,2,170,41,쇼핑엔T
+E,2,170,41,쇼핑엔티
 E,2,170,521,신세계 쇼핑
 E,2,170,632,아임쇼핑
 E,2,170,333,예술TV Arte
@@ -1209,7 +1210,7 @@ E,3,170,708,K쇼핑
 E,3,170,646,NS Shop+
 E,3,170,640,W쇼핑1
 E,3,170,247,동아TV
-E,3,170,41,쇼핑엔T
+E,3,170,41,쇼핑엔티
 E,3,170,521,신세계 쇼핑
 E,3,170,632,아임쇼핑
 E,3,170,567,홈&쇼핑
@@ -1319,6 +1320,8 @@ E,4,120,30,SBS스포츠
 E,4,120,109,SPOTV
 E,4,120,617,SPOTV 6
 E,4,120,80,SPOTV GAMES
+E,4,120,985,SPOTV ON
+E,4,120,986,SPOTV ON2
 E,4,120,713,SPOTV+
 E,4,120,922,SPOTV2
 E,4,120,760,SPOTV3(SKB)
@@ -1479,7 +1482,7 @@ E,4,170,640,W쇼핑1
 E,4,170,667,W쇼핑2
 E,4,170,247,동아TV
 E,4,170,138,롯데홈쇼핑
-E,4,170,41,쇼핑엔T
+E,4,170,41,쇼핑엔티
 E,4,170,521,신세계 쇼핑
 E,4,170,632,아임쇼핑
 E,4,170,15,올
