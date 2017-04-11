@@ -525,7 +525,7 @@ def generateXmlProgrammeUplus():
             f = request.urlopen(url, context=ctx)
             html = f.read().decode("cp949", "ignore")
             #UPLUS에서 제목을 제대로 안줌
-            html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;")
+            html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;").replace("<td class=\"txtL\"><", "<td class=\"txtL\">&lt;")
             if __USE_BS:
                 if __USE_LXML:
                     soup = BeautifulSoup(html, "lxml")
@@ -882,7 +882,7 @@ def generateChannelListUplus(o):
     for a in soup.select('a[href]'):
         if a['href'] == '#CHANNEL':
             printLog("#LG유플러스 %s" % a.text, file = o)
-            match = re.match(".*\('(.*)','(.*)','.*'\).*", a['onclick'])
+            match = re.match(".*\('(.*)','(.*)','.*','.*'\).*", a['onclick'])
             if match:
                 #with urllib.request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1))) as f2:
                 f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)), context=ctx)
