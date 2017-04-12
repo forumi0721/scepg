@@ -380,16 +380,15 @@ def generateXmlChannel():
             
             xml_display_name1 = etree.Element("display-name")
             xml_display_name1.text = "%s %s" % (channel_id, channel_name)
-
             xml_channel.append(xml_display_name1)
             
-            xml_display_name2 = etree.Element("display-name")
-            xml_display_name2.text = channel_id 
-            xml_channel.append(xml_display_name2)
-            
-            xml_display_name2 = etree.Element("display-name")
-            xml_display_name2.text = channel_name
-            xml_channel.append(xml_display_name2)
+            #xml_display_name2 = etree.Element("display-name")
+            #xml_display_name2.text = channel_id 
+            #xml_channel.append(xml_display_name2)
+            #
+            #xml_display_name2 = etree.Element("display-name")
+            #xml_display_name2.text = channel_name
+            #xml_channel.append(xml_display_name2)
 
             if channel_icon:
                 xml_icon = etree.Element("icon", src = channel_icon )
@@ -400,11 +399,11 @@ def generateXmlChannel():
             se_channel_1 = ET.SubElement(se_channel, "display-name")
             se_channel_1.text = str("%s %s" % (channel_id, channel_name))
 
-            se_channel_2 = ET.SubElement(se_channel, "display-name")
-            se_channel_2.text = str(channel_id)
+            #se_channel_2 = ET.SubElement(se_channel, "display-name")
+            #se_channel_2.text = str(channel_id)
 
-            se_channel_3 = ET.SubElement(se_channel, "display-name")
-            se_channel_3.text = str(channel_name)
+            #se_channel_3 = ET.SubElement(se_channel, "display-name")
+            #se_channel_3.text = str(channel_name)
 
             if channel_icon:
                 se_channel_icon = ET.SubElement(se_channel, "icon", {"src":channel_icon})
