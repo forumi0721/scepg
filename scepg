@@ -772,6 +772,94 @@ def generateXmlProgrammeEpg():
                 checkchannel_count = 0
     printLog("==> Done.", end = "\n\n")
 
+def generateXmlProgrammeEveryOnTV():
+    channel_config = [[k, v] for k, v in channel_list if v[0] == "O"]
+    if len(channel_config) <= 0:
+        return
+
+    generate_source = "http://www.everyon.tv/"
+    base_url = "http://www.everyon.tv/main/schedule.etv?chNum={channel_code}&schDt={date_ymd}"
+
+    printLog("==> Generate Programmes (EvenryOnTV)")
+    progress = 0
+    progressLog(0, len(channel_config) * retrieve_days)
+
+    for channel in channel_config:
+        channel_id = channel[0].split(",")[0]
+        channel_name = channel[0].split(",")[1]
+        channel_code = channel[1].split(",")[2]
+
+        dic_programme = {}
+
+        for day in range(retrieve_days):
+            download_date = (datetime.date.today() + datetime.timedelta(days = day))
+            url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
+
+            #with request.urlopen(url) as f:
+            f = request.urlopen(url)
+            html = f.read().decode("utf8", "ignore")
+            if __USE_BS:
+                if __USE_LXML:
+                    soup = BeautifulSoup(html, "lxml")
+                else:
+                    soup = BeautifulSoup(html, "html.parser")
+                for tr in soup.select("tbody tr"):
+                    row = 0
+                    for td in tr.find_all("td"):
+                        if row == 0:
+                            if dic_programme:
+                                generateXmlProgramme(dic_programme)
+
+                            dic_programme.clear()
+                            dic_programme["channel_id"] = channel_id
+                            dic_programme["channel_name"] = channel_name
+                            dic_programme["generate_source"] = generate_source
+                            match_time = re.search("^(.*):(.*)~(.*):(.*)$", td.next_element.strip())
+                            if match_time:
+                                dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match_time.group(1), match_time.group(2))
+                                dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match_time.group(3), match_time.group(4))
+                        elif row == 1:
+                            match_episode_num = re.search("^(.*)[\(|\[|<| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", td.next_element.strip())
+                            if match_episode_num:
+                                dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
+                                dic_programme["episode_num"] = match_episode_num.group(2).strip()
+                            else:
+                                dic_programme["title"] = td.next_element.strip()
+                            #dic_programme["sub_title"] = dic_programme["title"]
+                            #dic_programme["desc"] = dic_programme["title"]
+                        elif row == 2:
+                            dic_programme["rating"] = td.next_element.strip()
+                        row += 1
+            else:
+                body = html.partition("<tbody>")[2].rpartition("</tbody>")[0]
+                for programme in body.split("<tr>"):
+                    match = re.search(".*<td>(\d+):(\d+)~(\d+):(\d+)<\/td>.*<td>(.*)<\/td>.*<td>(.*)<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
+                    if match:
+                        if dic_programme:
+                            generateXmlProgramme(dic_programme)
+
+                        dic_programme.clear()
+                        dic_programme["channel_id"] = channel_id
+                        dic_programme["channel_name"] = channel_name
+                        dic_programme["generate_source"] = generate_source
+                        dic_programme["programme_start"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
+                        dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(3), match.group(4))
+                        match_episode_num = re.search("^(.*)[\(|\[|<| ]([\d|,]+[회|강|부])[\)|\]|>| ]?$", match.group(5).strip())
+                        if match_episode_num:
+                            dic_programme["title"] = "%s (%s)" % (match_episode_num.group(1).strip(), match_episode_num.group(2).strip())
+                            dic_programme["episode_num"] = match_episode_num.group(2).strip()
+                        else:
+                            dic_programme["title"] = match.group(5).strip()
+                        #dic_programme["sub_title"] = dic_programme["title"]
+                        #dic_programme["desc"] = dic_programme["title"]
+                        dic_programme["rating"] = match.group(6)
+
+            f.close()
+            progress += 1
+            progressLog(progress, len(channel_config) * retrieve_days)
+
+    printLog("==> Done.", end = "\n\n")
+
 def getCategory(category):
     if category == "드라마":
         category_ko = category
@@ -1136,6 +1224,8 @@ if __name__ == '__main__':
         generateXmlProgrammeNaver()
 
         generateXmlProgrammeEpg()
+
+        generateXmlProgrammeEveryOnTV()
 
         writeXml()
         postProc()

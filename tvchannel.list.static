@@ -1,0 +1,23 @@
+##에브리온TV
+#http://www.everyon.tv/main/schedule.etv?chNum={channelId}&chNm={channelName}&schDt=YYYYMMDD
+#channelId,channelName
+#실시간TV(유료)
+O,비키TV,765
+O,플레이보이 TV,497
+O,미드나잇,766
+O,The 야(夜)함(㮭),771
+O,But Go!,772
+O,펜트하우스TV,927
+O,허니TV,928
+O,스파이스TV,499
+O,걸스 TV,501
+
+#CH.901 비키TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/765.jpg
+#CH.902 플레이보이 TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/497.jpg
+#CH.903 미드나잇	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/766.jpg
+#CH.905 The 야(夜)함(㮭)	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/771.jpg
+#CH.907 But Go!	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/772.jpg
+#CH.909 펜트하우스TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/927.jpg
+#CH.911 허니TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/928.jpg
+#CH.913 스파이스TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/499.jpg
+#CH.915 걸스 TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/501.jpg
