@@ -52,7 +52,7 @@ if __USE_BS:
 if __USE_LXML:
     try:
         from lxml import etree
-        import lxml.builder    
+        import lxml.builder
     except ImportError:
         __USE_LXML = False
 if not __USE_LXML:
@@ -139,7 +139,7 @@ def readConfig():
     config = configparser.RawConfigParser()
     config.optionxform = str
     config.read(configFilePath)
-        
+
     printLog(" -> Config file : " + configFilePath)
     printLog(" -> python major version : " + str(sys.version_info[0]))
     if __USE_BS:
@@ -377,33 +377,33 @@ def generateXmlChannel():
         if __USE_LXML:
             xml_channel = etree.Element("channel", id = "I%s.stonecold.kr" % channel_id)
             xml.append(xml_channel)
-            
+
             xml_display_name1 = etree.Element("display-name")
-            xml_display_name1.text = "%s %s" % (channel_id, channel_name)
+            xml_display_name1.text = channel_name
             xml_channel.append(xml_display_name1)
-            
-            #xml_display_name2 = etree.Element("display-name")
-            #xml_display_name2.text = channel_id 
-            #xml_channel.append(xml_display_name2)
-            #
-            #xml_display_name2 = etree.Element("display-name")
-            #xml_display_name2.text = channel_name
-            #xml_channel.append(xml_display_name2)
+
+            xml_display_name2 = etree.Element("display-name")
+            xml_display_name2.text = "%s %s" % (channel_id, channel_name)
+            xml_channel.append(xml_display_name2)
+
+            xml_display_name3 = etree.Element("display-name")
+            xml_display_name3.text = channel_id
+            xml_channel.append(xml_display_name3)
 
             if channel_icon:
-                xml_icon = etree.Element("icon", src = channel_icon )
+                xml_icon = etree.Element("icon", src = channel_icon)
                 xml_channel.append(xml_icon)
         else:
             se_channel = ET.SubElement(xml, "channel", {"id":"I%s.stonecold.kr" % channel_id})
 
             se_channel_1 = ET.SubElement(se_channel, "display-name")
-            se_channel_1.text = str("%s %s" % (channel_id, channel_name))
+            se_channel_1.text = str(channel_name)
 
-            #se_channel_2 = ET.SubElement(se_channel, "display-name")
-            #se_channel_2.text = str(channel_id)
+            se_channel_2 = ET.SubElement(se_channel, "display-name")
+            se_channel_2.text = str("%s %s" % (channel_id, channel_name))
 
-            #se_channel_3 = ET.SubElement(se_channel, "display-name")
-            #se_channel_3.text = str(channel_name)
+            se_channel_3 = ET.SubElement(se_channel, "display-name")
+            se_channel_3.text = str(channel_id)
 
             if channel_icon:
                 se_channel_icon = ET.SubElement(se_channel, "icon", {"src":channel_icon})
@@ -657,7 +657,7 @@ def generateXmlProgrammeNaver():
                         dic_programme["channel_name"] = channel_name
                         dic_programme["generate_source"] = generate_source
                         dic_programme["programme_start"] = seq_list[seq - 1] + js_schedule["startTime"].replace(":", "")
-                        #dic_programme["programme_stop"] = 
+                        #dic_programme["programme_stop"] =
                         if js_schedule["episode"] != "":
                             dic_programme["title"] = "%s (%s)" % (js_schedule["title"], js_schedule["episode"])
                             dic_programme["episode_num"] = js_schedule["episode"]
@@ -670,7 +670,7 @@ def generateXmlProgrammeNaver():
                                 dic_programme["title"] = js_schedule["title"]
                         #dic_programme["sub_title"] = dic_programme["title"]
                         #dic_programme["desc"] = dic_programme["title"]
-                        #dic_programme["category"] = 
+                        #dic_programme["category"] =
                         if js_schedule["grade"] != 0:
                             dic_programme["rating"] = str(js_schedule["grade"])
 
@@ -967,7 +967,7 @@ def generateChannelListUplus(o):
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
         printLog(" -> URLerror : %s" % e.args[0], error = True)
-        
+
     if f is None:
         printLog("")
         return
@@ -1006,7 +1006,7 @@ def generateChannelListUplus(o):
     printLog("", file = o)
     printLog("")
     printLog("==> Done.", end = "\n\n")
-                                    
+
 def generateChannelListNaver(o):
     printLog("==> Generate Channel List (Naver)")
     total = 0
