@@ -798,9 +798,6 @@ def generateXmlProgrammeEveryOnTV():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             #with request.urlopen(url) as f:
-            printLog(url)
-            printLog(url)
-            printLog(url)
             f = request.urlopen(url)
             html = f.read().decode("utf8", "ignore")
             if __USE_BS:
