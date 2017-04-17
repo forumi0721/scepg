@@ -546,8 +546,9 @@ def generateXmlProgrammeUplus():
                     for td in tr.find_all("td"):
                         if row == 0:
                             if dic_programme:
-                                dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
-                                generateXmlProgramme(dic_programme)
+                                if "programme_start" in dic_programme:
+                                    dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
+                                    generateXmlProgramme(dic_programme)
 
                             dic_programme.clear()
                             dic_programme["channel_id"] = channel_id
@@ -575,8 +576,9 @@ def generateXmlProgrammeUplus():
                     match = re.search(".*<td>(\d+):(\d+)<\/td>.*<td class=\"title\">([^\n]*).*<\/td>(.*)<td>\W*(\w*)\W*<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
                     if match:
                         if dic_programme:
-                            dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
-                            generateXmlProgramme(dic_programme)
+                            if "programme_start" in dic_programme:
+                                dic_programme["programme_stop"] = "%s%s%s" % (download_date.strftime("%Y%m%d"), match.group(1), match.group(2))
+                                generateXmlProgramme(dic_programme)
 
                         dic_programme.clear()
                         dic_programme["channel_id"] = channel_id
@@ -796,6 +798,9 @@ def generateXmlProgrammeEveryOnTV():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             #with request.urlopen(url) as f:
+            printLog(url)
+            printLog(url)
+            printLog(url)
             f = request.urlopen(url)
             html = f.read().decode("utf8", "ignore")
             if __USE_BS:
@@ -808,7 +813,8 @@ def generateXmlProgrammeEveryOnTV():
                     for td in tr.find_all("td"):
                         if row == 0:
                             if dic_programme:
-                                generateXmlProgramme(dic_programme)
+                                if "programme_start" in dic_programme and "programme_stop" in dic_programme:
+                                    generateXmlProgramme(dic_programme)
 
                             dic_programme.clear()
                             dic_programme["channel_id"] = channel_id
@@ -836,7 +842,8 @@ def generateXmlProgrammeEveryOnTV():
                     match = re.search(".*<td>(\d+):(\d+)~(\d+):(\d+)<\/td>.*<td>(.*)<\/td>.*<td>(.*)<\/td>.*<\/tr>", programme, re.MULTILINE | re.DOTALL)
                     if match:
                         if dic_programme:
-                            generateXmlProgramme(dic_programme)
+                            if "programme_start" in dic_programme and "programme_stop" in dic_programme:
+                                generateXmlProgramme(dic_programme)
 
                         dic_programme.clear()
                         dic_programme["channel_id"] = channel_id
