@@ -70,6 +70,7 @@ if not __USE_LXML:
 ###Global Constant
 CONFIG_FILE = "tvchannel.conf"
 LIST_FILE = "tvchannel.list"
+LIST_FILE_STATIC = "tvchannel.list.static"
 
 ___START_TIME = time.time()
 
@@ -1155,38 +1156,48 @@ def generateChannelList():
         generateChannelListEpg(o)
 
 def checkChannelList():
-    printLog("==> Generate XML Channels")
+    printLog("==> Check Channels")
 
     progress = 0;
     progressLog(0, len(channel_list))
 
     list_file = []
-    with open(LIST_FILE, "r") as f:
-        line = f.readline()
-        while line:
-            if not line == "" and not line == "\n" and not line.startswith("#"):
-                list_file.append(line.rstrip())
-            line = f.readline()
 
-        for channel_config in channel_list:
-            if not channel_config[1] in list_file:
-                match = re.match("(.*),[^,]*", channel_config[1])
-                if match:
-                    conf = match.group(1)
-                    print(conf)
-                    conf_match = [k for k in list_file if k.startswith(conf)]
-                    if conf_match:
-                        printLog("")
-                        printLog(" -> Changed : [%s] to [%s]" % (channel_config[1], conf_match[0]))
-                    else:
-                        printLog("")
-                        printLog(" -> Unknown source : [%s]" % channel_config[1])
+    if os.path.isfile(LIST_FILE):
+        with open(LIST_FILE, "r") as f:
+            line = f.readline()
+            while line:
+                if not line == "" and not line == "\n" and not line.startswith("#"):
+                    list_file.append(line.rstrip())
+                line = f.readline()
+
+    if os.path.isfile(LIST_FILE_STATIC):
+        with open(LIST_FILE_STATIC, "r") as f_static:
+            line_static = f_static.readline()
+            while line_static:
+                if not line_static == "" and not line_static == "\n" and not line_static.startswith("#"):
+                    list_file.append(line_static.rstrip())
+                line_static = f_static.readline()
+
+    for channel_config in channel_list:
+        if not channel_config[1] in list_file:
+            match = re.match("(.*),[^,]*", channel_config[1])
+            if match:
+                conf = match.group(1)
+                print(conf)
+                conf_match = [k for k in list_file if k.startswith(conf)]
+                if conf_match:
+                    printLog("")
+                    printLog(" -> Changed : [%s] to [%s]" % (channel_config[1], conf_match[0]))
                 else:
                     printLog("")
-                    printLog(" -> Invalid : [%s]" % channel_config[1])
+                    printLog(" -> Unknown source : [%s]" % channel_config[1])
+            else:
+                printLog("")
+                printLog(" -> Invalid : [%s]" % channel_config[1])
 
-            progress += 1
-            progressLog(progress, len(channel_list))
+        progress += 1
+        progressLog(progress, len(channel_list))
 
     printLog("==> Done.", end = "\n\n")
 

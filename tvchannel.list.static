@@ -1,23 +1,200 @@
 ##에브리온TV
 #http://www.everyon.tv/main/schedule.etv?chNum={channelId}&chNm={channelName}&schDt=YYYYMMDD
 #channelId,channelName
-#실시간TV(유료)
+O,채널A,251
+O,현대 홈쇼핑,75
+O,MBN,17
+O,롯데홈쇼핑,707
+O,JTBC,343
+O,NS 홈쇼핑,905
+O,K쇼핑,880
+O,OBS,1042
+O,QBS,957
+O,TV조선,341
+O,GS Shop,883
+O,연합뉴스TV,133
+O,YTN,20
+O,쇼핑엔티,1296
+O,홈앤쇼핑,901
+O,CJ오쇼핑,1057
+O,CCTV-4,1212
+O,신세계쇼핑,1067
+O,GS MY SHOP,1275
+O,내외경제TV,639
+O,iGMB,481
+O,현대홈쇼핑+Shop,1215
+O,KBSN PLUS,1327
+O,SC증권경제TV,1293
+O,815증권경제TV,1174
+O,런웨이TV,753
+O,한국경제TV,26
+O,서울경제TV SEN,22
+O,rbs농어촌방송,1053
+O,이토마토TV,25
+O,매일경제TV,563
+O,서울경제TV SEN PLUS,1268
+O,아시아경제TV,385
+O,매일경제TV 스페셜,725
+O,이데일리TV,23
+O,MTN,18
+O,방송대학TV,1216
+O,euronews,1104
+O,문화유산채널,1297
+O,올댓홈쇼핑,1302
+O,TBS TV,40
+O,NTD AP,926
+O,NTDTV,1058
+O,헝그리앱TV,1204
+O,FTV,12
+O,FishingTV,269
+O,Billiards TV,191
+O,한국당구방송(KBNTV),387
+O,인도어 스포츠 채널,1197
+O,K-바둑,207
+O,브레인TV,381
+O,JTBC GOLF,58
+O,STN,852
+O,원음방송,1173
+O,엣지TV,849
+O,마운틴TV,337
+O,SHOW TV,1325
+O,ONT,30
+O,ONT M,884
+O,우먼스톡,1187
+O,가락 TV,1331
+O,Boom TV,1066
+O,폴라리스TV,14
+O,TVis,551
+O,리빙TV,13
+O,M1글로벌TV,1020
+O,양파TV,1200
+O,블랙박스TV,1278
+O,쉴라의 영어 TV,986
+O,쉴라의 원데이렉쳐,1021
+O,더 무비,8
+O,CHING,7
+O,CH W,6
+O,CHING M,783
+O,야근왕 김보통,1290
+O,Everything TV,129
+O,텔레노벨라,319
+O,개들끼리,1193
+O,마이펫TV,1289
+O,서울대학교 학생방송국 SUB,1075
+O,GMB TV,275
+O,Son TV,1214
+O,더메디치,1273
+O,NETVIET,1222
+O,채널A 플러스,1076
+O,CMC가족오락,1
+O,OBS W,3
+O,C'TIME,21
+O,ETN연예,2
+O,Party's,1314
+O,Lollipop,1315
+O,WOW,1316
+O,이제 만나러 갑니다(채널A스페셜),547
+O,먹거리X파일(채널A스페셜),435
+O,개밥주는남자(채널A스페셜),409
+O,실버넷TV,1181
+O,YTN사이언스,863
+O,리얼TV,1065
+O,YTN라이프,193
+O,푸드TV,1015
+O,채널차이나,1016
+O,아르떼TV,35
+O,헬스메디TV,1094
+O,케이웨더,581
+O,법률방송,33
+O,SilveriTV,1186
+O,GTV,44
+O,동아TV,43
+O,트렌디,4
+O,트렌디 M,784
+O,베이비TV,1298
+O,어린이TV,5
+O,Jei English,15
+O,애니프렌즈,933
+O,정철영어TV,169
+O,육아방송,42
+O,KIDS-TV,1043
+O,eduTV,1301
+O,Church TV,1326
+O,CBS,27
+O,CTS,28
+O,BTN불교TV,34
+O,참불교방송,1317
+O,CGN TV,235
+O,한문화 중심채널 STB상생방송,38
+O,Good TV,29
+O,C채널,335
+O,BBS불교방송,553
+O,아리랑TV,36
+O,국방TV,31
+O,국회방송,401
+O,한국정책방송 KTV,393
+O,소비자 TV,77
+O,현대HCN TV,407
+O,현대HCN 서초방송,745
+O,현대HCN 충북방송,853
+O,현대HCN 새로넷방송,779
+O,HCN 경북방송,778
+O,HCN 금호방송,782
+O,HCN 부산방송,951
+O,애터미TV,967
+O,한우리 교회,897
+O,GCN TV,327
+O,씨네허브 단편영화 상영관,899
+O,아이넷TV,263
+O,Event TV,389
+O,가요 TV,273
+O,에이풀,1195
+O,펀TV,71
+O,최신인기가요(오디오채널),293
+O,엠넷인기차트(오디오채널),357
+O,추억의 명곡(오디오채널),299
+O,러브 발라드(오디오채널),295
+O,오디션스타(오디오채널),297
+O,김기덕의 골든팝(오디오채널),673
+O,트로트가요무대(오디오채널),665
+O,홈 클래식(오디오채널),361
+O,골든팝스다이얼(오디오채널),669
+O,크리스찬음악(오디오채널),691
+O,최신히트가요(오디오채널),685
+O,재즈스테이션(오디오채널),359
+O,TBS FM 95.1MHz,856
+O,클럽댄스뮤직(오디오채널),365
+O,어린이감성동요(오디오채널),363
+O,히트80-90(오디오채널),679
+O,영화음악실(오디오채널),677
+O,블록버스터팝(오디오채널),667
+O,헤븐터치CCM(오디오채널),437
+O,TBS eFM 101.3MHz,857
+O,엄마랑EQ동요(오디오채널),703
+O,주부애창가요(오디오채널),697
+O,가톨릭음악(오디오채널),689
+O,재팬스테이션(오디오채널),687
+O,히트70-80(오디오채널),683
+O,히트90-00(오디오채널),681
+O,락&하드코어(오디오채널),675
+O,다문화음악(오디오채널),671
+O,아리랑FM,1019
+O,오디오북채널(오디오채널),705
+O,파티라운지(오디오채널),701
+O,헬스&피트니스(오디오채널),699
+O,국악한마당(오디오채널),695
+O,불교음악(오디오채널),693
+O,연세대학교 교육방송국 YBS,1286
 O,비키TV,765
 O,플레이보이 TV,497
 O,미드나잇,766
+O,오감만족TV,62
 O,The 야(夜)함(㮭),771
+O,파라다이스TV,61
 O,But Go!,772
 O,펜트하우스TV,927
 O,허니TV,928
 O,스파이스TV,499
 O,걸스 TV,501
-
-#CH.901 비키TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/765.jpg
-#CH.902 플레이보이 TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/497.jpg
-#CH.903 미드나잇	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/766.jpg
-#CH.905 The 야(夜)함(㮭)	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/771.jpg
-#CH.907 But Go!	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/772.jpg
-#CH.909 펜트하우스TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/927.jpg
-#CH.911 허니TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/928.jpg
-#CH.913 스파이스TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/499.jpg
-#CH.915 걸스 TV	http://imgcdn.pandora.tv/ptv_img/everyon_img/ch_sm_img/501.jpg
+O,해피독TV,1191
+O,해피독 힐링TV,1192

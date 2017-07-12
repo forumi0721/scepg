@@ -94,7 +94,6 @@ U,686,채널CGV(Ch.39)
 U,685,Super Action(Ch.40)
 U,652,스크린(Ch.41)
 U,653,씨네프(Ch.42)
-U,659,선댄스(Ch.43)
 U,654,FOX채널(Ch.44)
 U,744,AXN(Ch.45)
 U,756,엠플렉스(Ch.46)
@@ -113,7 +112,6 @@ U,616,SBS CNBC(Ch.27)
 U,771,토마토TV(Ch.111)
 U,627,매일경제TV(Ch.112)
 U,742,아시아경제TV(Ch.113)
-U,730,부동산TV(Ch.114)
 U,729,CNN International(Ch.117)
 U,735,CNBC(Ch.118)
 U,739,CGTN(Ch.119)
@@ -413,7 +411,6 @@ N,홈앤쇼핑 편성표,홈&쇼핑
 N,channelnewsasia편성표,Channel News Asia
 N,euronews편성표,Euronews
 N,mtn편성표,MTN
-N,rtn부동산tv편성표,RTN 부동산경제TV
 N,sbscnbc편성표,SBS CNBC
 N,ytn편성표,YTN
 N,서울경제tv편성표,서울경제TV
@@ -427,7 +424,6 @@ N,한국경제tv편성표,한국경제TV
 #네이버 케이블 레저
 N,FISHINGTV편성표,FISHING TV
 N,ftv편성표,FTV
-N,booktv편성표,onbooktv
 N,ont편성표,ONT
 N,Sky Travel 편성표,Sky Travel
 N,리빙tv편성표,리빙TV
@@ -546,8 +542,8 @@ N,스카이라이프채널a편성표,채널A
 N,스카이라이프asian편성표,Asia N
 N,스카이라이프 Asia UHD 편성표,Asia UHD
 N,스카이라이프DIATV편성표,DIATV
-N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
+N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
 N,스카이라이프sbs플러스편성표,SBS플러스
@@ -616,7 +612,6 @@ N,스카이라이프홈앤쇼핑편성표,홈&쇼핑
 #네이버 스카이라이프 뉴스/경제
 N,HD 아시아경제TV 편성표,HD 아시아경제TV
 N,스카이라이프mtn편성표,MTN
-N,스카이라이프rtn부동산tv편성표,RTN 부동산경제TV
 N,스카이라이프sbscnbc편성표,SBS CNBC
 N,스카이라이프ytn편성표,YTN
 N,스카이라이프서울경제tv편성표,서울경제TV
@@ -966,7 +961,7 @@ E,2,160,90,다큐스토리
 E,2,160,498,디스커버리 채널
 E,2,160,28,리빙TV
 E,2,160,669,리얼TV
-E,2,160,639,마이펫TV
+E,2,160,639,마이펫티비
 E,2,160,185,메디컬TV
 E,2,160,812,법률방송
 E,2,160,707,복지TV
@@ -1449,7 +1444,7 @@ E,4,160,498,디스커버리 채널
 E,4,160,845,라이프TV
 E,4,160,28,리빙TV
 E,4,160,669,리얼TV
-E,4,160,639,마이펫TV
+E,4,160,639,마이펫티비
 E,4,160,185,메디컬TV
 E,4,160,812,법률방송
 E,4,160,707,복지TV
