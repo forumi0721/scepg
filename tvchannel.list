@@ -542,8 +542,8 @@ N,스카이라이프채널a편성표,채널A
 N,스카이라이프asian편성표,Asia N
 N,스카이라이프 Asia UHD 편성표,Asia UHD
 N,스카이라이프DIATV편성표,DIATV
-N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
 N,hd텔레노벨라편성표,HD 텔레노벨라
+N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
 N,스카이라이프sbs플러스편성표,SBS플러스
@@ -639,7 +639,6 @@ N,스카이라이프cctvnews편성표,CCTV News
 N,스카이라이프cnnint’l편성표,CNN Int’l
 N,스카이라이프CNNUSHD편성표,CNN US HD
 N,스카이라이프hdclassica편성표,HD Classica
-N,스카이라이프hdsundancetv편성표,HD SundanceTV
 N,스카이라이프historychannelhd편성표,History channel HD
 N,스카이라이프nhkworldpremium편성표,NHK WORLD Premium
 N,스카이라이프starsports편성표,STAR Sports
@@ -695,7 +694,6 @@ N,eurosportsnews편성표,Euro Sports News
 N,foxnews편성표,Fox News
 N,해외위성 France 24 편성표,France 24
 N,HD Classica 편성표,HD Classica
-N,hdsundancetv편성표,HD SundanceTV
 N,historychannelhd편성표,History channel HD
 N,lac편성표,LAC
 N,natgeowild편성표,Nat Geo Wild
@@ -801,7 +799,6 @@ E,2,100,372,HD SUPER ACTION
 E,2,100,677,HD THE MOVIE
 E,2,100,86,HD ViKi
 E,2,100,282,HD XTM
-E,2,100,519,MCE
 E,2,100,167,Mplex
 E,2,100,22,OCN
 E,2,100,129,SUPER ACTION
@@ -850,6 +847,7 @@ E,2,120,515,IB sports
 E,2,120,487,JTBC GOLF
 E,2,120,407,JTBC3
 E,2,120,147,KBS N 스포츠
+E,2,120,162,K바둑
 E,2,120,176,MBC SPORTS+2
 E,2,120,124,MBC스포츠 플러스
 E,2,120,402,ONT
@@ -871,7 +869,6 @@ E,2,120,488,브레인TV
 E,2,120,151,생활체육 TV
 E,2,120,633,인도어 스포츠
 E,2,120,683,폴라리스TV
-E,2,120,162,한국바둑방송
 #EPG 케이블 뉴스/재테크
 E,2,130,527,CNN US HD
 E,2,130,81,Channel News Asia
@@ -881,7 +878,6 @@ E,2,130,704,R토마토
 E,2,130,622,SBS CNBC
 E,2,130,24,YTN
 E,2,130,594,매일경제TV
-E,2,130,125,부동산TV
 E,2,130,157,서울경제TV
 E,2,130,579,소상공인방송
 E,2,130,78,아시아경제TV
@@ -894,6 +890,7 @@ E,2,130,106,한국경제TV
 #EPG 케이블 어린이/만화
 E,2,140,740,AniBox
 E,2,140,160,AniOne
+E,2,140,110,CBeebies
 E,2,140,723,EBS U
 E,2,140,23,JEI 재능TV
 E,2,140,596,KBS KIDS
@@ -949,7 +946,6 @@ E,2,160,514,SkyA&C
 E,2,160,502,YTN life
 E,2,160,50,arirang
 E,2,160,290,channel J
-E,2,160,584,onbooktv
 E,2,160,500,skyUHD
 E,2,160,495,tbsTV
 E,2,160,33,가톨릭 평화방송
@@ -957,7 +953,7 @@ E,2,160,698,국방TV
 E,2,160,427,국회방송
 E,2,160,119,내셔널지오그래픽채널
 E,2,160,638,다문화TV
-E,2,160,90,다큐스토리
+E,2,160,631,다큐원
 E,2,160,498,디스커버리 채널
 E,2,160,28,리빙TV
 E,2,160,669,리얼TV
@@ -1031,14 +1027,12 @@ E,2,180,684,SBS funE
 E,2,180,142,Smile TV
 E,2,180,388,XTM
 E,2,180,101,etn 연예채널
-E,2,180,647,high4K
 E,2,180,663,tag TV
 E,2,180,743,tvN
 E,2,180,102,이벤트TV
 E,2,180,627,채널A플러스
 E,2,180,100,코미디TV
 E,2,180,598,큐브TV
-E,2,180,631,헝그리앱TV
 #EPG 케이블 해외위성
 E,2,190,483,(S)AMC
 E,2,190,994,AMC
@@ -1056,7 +1050,6 @@ E,2,190,117,CNN Int’l
 E,2,190,463,Channel V
 E,2,190,256,DWTV
 E,2,190,578,EUROSPORT
-E,2,190,750,HD SundanceTV
 E,2,190,900,History channel HD
 E,2,190,908,INSIGHT TV
 E,2,190,166,NHK WORLD Premium
@@ -1119,12 +1112,12 @@ E,3,120,254,FISHING TV
 E,3,120,969,HD FTV2
 E,3,120,974,HD JTBC GOLF2
 E,3,120,550,HD KBSN스포츠
+E,3,120,170,HD K바둑
 E,3,120,96,HD MBC SPORTS+2
 E,3,120,911,HD MBC스포츠 플러스
 E,3,120,769,HD SBS골프
 E,3,120,977,HD SBS스포츠
 E,3,120,164,HD 바둑TV
-E,3,120,170,HD 한국바둑방송
 E,3,120,515,IB sports
 E,3,120,407,JTBC3
 E,3,120,109,SPOTV
@@ -1314,6 +1307,7 @@ E,4,120,262,FTV
 E,4,120,487,JTBC GOLF
 E,4,120,407,JTBC3
 E,4,120,147,KBS N 스포츠
+E,4,120,162,K바둑
 E,4,120,176,MBC SPORTS+2
 E,4,120,124,MBC스포츠 플러스
 E,4,120,863,MLB ch.1
@@ -1347,7 +1341,6 @@ E,4,120,488,브레인TV
 E,4,120,151,생활체육 TV
 E,4,120,633,인도어 스포츠
 E,4,120,683,폴라리스TV
-E,4,120,162,한국바둑방송
 E,4,120,107,한국승마TV
 #EPG IPTV 뉴스/재테크
 E,4,130,527,CNN US HD
@@ -1399,6 +1392,7 @@ E,4,150,114,EBS플러스2
 E,4,150,289,JEI English TV
 E,4,150,47,OUN
 E,4,150,384,edu TV
+E,4,150,788,다빈치러닝
 E,4,150,811,일자리방송
 E,4,150,561,정철영어 TV
 E,4,150,79,한국직업방송
@@ -1412,10 +1406,12 @@ E,4,160,156,CBS TV
 E,4,160,688,CGN
 E,4,160,42,CTS 기독교TV
 E,4,160,76,DOGTV
+E,4,160,621,DSC Science
 E,4,160,933,FTN
 E,4,160,36,FUNTV
 E,4,160,652,GCN
 E,4,160,293,GOODTV
+E,4,160,787,HGTV
 E,4,160,49,JJC TV
 E,4,160,89,K.NET
 E,4,160,168,KBS N Life
@@ -1440,6 +1436,7 @@ E,4,160,417,극동 ArtTV
 E,4,160,119,내셔널지오그래픽채널
 E,4,160,638,다문화TV
 E,4,160,90,다큐스토리
+E,4,160,631,다큐원
 E,4,160,498,디스커버리 채널
 E,4,160,845,라이프TV
 E,4,160,28,리빙TV
@@ -1504,9 +1501,11 @@ E,4,170,930,현대홈쇼핑+Shop
 E,4,170,567,홈&쇼핑
 #EPG IPTV 음악/오락
 E,4,180,771,C TIME
+E,4,180,518,CH W
 E,4,180,419,CMC 가족오락TV
 E,4,180,629,CMTV
 E,4,180,912,DIA TV
+E,4,180,177,E! 엔터
 E,4,180,108,E채널
 E,4,180,818,FX
 E,4,180,43,GMTV
@@ -1537,7 +1536,6 @@ E,4,180,102,이벤트TV
 E,4,180,627,채널A플러스
 E,4,180,100,코미디TV
 E,4,180,598,큐브TV
-E,4,180,631,헝그리앱TV
 #EPG IPTV 해외위성
 E,4,190,994,AMC
 E,4,190,182,Animal Planet
