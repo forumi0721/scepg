@@ -379,7 +379,6 @@ N,SPOTV 편성표,SPOTV
 N,spotv+편성표,SPOTV+
 N,SPOTV2,SPOTV2
 N,인도어 스포츠 편성표,인도어 스포츠
-N,헝그리앱TV편성표,헝그리앱TV
 #네이버 케이블 어린이
 N,anibox편성표,AniBox
 N,anione편성표,AniOne
@@ -504,6 +503,7 @@ N,kbsnlife편성표,KBS N Life
 N,Nat Geo People 편성표,Nat Geo People
 N,rtv편성표,RTV
 N,내셔널지오그래픽채널편성표,내셔널지오그래픽채널
+N,다큐원편성표,다큐원
 N,리얼tv편성표,리얼TV
 N,사이언스tv편성표,사이언스TV
 N,채널뷰편성표,채널 뷰
@@ -542,8 +542,8 @@ N,스카이라이프채널a편성표,채널A
 N,스카이라이프asian편성표,Asia N
 N,스카이라이프 Asia UHD 편성표,Asia UHD
 N,스카이라이프DIATV편성표,DIATV
-N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
+N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
 N,스카이라이프sbs플러스편성표,SBS플러스
