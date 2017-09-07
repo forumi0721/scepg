@@ -533,7 +533,11 @@ def generateXmlProgrammeUplus():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             #with request.urlopen(url) as f:
-            f = request.urlopen(url)
+            try:
+                f = request.urlopen(url)
+            except Exception as e:
+                printLog(" -> error : %s (Uplus)" % url, error = True)
+                continue
             html = f.read().decode("cp949", "ignore")
             #UPLUS에서 제목을 제대로 안줌
             html = html.replace("<td class=\"title\"><", "<td class=\"title\">&lt;").replace("<td class=\"txtL\"><", "<td class=\"txtL\">&lt;")
@@ -625,7 +629,11 @@ def generateXmlProgrammeNaver():
 
         url = base_url.replace("{channelCode}", quote(channel_code))
 
-        f = request.urlopen(url)
+        try:
+            f = request.urlopen(url)
+        except Exception as e:
+            printLog(" -> error : %s (Naver)" % url, error = True)
+            continue
         html = f.read().decode("utf-8")
 
         if not "var htInitDataForTvtimeSchedule = " in html:
@@ -731,7 +739,11 @@ def generateXmlProgrammeEpg():
                     url = base_url.replace("{top_channel_group}", top_channel_group).replace("{sub_channel_group}", sub_channel_group).replace("{checkchannel}", checkchannel).replace("{date_y-m-d}", download_date.strftime("%Y-%m-%d"))
 
                     #with urllib.request.urlopen(url) as f:
-                    f = request.urlopen(url)
+                    try:
+                        f = request.urlopen(url)
+                    except Exception as e:
+                        printLog(" -> error : %s (EPG)" % url, error = True)
+                        continue
                     match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                     for preview in match_preview:
                         match_program = re.match(r".*Preview\('[^']*','(.*)','([^']*)','(\d*/\d* [^<]*)<br>~(\d*/\d* [^']*)','([^']*)','[^']*','[^']*'\).*", preview)
@@ -799,7 +811,11 @@ def generateXmlProgrammeEveryOnTV():
             url = base_url.replace("{channel_code}", channel_code).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
             #with request.urlopen(url) as f:
-            f = request.urlopen(url)
+            try:
+                f = request.urlopen(url)
+            except Exception as e:
+                printLog(" -> error : %s (EveryOnTV)" % url, error = True)
+                continue
             html = f.read().decode("utf8", "ignore")
             if __USE_BS:
                 if __USE_LXML:

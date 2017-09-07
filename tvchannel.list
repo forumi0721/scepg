@@ -366,6 +366,7 @@ N,코미디tv편성표,코미디TV
 N,큐브TV 편성표,큐브TV
 #네이버 케이블 스포츠/게임
 N,Billiards TV 편성표,Billiards TV
+N,IB sports편성표,IB sports
 N,jtbc3 Fox Sports 편성표,JTBC3
 N,jtbcgolf편성표,JTBC Golf
 N,kbsn스포츠편성표,KBS N 스포츠
@@ -466,7 +467,7 @@ N,케이블natgeowild편성표,Nat Geo Wild
 N,케이블nhkworldpremium편성표,NHK WORLD Premium
 N,케이블starsports편성표,STAR Sports
 N,케이블stc편성표,STC
-N,케이블tv5편성표,TV5
+N,케이블tv5monde편성표,TV5MONDE
 #네이버 케이블 종교
 N,bbs불교 편성표,BBS불교방송
 N,btn불교tv 편성표,BTN불교TV
@@ -578,8 +579,8 @@ N,스카이라이프tvn편성표,tvN
 N,스카이라이프xtm편성표,XTM
 N,스카이라이프코미디tv편성표,코미디TV
 #네이버 스카이라이프 스포츠/게임
-N,(S)IB sports 편성표,(S)IB sports
 N,스카이라이프 EUROSPORT 편성표,EUROSPORT
+N,스카이라이프IB sports 편성표,IB sports
 N,스카이라이프jtbcgolf편성표,JTBC Golf
 N,스카이라이프kbsn스포츠편성표,KBS N 스포츠
 N,스카이라이프MBC SPORTS+2편성표,MBC SPORTS+2
@@ -700,7 +701,7 @@ N,natgeowild편성표,Nat Geo Wild
 N,nhkworldpremium편성표,NHK WORLD Premium
 N,starsports편성표,STAR Sports
 N,stc편성표,STC
-N,tv5편성표,TV5
+N,tv5monde편성표,TV5MONDE
 #네이버 라디오
 N,bbs불교라디오방송편성표,BBS불교방송
 N,cbs음악fm편성표,CBS음악FM
@@ -938,6 +939,7 @@ E,2,160,168,KBS N Life
 E,2,160,559,KBS WORLD
 E,2,160,184,KTV 국민방송
 E,2,160,764,MBCNET
+E,2,160,663,Now 제주TV
 E,2,160,175,RTV
 E,2,160,416,SAFE TV
 E,2,160,568,Sky ICT
@@ -1027,7 +1029,6 @@ E,2,180,684,SBS funE
 E,2,180,142,Smile TV
 E,2,180,388,XTM
 E,2,180,101,etn 연예채널
-E,2,180,663,tag TV
 E,2,180,743,tvN
 E,2,180,102,이벤트TV
 E,2,180,627,채널A플러스
@@ -1059,7 +1060,7 @@ E,2,190,654,NTDTV
 E,2,190,544,Outdoor Channel
 E,2,190,122,STAR Sports
 E,2,190,637,Star Chinese
-E,2,190,612,TV5
+E,2,190,612,TV5MONDE
 #EPG 케이블 종합편성
 E,2,230,563,HD JTBC
 E,2,230,562,HD MBN
@@ -1207,7 +1208,6 @@ E,3,170,646,NS Shop+
 E,3,170,640,W쇼핑1
 E,3,170,247,동아TV
 E,3,170,41,쇼핑엔티
-E,3,170,521,신세계 쇼핑
 E,3,170,632,아임쇼핑
 E,3,170,567,홈&쇼핑
 #EPG SkyLife 음악/오락
@@ -1419,6 +1419,7 @@ E,4,160,168,KBS N Life
 E,4,160,184,KTV 국민방송
 E,4,160,764,MBCNET
 E,4,160,560,Nat Geo People
+E,4,160,663,Now 제주TV
 E,4,160,416,SAFE TV
 E,4,160,40,Sky Healing
 E,4,160,568,Sky ICT
@@ -1529,7 +1530,6 @@ E,4,180,899,Sky ENT
 E,4,180,142,Smile TV
 E,4,180,388,XTM
 E,4,180,647,high4K
-E,4,180,663,tag TV
 E,4,180,743,tvN
 E,4,180,775,가요TV
 E,4,180,874,드림콘서트(독점) 백스테이지
@@ -1563,7 +1563,7 @@ E,4,190,920,Nat Geo Wild
 E,4,190,82,Russia Today
 E,4,190,122,STAR Sports
 E,4,190,637,Star Chinese
-E,4,190,612,TV5
+E,4,190,612,TV5MONDE
 E,4,190,406,iConcerts
 #EPG IPTV 종합편성
 E,4,230,570,JTBC
