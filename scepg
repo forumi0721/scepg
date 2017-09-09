@@ -536,7 +536,7 @@ def generateXmlProgrammeUplus():
             try:
                 f = request.urlopen(url)
             except Exception as e:
-                printLog(" -> error : %s (Uplus)" % url, error = True)
+                printLog(" -> error : %s (Uplus) - %s" % (url, e.args[0]), error = True)
                 continue
             html = f.read().decode("cp949", "ignore")
             #UPLUS에서 제목을 제대로 안줌
@@ -551,7 +551,7 @@ def generateXmlProgrammeUplus():
                     for td in tr.find_all("td"):
                         if row == 0:
                             if dic_programme:
-                                if "programme_start" in dic_programme:
+                                if "programme_start" in dic_programme and "title" in dic_programme:
                                     dic_programme["programme_stop"] = "%s%s" % (download_date.strftime("%Y%m%d"), str(td.next_element).strip().replace(":", ""))
                                     generateXmlProgramme(dic_programme)
 
@@ -632,7 +632,7 @@ def generateXmlProgrammeNaver():
         try:
             f = request.urlopen(url)
         except Exception as e:
-            printLog(" -> error : %s (Naver)" % url, error = True)
+            printLog(" -> error : %s (Naver) - %s" % (url, e.args[0]), error = True)
             continue
         html = f.read().decode("utf-8")
 
@@ -742,7 +742,7 @@ def generateXmlProgrammeEpg():
                     try:
                         f = request.urlopen(url)
                     except Exception as e:
-                        printLog(" -> error : %s (EPG)" % url, error = True)
+                        printLog(" -> error : %s (EPG) - %s" % (url, e.args[0]), error = True)
                         continue
                     match_preview = re.findall("(<td>.*Preview\(.*\).*</td>)", f.read().decode("cp949", "ignore").replace("<td>", "\n<td>").replace("</tr>", "\n</tr>"))
                     for preview in match_preview:
@@ -814,7 +814,7 @@ def generateXmlProgrammeEveryOnTV():
             try:
                 f = request.urlopen(url)
             except Exception as e:
-                printLog(" -> error : %s (EveryOnTV)" % url, error = True)
+                printLog(" -> error : %s (EveryOnTV) - %s" % (url, e.args[0]), error = True)
                 continue
             html = f.read().decode("utf8", "ignore")
             if __USE_BS:
