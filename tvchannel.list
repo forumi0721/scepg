@@ -478,6 +478,7 @@ N,CMTV 편성표,CMTV
 N,CTS 기독교TV 편성표,CTS 기독교TV
 N,goodtv편성표,GOODTV
 N,상생방송편성표,상생방송
+N,원음방송 편성표,원음방송
 N,평화방송편성표,평화방송
 #네이버 케이블 공공
 N,3d시험방송편성표,3D 시험방송
@@ -542,8 +543,8 @@ N,스카이라이프채널a편성표,채널A
 #네이버 스카이라이프 드라마
 N,스카이라이프asian편성표,Asia N
 N,스카이라이프 Asia UHD 편성표,Asia UHD
-N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프hd텔레노벨라편성표,HD 텔레노벨라
+N,hd텔레노벨라편성표,HD 텔레노벨라
 N,스카이라이프kbs드라마편성표,KBS 드라마
 N,스카이라이프mbc드라마넷편성표,MBC 드라마넷
 N,스카이라이프sbs플러스편성표,SBS플러스
@@ -725,7 +726,6 @@ N,YTN NEWS FM 편성표,YTN NEWS FM
 N,경인방송편성표,경인방송
 N,국악방송편성표,국악방송
 N,극동방송 편성표,극동방송
-N,원음방송 편성표,원음방송
 
 ##EPG
 #http://www.epg.co.kr/new/tvguide/tvguide.php?search_top_channel_group={search_top_channel_group}&old_top_channel_group={search_top_channel_group}&search_sub_channel_group={search_sub_channel_group}&old_sub_channel_group={search_sub_channel_group}&ymd={date}&{channel}
@@ -1318,7 +1318,6 @@ E,4,120,793,MLB ch.4
 E,4,120,137,MLB시범경기
 E,4,120,923,NOLL TV
 E,4,120,402,ONT
-E,4,120,993,OVERWATCH 전국 대학 경쟁전
 E,4,120,44,SBS골프
 E,4,120,30,SBS스포츠
 E,4,120,109,SPOTV
@@ -1340,6 +1339,7 @@ E,4,120,613,마운틴TV
 E,4,120,46,바둑TV
 E,4,120,488,브레인TV
 E,4,120,151,생활체육 TV
+E,4,120,993,오버워치 대학 경쟁전 시즌2
 E,4,120,633,인도어 스포츠
 E,4,120,683,폴라리스TV
 E,4,120,107,한국승마TV
