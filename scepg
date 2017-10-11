@@ -1000,6 +1000,7 @@ def generateChannelListUplus(o):
         soup = BeautifulSoup(html, "html.parser")
     for a in soup.select('a[href]'):
         if a['href'] == '#CHANNEL':
+            result = []
             printLog("#LG유플러스 %s" % a.text, file = o)
             match = re.match(".*\('(.*)','(.*)','.*','.*'\).*", a['onclick'])
             if match:
@@ -1019,10 +1020,13 @@ def generateChannelListUplus(o):
                             #    printLog("U,%s,%s" % (match2.group(1), match_b_text.group(1)), file = o)
                             #else:
                             #    printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
-                            printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+                            #printLog("U,%s,%s" % (match2.group(1), b.text), file = o)
+                            result.append("U,%s,%s" % (match2.group(1), b.text))
                             total += 1
                             progressCount(total)
                 f2.close()
+                result.sort()
+                printLog("\n".join(result), file = o)
     f.close()
     printLog("", file = o)
     printLog("")
@@ -1054,21 +1058,39 @@ def generateChannelListNaver(o):
             soup2 = BeautifulSoup(html2, "lxml")
         else:
             soup2 = BeautifulSoup(html2, "html.parser")
+        result = []
         for a2 in soup2.select('div[class=cs_tvtime] div[class=cont_area] a[href]'):
             if a.text == "케이블" and (a2.text == "드라마" or a2.text == "영화" or a2.text == "연예/오락" or a2.text == "스포츠/게임" or a2.text == "어린이" or a2.text == "쇼핑" or a2.text == "뉴스/경제" or a2.text == "레저" or a2.text == "여성/패션" or a2.text == "해외" or a2.text == "종교" or a2.text == "공공" or a2.text == "교육" or a2.text == "다큐" or a2.text == "교양/정보"):
+                if result:
+                    result.sort()
+                    printLog("\n".join(result), file = o)
+                    result.clear()
                 printLog("#네이버 %s %s" % (a.text, a2.text), file = o)
             elif a.text == "스카이라이프" and (a2.text == "지상파" or a2.text == "종합편성" or a2.text == "드라마" or a2.text == "영화" or a2.text == "연예/오락" or a2.text == "스포츠/게임" or a2.text == "어린이" or a2.text == "쇼핑" or a2.text == "뉴스/경제" or a2.text == "레저" or a2.text == "여성/패션" or a2.text == "해외" or a2.text == "종교" or a2.text == "공공/정보" or a2.text == "교육" or a2.text == "다큐"):
+                if result:
+                    result.sort()
+                    printLog("\n".join(result), file = o)
+                    result.clear()
+
                 printLog("#네이버 %s %s" % (a.text, a2.text), file = o)
             else:
                 match_href = re.match("^.*query=(.*)$", a2['href'])
                 if match_href:
-                    printLog("N,%s,%s" % (unquote(match_href.group(1)), a2.text), file = o)
+                    #printLog("N,%s,%s" % (unquote(match_href.group(1)), a2.text), file = o)
+                    result.append("N,%s,%s" % (unquote(match_href.group(1)), a2.text))
                 else:
-                    printLog("N,%s,%s" % (a2.text, a2.text), file = o)
+                    #printLog("N,%s,%s" % (a2.text, a2.text), file = o)
+                    result.append("N,%s,%s" % (a2.text, a2.text))
                 total += 1
                 progressCount(total)
 
         f2.close()
+
+        if result:
+            result.sort()
+            printLog("\n".join(result), file = o)
+            result.clear()
+
     f.close()
     printLog("", file = o)
     printLog("")
@@ -1089,6 +1111,7 @@ def generateChannelListEpg(o):
             top_channel_group = ""
             sub_channel_group = ""
             printLog("#EPG %s" % a.text, file = o)
+            result = []
             for b in soup.select('input[name=search_top_channel_group]'):
                 if 'value' in b.attrs:
                     top_channel_group = b['value']
@@ -1101,11 +1124,15 @@ def generateChannelListEpg(o):
                 if b['type'] == "checkbox":
                     match_b_value = re.match("^(.*)\(\d+\)$", b['value'])
                     if match_b_value:
-                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), match_b_value.group(1)), file = o)
+                        #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), match_b_value.group(1)), file = o)
+                        result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), match_b_value.group(1)))
                     else:
-                        printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+                        #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']), file = o)
+                        result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']))
                     total += 1
                     progressCount(total)
+            result.sort()
+            printLog("\n".join(result), file = o)
         else:
             #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value']) as f2:
             f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'])
@@ -1118,6 +1145,7 @@ def generateChannelListEpg(o):
                     top_channel_group = ""
                     sub_channel_group = ""
                     printLog("#EPG %s %s" % (a.text, b.text), file = o)
+                    result = []
                     for c in soup2.select('input[name=search_top_channel_group]'):
                         if 'value' in c.attrs:
                             top_channel_group = c['value']
@@ -1130,11 +1158,15 @@ def generateChannelListEpg(o):
                         if c['type'] == "checkbox":
                             match_c_value = re.match("^(.*)\(\d+\)$", c['value'])
                             if match_c_value:
-                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), match_c_value.group(1)), file = o)
+                                #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), match_c_value.group(1)), file = o)
+                                result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), match_c_value.group(1)))
                             else:
-                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                                #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']), file = o)
+                                result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']))
                             total += 1
                             progressCount(total)
+                    result.sort()
+                    printLog("\n".join(result), file = o)
                 else:
                     #with urllib.request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value'])) as f3:
                     f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']))
@@ -1143,15 +1175,20 @@ def generateChannelListEpg(o):
                     top_channel_group = a['value']
                     sub_channel_group = b['value']
                     printLog("#EPG %s %s" % (a.text, b.text), file = o)
+                    result = []
                     for d in soup3.select('input[name^=checkchannel]'):
                         if d['type'] == "checkbox":
                             match_d_value = re.match("^(.*)\(\d+\)$", d['value'])
                             if match_d_value:
-                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), match_d_value.group(1)), file = o)
+                                #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), match_d_value.group(1)), file = o)
+                                result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), match_d_value.group(1)))
                             else:
-                                printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+                                #printLog("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']), file = o)
+                                result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']))
                             total += 1
                             progressCount(total)
+                    result.sort()
+                    printLog("\n".join(result), file = o)
                     f3.close()
             f2.close()
     f.close()
