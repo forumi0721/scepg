@@ -1,3 +1,4 @@
-xmltv.xml
+*.xml
+*.json
 postproc.sh
 __pycache__

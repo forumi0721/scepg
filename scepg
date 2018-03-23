@@ -1025,6 +1025,7 @@ def generateChannelListUplus(o):
                             total += 1
                             progressCount(total)
                 f2.close()
+                result = list(set(result))
                 result.sort()
                 printLog("\n".join(result), file = o)
     f.close()
@@ -1062,12 +1063,14 @@ def generateChannelListNaver(o):
         for a2 in soup2.select('div[class=cs_tvtime] div[class=cont_area] a[href]'):
             if a.text == "케이블" and (a2.text == "드라마" or a2.text == "영화" or a2.text == "연예/오락" or a2.text == "스포츠/게임" or a2.text == "어린이" or a2.text == "쇼핑" or a2.text == "뉴스/경제" or a2.text == "레저" or a2.text == "여성/패션" or a2.text == "해외" or a2.text == "종교" or a2.text == "공공" or a2.text == "교육" or a2.text == "다큐" or a2.text == "교양/정보"):
                 if result:
+                    result = list(set(result))
                     result.sort()
                     printLog("\n".join(result), file = o)
                     result.clear()
                 printLog("#네이버 %s %s" % (a.text, a2.text), file = o)
             elif a.text == "스카이라이프" and (a2.text == "지상파" or a2.text == "종합편성" or a2.text == "드라마" or a2.text == "영화" or a2.text == "연예/오락" or a2.text == "스포츠/게임" or a2.text == "어린이" or a2.text == "쇼핑" or a2.text == "뉴스/경제" or a2.text == "레저" or a2.text == "여성/패션" or a2.text == "해외" or a2.text == "종교" or a2.text == "공공/정보" or a2.text == "교육" or a2.text == "다큐"):
                 if result:
+                    result = list(set(result))
                     result.sort()
                     printLog("\n".join(result), file = o)
                     result.clear()
@@ -1087,6 +1090,7 @@ def generateChannelListNaver(o):
         f2.close()
 
         if result:
+            result = list(set(result))
             result.sort()
             printLog("\n".join(result), file = o)
             result.clear()
@@ -1131,6 +1135,7 @@ def generateChannelListEpg(o):
                         result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, b['name'].replace('checkchannel[', '').replace(']', ''), b['value']))
                     total += 1
                     progressCount(total)
+            result = list(set(result))
             result.sort()
             printLog("\n".join(result), file = o)
         else:
@@ -1165,6 +1170,7 @@ def generateChannelListEpg(o):
                                 result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, c['name'].replace('checkchannel[', '').replace(']', ''), c['value']))
                             total += 1
                             progressCount(total)
+                    result = list(set(result))
                     result.sort()
                     printLog("\n".join(result), file = o)
                 else:
@@ -1187,6 +1193,7 @@ def generateChannelListEpg(o):
                                 result.append("E,%s,%s,%s,%s" % (top_channel_group, sub_channel_group, d['name'].replace('checkchannel[', '').replace(']', ''), d['value']))
                             total += 1
                             progressCount(total)
+                    result = list(set(result))
                     result.sort()
                     printLog("\n".join(result), file = o)
                     f3.close()
