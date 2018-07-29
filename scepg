@@ -882,7 +882,7 @@ def generateXmlProgrammeEveryOnTV():
     for channel in channel_config:
         channel_id = channel[0].split(",")[0]
         channel_name = channel[0].split(",")[1]
-        channel_code = channel[1].split(",")[2]
+        channel_code = channel[1].split(",")[3]
 
         dic_programme = {}
 
