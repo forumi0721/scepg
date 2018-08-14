@@ -28,6 +28,7 @@ try:
     import urllib.request as request
 except ImportError:
     import urllib2 as request
+import http.client, urllib.parse
 import re
 import json
 from subprocess import call
@@ -632,16 +633,19 @@ def generateXmlProgrammeSKB():
 
         for day in range(retrieve_days):
             download_date = (datetime.date.today() + datetime.timedelta(days = day))
-            url = base_url.replace("{key_depth1}", channel_key1).replace("{key_depth2}", channel_key2).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
 
-            f = None
+            html = ""
             try:
-                f = request.urlopen(url)
+                conn = http.client.HTTPConnection("m.skbroadband.com", 80)
+                conn.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s&key_depth2=%s&key_depth3=%s" % (channel_key1, channel_key2, download_date.strftime("%Y%m%d")))
+                f = conn.getresponse()
+                html = f.read().decode("cp949", "ignore")
+                conn.close()
             except Exception as e:
-                printLog(" -> error : %s (Uplus) - %s" % (url, e.args[0]), error = True)
+                url = base_url.replace("{key_depth1}", channel_key1).replace("{key_depth2}", channel_key2).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
+                printLog(" -> error : %s (SKB) - %s" % (url, e.args[0]), error = True)
                 continue
 
-            html = f.read().decode("cp949", "ignore")
             #SKB에서 제목을 제대로 안줌
             html = html.replace("<p class \"tit\"><", "<p class \"tit\">&lt;").replace("<p class \"cont\"><", "<p class \"cont\">&lt;")
             if __USE_BS:
@@ -712,7 +716,7 @@ def generateXmlProgrammeNaver():
         except Exception as e:
             printLog(" -> error : %s (Naver) - %s" % (url, e.args[0]), error = True)
             continue
-        html = f.read().decode("utf-8")
+        html = f.read().decode("utf-8", "ignore")
 
         if not "var htInitDataForTvtimeSchedule = " in html:
             printLog(" -> Invalide Data")
@@ -1124,9 +1128,14 @@ def generateChannelListSKB(o):
     printLog("##SKB", file = o)
     printLog("#http://m.skbroadband.com/content/realtime/Channel_List.do?key_depth1={key_depth1}&key_depth2={key_depth2}&key_depth3=YYYYMMDD", file = o)
     printLog("#key_depth1,key_depth2,channel_name", file = o)
-    f = None
+    html = ""
+
     try:
-        f = request.urlopen("http://m.skbroadband.com/content/realtime/Channel_List.do", timeout=10)
+        conn = http.client.HTTPConnection("m.skbroadband.com", 80)
+        conn.request("GET", "/content/realtime/Channel_List.do")
+        f = conn.getresponse()
+        html = f.read().decode("cp949", "ignore")
+        conn.close()
     except socket.timeout as e:
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
@@ -1136,7 +1145,6 @@ def generateChannelListSKB(o):
         printLog("")
         return
 
-    html = f.read().decode("cp949", "ignore")
     if __USE_LXML:
         soup = BeautifulSoup(html, "lxml")
     else:
@@ -1146,12 +1154,16 @@ def generateChannelListSKB(o):
             result = []
             printLog("#SKB %s" % a.text.replace("선택됨", ""), file = o)
 
-            f2 = None
+            html2 = ""
             try:
-                f2 = request.urlopen("http://m.skbroadband.com/content/realtime/Channel_List.do?key_depth1=%s" % a['value'])
+                conn2 = http.client.HTTPConnection("m.skbroadband.com", 80)
+                conn2.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s" % a['value'])
+                f2 = conn2.getresponse()
+                html2 = f2.read().decode("cp949", "ignore")
+                conn2.close()
             except:
                 continue
-            html2 = f2.read().decode("cp949", "ignore")
+
             if __USE_LXML:
                 soup2 = BeautifulSoup(html2, "lxml")
             else:
