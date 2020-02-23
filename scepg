@@ -511,7 +511,7 @@ def generateXmlProgramme(dic_programme):
         se_generate_source = ET.SubElement(se_programme, "generate-source", {"name":dic_programme["generate_source"]})
 
 def generateXmlProgrammeUplus():
-    channel_config = [[k, v] for k, v in channel_list if v[0] == "U"]
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "U"]
     if len(channel_config) <= 0:
         return
 
@@ -612,7 +612,7 @@ def generateXmlProgrammeUplus():
     printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgrammeSKB():
-    channel_config = [[k, v] for k, v in channel_list if v[0] == "S"]
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "S"]
     if len(channel_config) <= 0:
         return
 
@@ -691,7 +691,7 @@ def generateXmlProgrammeSKB():
 
 #Deprecated
 def generateXmlProgrammeNaver():
-    channel_config = [[k, v] for k, v in channel_list if v[0] == "N"]
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "N"]
     if len(channel_config) <= 0:
         return
 
@@ -785,7 +785,7 @@ def generateXmlProgrammeNaver():
 
 #Deprecated
 def generateXmlProgrammeEpg():
-    channel_config = [[k, v] for k, v in channel_list if v[0] == "E"]
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "E"]
     if len(channel_config) <= 0:
         return
 
@@ -871,7 +871,7 @@ def generateXmlProgrammeEpg():
     printLog("==> Done.", end = "\n\n")
 
 def generateXmlProgrammeEveryOnTV():
-    channel_config = [[k, v] for k, v in channel_list if v[0] == "O"]
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "O"]
     if len(channel_config) <= 0:
         return
 
@@ -1476,7 +1476,7 @@ if __name__ == '__main__':
 
         #generateXmlProgrammeEpg()
 
-        generateXmlProgrammeEveryOnTV()
+        #generateXmlProgrammeEveryOnTV()
 
         writeXml()
         postProc()
