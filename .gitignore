@@ -2,3 +2,4 @@
 *.json
 postproc.sh
 __pycache__
+.venv

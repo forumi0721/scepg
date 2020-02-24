@@ -13,35 +13,39 @@ __DEBUG = True
 import sys
 import os
 import argparse
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+import configparser
+#try:
+#    import configparser
+#except ImportError:
+#    import ConfigParser as configparser
 import socket
 import time
 import datetime
-try:
-    from urllib import quote,unquote
-except ImportError:
-    from urllib.parse import quote,unquote
-try:
-    import urllib.request as request
-except ImportError:
-    import urllib2 as request
-import http.client, urllib.parse
+from urllib.parse import quote,unquote
+#try:
+#    from urllib import quote,unquote
+#except ImportError:
+#    from urllib.parse import quote,unquote
+import urllib.request as request
+#try:
+#    import urllib.request as request
+#except ImportError:
+#    import urllib2 as request
+#import http.client, urllib.parse
 import re
 import json
 from subprocess import call
-#for python2
-if sys.version_info[0] < 3:
-    from io import open
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
-    __USE_LXML = False
-    import HTMLParser
-    htmlparser = HTMLParser.HTMLParser()
-else:
-    import html as htmlparser
+import html as htmlparser
+##for python2
+#if sys.version_info[0] < 3:
+#    from io import open
+#    reload(sys)
+#    sys.setdefaultencoding('utf-8')
+#    __USE_LXML = False
+#    import HTMLParser
+#    htmlparser = HTMLParser.HTMLParser()
+#else:
+#    import html as htmlparser
 ###Import(dynamic)
 #Check BeautifulSoup
 if __USE_BS:
@@ -535,7 +539,9 @@ def generateXmlProgrammeUplus():
 
             f = None
             try:
-                f = request.urlopen(url, timeout=10)
+                req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                f = request.urlopen(req, timeout=10)
+                #f = request.urlopen(url, timeout=10)
             except Exception as e:
                 printLog(" -> error : %s (Uplus) - %s" % (url, e.args[0]), error = True)
                 continue
@@ -611,6 +617,93 @@ def generateXmlProgrammeUplus():
 
     printLog("==> Done.", end = "\n\n")
 
+def generateXmlProgrammeVideoPortal():
+    channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "V"]
+    if len(channel_config) <= 0:
+        return
+
+    generate_source = "http://www.uplus.co.kr/"
+    base_url = "http://123.140.104.150/api/epg/v1/schedule/virtual?access_key=CE45020A8BC704127A6C&cp_id=S_LGU_HYUK0920&system_id=HDTV&SA_ID=M20110725000&STB_MAC=v201.1072.5000&NSC_TYPE=LTE&TC_IN=-1&TC_OUT=3&YOUTH_YN=N&POOQ_YN=N&HDTV_VIEW_GB=R&SERVICE_ID=&EPG_SDATE=&EPG_EDATE=&SID=001010005638&CLIENT_IP=192.168.0.1&OS_INFO=android_4.4.2&NW_INFO=WIFI&APP_TYPE=ROSA&DEV_MODEL=SM-N935F&CARRIER_TYPE=E&UI_VER=04.38.04&NOW_PAGE=25&PRE_PAGE=&MENU_NM=&CONTS_GB=&TERM_BINVER=3.8.118.0106"
+
+    printLog("==> Generate Programmes (VideoPortal)")
+    progress = 0
+    progressLog(0, len(channel_config))
+
+    dic_programme = {}
+
+    f = None
+    try:
+        req = request.Request(base_url, headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+        #f = request.urlopen(base_url, timeout=10)
+    except Exception as e:
+        printLog(" -> error : %s (VideoPortal) - %s" % (url, e.args[0]), error = True)
+
+    html = f.read().decode("utf-8", "ignore")
+    if __USE_BS:
+        if __USE_LXML:
+            soup = BeautifulSoup(html, "lxml")
+        else:
+            soup = BeautifulSoup(html, "html.parser")
+
+    item_list = soup.select('list')
+
+    for channel in channel_config:
+        channel_id = channel[0].split(",")[0]
+        channel_name = channel[0].split(",")[1]
+        channel_key1 = channel[1].split(",")[1]
+
+        dic_programme = {}
+
+        item_list_channel = [x for x in item_list if x.select('service_id')[0].text == channel_key1]
+
+        for item in item_list_channel:
+
+            service_id = item.select('service_id')[0].text
+            start_time = item.select('start_time')[0].text
+            end_time = item.select('end_time')[0].text
+            title = item.select('program_title')[0].text
+            episode_num = item.select('sid')[0].text
+            desc = item.select('program_synopsis')[0].text
+            icon = ""
+            try:
+                icon_base = item.select('thm_url')[0].text
+                icon_url = item.select('thm_img_file')[0].text
+                icon = '%s%s' % (icon_base, icon_url)
+            except:
+                pass
+
+            actors = []
+            actorName = item.select('act')[0].text
+            if actorName != '':
+                temp = actorName.split(',')
+                for actor in temp:
+                    actors.append(actor.strip())
+
+            dic_programme.clear()
+            dic_programme["channel_id"] = channel_id
+            dic_programme["channel_name"] = channel_name
+            dic_programme["generate_source"] = generate_source
+            dic_programme["programme_start"] = start_time
+            dic_programme["programme_stop"] = end_time
+            if episode_num:
+                dic_programme["title"] = "%s (%s)" % (title.strip(), episode_num.strip())
+                dic_programme["episode_num"] = episode_num.strip()
+            else:
+                dic_programme["title"] = title.strip()
+
+            generateXmlProgramme(dic_programme)
+            dic_programme.clear()
+        #else:
+        #    #Need beautifulsoup
+            
+
+        f.close()
+        progress += 1
+        progressLog(progress, len(channel_config))
+
+    printLog("==> Done.", end = "\n\n")
+
 def generateXmlProgrammeSKB():
     channel_config = [[k, v] for k, v in channel_list if len(v) > 1 and v[0] == "S"]
     if len(channel_config) <= 0:
@@ -636,11 +729,13 @@ def generateXmlProgrammeSKB():
 
             html = ""
             try:
-                conn = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
-                conn.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s&key_depth2=%s&key_depth3=%s" % (channel_key1, channel_key2, download_date.strftime("%Y%m%d")))
-                f = conn.getresponse()
+                req = request.Request("http://m.skbroadband.com/content/realtime/Channel_List.do?key_depth1=%s&key_depth2=%s&key_depth3=%s" % (channel_key1, channel_key2, download_date.strftime("%Y%m%d")), headers={'User-Agent': 'Mozilla/5.0'})
+                f = request.urlopen(req, timeout=10)
+                #conn = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
+                #conn.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s&key_depth2=%s&key_depth3=%s" % (channel_key1, channel_key2, download_date.strftime("%Y%m%d")))
+                #f = conn.getresponse()
                 html = f.read().decode("cp949", "ignore")
-                conn.close()
+                #conn.close()
             except Exception as e:
                 url = base_url.replace("{key_depth1}", channel_key1).replace("{key_depth2}", channel_key2).replace("{date_ymd}", download_date.strftime("%Y%m%d"))
                 printLog(" -> error : %s (SKB) - %s" % (url, e.args[0]), error = True)
@@ -712,7 +807,9 @@ def generateXmlProgrammeNaver():
 
         f = None
         try:
-            f = request.urlopen(url, timeout=10)
+            req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            f = request.urlopen(req, timeout=10)
+            #f = request.urlopen(url, timeout=10)
         except Exception as e:
             printLog(" -> error : %s (Naver) - %s" % (url, e.args[0]), error = True)
             continue
@@ -823,7 +920,9 @@ def generateXmlProgrammeEpg():
 
                     f = None
                     try:
-                        f = request.urlopen(url, timeout=10)
+                        req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                        f = request.urlopen(req, timeout=10)
+                        #f = request.urlopen(url, timeout=10)
                     except Exception as e:
                         printLog(" -> error : %s (EPG) - %s" % (url, e.args[0]), error = True)
                         continue
@@ -895,7 +994,9 @@ def generateXmlProgrammeEveryOnTV():
 
             f = None
             try:
-                f = request.urlopen(url, timeout=10)
+                req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                f = request.urlopen(req, timeout=10)
+                #f = request.urlopen(url, timeout=10)
             except Exception as e:
                 printLog(" -> error : %s (EveryOnTV) - %s" % (url, e.args[0]), error = True)
                 continue
@@ -1065,7 +1166,9 @@ def generateChannelListUplus(o):
     printLog("#channelId,channelName", file = o)
     f = None
     try:
-        f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=10)
+        req = request.Request("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+        #f = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvContentsMFamily.hpi", timeout=10)
     except socket.timeout as e:
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
@@ -1088,7 +1191,9 @@ def generateChannelListUplus(o):
             if match:
                 f2 = None
                 try:
-                    f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)), timeout=10)
+                    req2 = request.Request("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)), headers={'User-Agent': 'Mozilla/5.0'})
+                    f2 = request.urlopen(req2, timeout=10)
+                    #f2 = request.urlopen("http://www.uplus.co.kr/css/chgi/chgi/RetrieveTvChannel.hpi?code=%s&category=%s" % (match.group(2), match.group(1)), timeout=10)
                 except:
                     continue
                 html2 = f2.read().decode("cp949", "ignore")
@@ -1118,6 +1223,44 @@ def generateChannelListUplus(o):
     printLog("")
     printLog("==> Done.", end = "\n\n")
 
+def generateChannelListVideoPortal(o):
+    printLog("==> Generate Channel List (VideoPortal)")
+    total = 0
+    printLog("##VideoPortal", file = o)
+    printLog("#http://123.140.104.150/api/epg/v1/channel/virtual?access_key=C4A0697007C3548D389B&cp_id=S_LGU_HYUK0920&system_id=HDTV&SA_ID=500053434041&STB_MAC=v000.5343.4041&NSC_TYPE=LTE&BASE_GB=Y&BASE_CD=W172.017&YOUTH_YN=N&ORDER_GB=N&POOQ_YN=N&HDTV_VIEW_GB=R&SID=001010005638&CLIENT_IP=172.17.100.15&OS_INFO=android_4.4.2&NW_INFO=WIFI&APP_TYPE=ROSA&DEV_MODEL=SM-N935F&CARRIER_TYPE=E&UI_VER=04.38.04&NOW_PAGE=25&PRE_PAGE=&MENU_NM=&CONTS_GB=&TERM_BINVER=3.8.118.0106", file = o)
+    printLog("#channelId,channelName", file = o)
+    f = None
+    try:
+        req = request.Request("http://123.140.104.150/api/epg/v1/channel/virtual?access_key=C4A0697007C3548D389B&cp_id=S_LGU_HYUK0920&system_id=HDTV&SA_ID=500053434041&STB_MAC=v000.5343.4041&NSC_TYPE=LTE&BASE_GB=Y&BASE_CD=W172.017&YOUTH_YN=N&ORDER_GB=N&POOQ_YN=N&HDTV_VIEW_GB=R&SID=001010005638&CLIENT_IP=172.17.100.15&OS_INFO=android_4.4.2&NW_INFO=WIFI&APP_TYPE=ROSA&DEV_MODEL=SM-N935F&CARRIER_TYPE=E&UI_VER=04.38.04&NOW_PAGE=25&PRE_PAGE=&MENU_NM=&CONTS_GB=&TERM_BINVER=3.8.118.0106", headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+    except socket.timeout as e:
+        printLog(" -> socket.timeout : %s" % e.args[0], error = True)
+    except urllib.error.URLError:
+        printLog(" -> URLerror : %s" % e.args[0], error = True)
+
+    if f is None:
+        printLog("")
+        return
+
+    result = []
+
+    html = f.read().decode("utf-8", "ignore")
+    if __USE_LXML:
+        soup = BeautifulSoup(html, "lxml")
+    else:
+        soup = BeautifulSoup(html, "html.parser")
+    for a in soup.select('list'):
+        result.append("V,%s,%s" % (a.select('service_id')[0].text, a.select('service_name')[0].text))
+        total += 1
+    result = list(set(result))
+    result.sort()
+    printLog("\n".join(result), file = o)
+
+    f.close()
+    printLog("", file = o)
+    printLog("")
+    printLog("==> Done.", end = "\n\n")
+
 def generateChannelListSKB(o):
     printLog("==> Generate Channel List (SKB)")
     total = 0
@@ -1127,11 +1270,13 @@ def generateChannelListSKB(o):
     html = ""
 
     try:
-        conn = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
-        conn.request("GET", "/content/realtime/Channel_List.do")
-        f = conn.getresponse()
+        req = request.Request("http://m.skbroadband.com/content/realtime/Channel_List.do", headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+        #conn = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
+        #conn.request("GET", "/content/realtime/Channel_List.do")
+        #f = conn.getresponse()
         html = f.read().decode("cp949", "ignore")
-        conn.close()
+        #conn.close()
     except socket.timeout as e:
         printLog(" -> socket.timeout : %s" % e.args[0], error = True)
     except urllib.error.URLError:
@@ -1152,11 +1297,13 @@ def generateChannelListSKB(o):
 
             html2 = ""
             try:
-                conn2 = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
-                conn2.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s" % a['value'])
-                f2 = conn2.getresponse()
+                req2 = request.Request("http://m.skbroadband.com/content/realtime/Channel_List.do?key_depth1=%s" % a['value'], headers={'User-Agent': 'Mozilla/5.0'})
+                f2 = request.urlopen(req2, timeout=10)
+                #conn2 = http.client.HTTPConnection("m.skbroadband.com", 80, timeout=10)
+                #conn2.request("GET", "/content/realtime/Channel_List.do?key_depth1=%s" % a['value'])
+                #f2 = conn2.getresponse()
                 html2 = f2.read().decode("cp949", "ignore")
-                conn2.close()
+                #conn2.close()
             except:
                 continue
 
@@ -1187,7 +1334,9 @@ def generateChannelListNaver(o):
     printLog("#channelCode,channelName", file = o)
     f = None
     try:
-        f = request.urlopen("https://search.naver.com/search.naver?query=" + quote("편성표"), timeout=10)
+        req = request.Request("https://search.naver.com/search.naver?query=" + quote("편성표"), headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+        #f = request.urlopen("https://search.naver.com/search.naver?query=" + quote("편성표"), timeout=10)
     except:
         printLog("", file = o)
         printLog("==> Error.", end = "\n\n")
@@ -1205,7 +1354,9 @@ def generateChannelListNaver(o):
 
         f2 = None
         try:
-            f2 = request.urlopen("https://search.naver.com/search.naver?" + a['href'], timeout=10)
+            req2 = request.Request("https://search.naver.com/search.naver?" + a['href'], headers={'User-Agent': 'Mozilla/5.0'})
+            f2 = request.urlopen(req2, timeout=10)
+            #f2 = request.urlopen("https://search.naver.com/search.naver?" + a['href'], timeout=10)
         except HTTPError:
             continue
 
@@ -1265,7 +1416,9 @@ def generateChannelListEpg(o):
     printLog("#top_channel_group,sub_channel_group,checkchannel,channel_name", file = o)
     f = None
     try:
-        f = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php", timeout=10)
+        req = request.Request("http://epg.co.kr/php/guide/schedule_day_on.php", headers={'User-Agent': 'Mozilla/5.0'})
+        f = request.urlopen(req, timeout=10)
+        #f = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php", timeout=10)
     except:
         printLog("", file = o)
         printLog("==> Error.", end = "\n\n")
@@ -1304,7 +1457,9 @@ def generateChannelListEpg(o):
         else:
             f2 = None
             try:
-                f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'], timeout=10)
+                req2 = request.Request("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'], headers={'User-Agent': 'Mozilla/5.0'})
+                f2 = request.urlopen(req2, timeout=10)
+                #f2 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s" % a['value'], timeout=10)
             except:
                 continue
             html2 = f2.read().decode("cp949", "ignore")
@@ -1342,7 +1497,9 @@ def generateChannelListEpg(o):
                 else:
                     f3 = None
                     try:
-                        f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']), timeout=10)
+                        req3 = request.Request("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']), headers={'User-Agent': 'Mozilla/5.0'})
+                        f3 = request.urlopen(req3, timeout=10)
+                        #f3 = request.urlopen("http://epg.co.kr/php/guide/schedule_day_on.php?search_top_channel_group=%s&old_top_channel_group=%s&search_sub_channel_group=%s&old_sub_channel_group=%s" % (a['value'], a['value'], b['value'], b['value']), timeout=10)
                     except:
                         continue
                     html3 = f3.read().decode("cp949", "ignore")
@@ -1381,7 +1538,8 @@ def generateChannelList():
             o.append(sys.stderr)
 
         generateChannelListUplus(o)
-        generateChannelListSKB(o)
+        generateChannelListVideoPortal(o)
+        #generateChannelListSKB(o)
         #generateChannelListNaver(o)
         #generateChannelListEpg(o)
 
@@ -1469,6 +1627,8 @@ if __name__ == '__main__':
         generateXmlChannel()
 
         generateXmlProgrammeUplus()
+
+        generateXmlProgrammeVideoPortal()
 
         generateXmlProgrammeSKB()
 
